@@ -1,0 +1,1190 @@
+---
+title: "STA 214 Codebook"
+output: 
+  rmdformats::robobook:
+    css: "homework.css"
+    highlight: pygments
+link-citations: yes
+editor_options: 
+  chunk_output_type: console
+---
+
+**Use:** The purpose of this codebook is to summarize key code that we use in R to visualize and explore data, fit models, assess assumptions, and test hypotheses.
+
+Many tasks in R, such as visualizing data, can be done in multiple different ways. Throughout this codebook I will tend to use the `tidyverse` for visualizing and cleaning data, but be aware that other options exist.
+
+# Installing packages
+
+Many functions and datasets we want to use in R are provided in *packages*. An important package for STA 214 will be the `tidyverse` package, which is really a collection of R packages with a common philosophy on how to work with data.
+
+To install `tidyverse`, run the following code in your R console (*not* in a Quarto or R Markdown document!):
+
+```r
+install.packages("tidyverse")
+```
+
+To install other packages, simply replace the name `tidyverse` with the name of the package you want to install. Note that packages only ever need to be installed *once*. After a package is successfully installed, you won't need to install it again unless you update R on your computer.
+
+## Loading packages 
+
+Installing a package downloads it to your computer, but doesn't make it immediately available to your R session. If you want to use the `tidyverse` package, you will need to *load* it by running the following code:
+
+```r
+library(tidyverse)
+```
+
+(The code is similar for other packages, just replace the name `tidyverse`). You will need to include `library(...)` calls in the setup chunk of your Quarto or R Markdown documents.
+
+# Exploratory data analysis (EDA)
+
+In STA 112, you learned tools for *exploratory data analysis* (EDA), in which we explore features of the data such as the available variables and their relationships. Exploratory data analysis is an important step before we do any model fitting or hypothesis testing, because it gets us familiar with the data and any unusual features. It is hard to fit a sensible model when we don't know what the data look like!
+
+This section of the codebook includes examples of summarizing the data, identifying missing values, and univariate and multivariate EDA. The data used for this section is the `penguins` dataset, from the `palmerpenguins` package. To load the `penguins` data, run the following in R (you may need to install the `palmerpenguins` package):
+
+```r
+library(palmerpenguins)
+```
+
+We can then look at the description of the `penguins` data provided by the package:
+
+```r
+?penguins
+```
+
+(this only works for datasets included in packages).
+
+```{r, include=F}
+library(palmerpenguins)
+library(tidyverse)
+titanic <- read_csv("https://sta214-f22.github.io/labs/Titanic.csv")
+```
+
+## Data size and variables
+
+To peak at the data, we can use the `glimpse` function to see the variables and the size:
+
+```{r}
+glimpse(penguins)
+```
+
+From this summary, we can see there are 344 rows (each row is one penguin), 8 columns, and we see the first few values in each column. Another way to explore the raw data in RStudio is to run
+
+```r
+View(penguins)
+```
+
+in your console (*not* in Quarto or R Markdown!).
+
+Other functions can also be used to calculate the number of rows, the number of columns, and both the number of rows and number of columns:
+
+```{r}
+nrow(penguins) # number of rows
+ncol(penguins) # number of columns
+dim(penguins) # dimensions of the data
+```
+
+## Missing data
+
+Sometimes, our data contains missing values. These are often recorded as `NA` in R (for "not available"). You can see when we glimpsed the `penguins` data above that there were several missing values (`NA`s), and there are probably more in the rest of the data that wasn't displayed.
+
+To remove missing rows which contain missing values, we can use the `drop_na` function. The following code creates a *new* dataset (called `penguins_new`) without those missing values:
+
+```{r}
+penguins_new <- penguins |>
+  drop_na()
+```
+
+How many rows did we remove (i.e., how many rows had missing values)? We can compare the dimensions of `penguins_new` to `penguins`:
+
+```{r}
+dim(penguins_new)
+```
+
+Since `penguins_new` has 333 rows, we have removed 11 rows due to missing values.
+
+### Removing missing values from specific columns
+
+What if we only want to remove rows with `NA`s in the `flipper_length_mm` column? We can specify that column in the `drop_na` function:
+
+```{r}
+penguins_new <- penguins |>
+  drop_na(flipper_length_mm)
+
+dim(penguins_new)
+```
+
+So, there were 2 rows with missing flipper length values.
+
+## A note on pipes (`|>`)
+
+Throughout this codebook (and throughout my own code too!), I use the pipe operator `|>`. The pipe just means "take THIS, then do THAT". So,
+
+```r
+penguins |>
+  drop_na(flipper_length_mm)
+```
+
+means "take `penguins`, then `drop_na` (remove missing values)". Pipes can be chained together into a longer sequence of steps, too:
+
+```{r}
+penguins |>
+  drop_na(flipper_length_mm) |>
+  dim()
+```
+
+I like pipes because I think they often make code cleaner and more readable, but you don't have to use them. You can collapse the pipe into a nested series of functions (evaluated from the inside out):
+
+```{r}
+dim(drop_na(penguins, flipper_length_mm))
+```
+
+Or you can save the intermediate steps:
+
+```{r}
+penguins_new <- drop_na(penguins, flipper_length_mm)
+dim(penguins_new)
+```
+
+
+## Types of variables
+
+Here we will deal mainly with *categorical* and *quantitative* variables. 
+
+* **Categorical** variables are variables which take on one of several fixed values. These values generally do not have a numeric interpretation.
+    * Examples: gender, favorite food, brand of laptop
+    * *Binary* categorical variables have exactly 2 possible values
+* **Quantitative** variables are variables which take on a numeric value, and which have a numeric interpretation.
+    * Examples: number of pets, height, weight, age
+    * *Discrete* quantitative variables only take on discrete values (e.g., number of pets)
+    * *Continuous* quantitative variables can take on an entire range of values (e.g., height is continuous if we allow heights like 60.323 inches)
+
+## An overview of `ggplot` for making plots
+
+The `ggplot2` package, which is part of `tidyverse`, is a very valuable tool for visualizing data. The `ggplot2` packages provides the `ggplot` function, which is my default for making plots. For example, here is code to create a scatterplot:
+
+```{r}
+penguins |>
+  ggplot(aes(x = bill_depth_mm, 
+             y = bill_length_mm, 
+             color = species)) +
+  geom_point() +
+  labs(x = 'Bill depth (mm)', 
+       y = 'Bill length (mm)',
+       color = 'Species',
+       title = "Penguin bill length vs. bill depth") +
+  theme_bw()
+```
+
+Notice that `ggplot` is warning us that we had some missing values in the data. If we remove those missing values, the warning will go away.
+
+### `ggplot` layers
+
+The idea behind `ggplot` is to build the figure in layers. We start off by specifying the data that we want to use (`penguins`), and the variables that we want to plot (`bill_depth_mm`, `bill_length_mm`, and `species`). These variables are mapped to the *aesthetics* of the plot: features like the x-axis (`x = bill_depth_mm`), the y-axis (`y = bill_length_mm`), and the color of the points (`color = species`). We specify the aesthetics in the `aes`. Other aesthetics include `shape`, `fill`, `alpha`, etc. 
+
+Running the first few lines sets up the plot for us to fill in:
+
+```{r}
+penguins |>
+  ggplot(aes(x = bill_depth_mm, 
+             y = bill_length_mm, 
+             color = species))
+```
+
+Next, we need to decide how to represent the observations in our plot. Here we have two quantitative variables, so a scatterplot is reasonable. We therefore add another layer to our plot, representing each observation as a point (notice that we add layers together with the `+` sign):
+
+```{r}
+penguins |>
+  ggplot(aes(x = bill_depth_mm, 
+             y = bill_length_mm, 
+             color = species)) +
+  geom_point()
+```
+
+The way we represent our data (in this case, points) is with geometric objects, or *geoms*. If we want points, we use `geom_point`. Other geoms include `geom_histogram` (histograms), `geom_bar` (bar charts), `geom_boxplot` (boxplots), among many others. The sections below give an overview of some of the most important plots.
+
+Finally, we want to make our plot look nice. This involves changing the axis labels and the legend, adding a title, and changing the theme. We include axis labels in the `labs` layer, and we change the theme in the `theme` layer. Possible themes include `theme_bw`, `theme_minimal`, `theme_classic`, `theme_light`, and many others. I typically use `theme_bw`, but you may choose whichver theme you prefer.
+
+```{r}
+penguins |>
+  ggplot(aes(x = bill_depth_mm, 
+             y = bill_length_mm, 
+             color = species)) +
+  geom_point() +
+  labs(x = 'Bill depth (mm)', 
+       y = 'Bill length (mm)',
+       color = 'Species',
+       title = "Penguin bill length vs. bill depth") +
+  theme_bw()
+```
+
+## Univariate exploratory data analysis
+
+Here we discuss how to summarize, visualize, and describe the distributions of categorical and quantitative variables.
+
+### Categorical variables
+
+#### Summarize
+
+The number of observations in each group can be summarized in a **frequency table**:
+
+```{r}
+penguins |>
+  count(species)
+```
+
+#### Visualize
+
+The same information can be visualized with **bar charts**, which display the number of observations in each group as the height of the bar:
+
+
+```{r}
+penguins |>
+  ggplot(aes(x = species)) +
+  geom_bar() +
+  labs(x = "Species") +
+  theme_bw()
+```
+
+Other visualization options include pie charts.
+
+#### Describe
+
+* Which category has the most number of observations? The least?
+* Are observations spread relatively evenly across categories, or do one or two categories have the majority of the observations?
+
+### Quantitative variables
+
+#### Summarize
+
+Many summary statistics can be calculated for quantitative variables. We often calculate the mean or median to summarize the center of the distribution, and the standard deviation or IQR to summarize the spread of the distribution. If the data are highly skewed, the median and IQR are often more appropriate measures of center and spread.
+
+Note that if NAs (missing values) are present in the data, then we need to remove them before calculating summary statistics. This can be done by removing all rows with NAs (`drop_na()`), or by ignoring NAs when we calculate the summary statistics (`na.rm=TRUE`).
+
+```{r}
+penguins |>
+  summarize(mean_mass = mean(body_mass_g, na.rm=TRUE),
+            median_mass = median(body_mass_g, na.rm=TRUE),
+            sd_mass = sd(body_mass_g, na.rm=TRUE),
+            iqr_mass = IQR(body_mass_g, na.rm=TRUE))
+```
+
+#### Visualize
+
+A good choice for visualize the distribution of a quantitative variable is with a **histogram**. A histogram divides the range of the data into evenly spaced bins, and then displays the number of observations which fall into each bin. Since the number of bins affects how the histogram looks, it is good practice to experiment with several different numbers of bins. This can be specified with the `bins` argument in `geom_histogram`.
+
+```{r, message=F, warning=F}
+penguins |>
+  ggplot(aes(x = body_mass_g)) +
+  geom_histogram(bins = 20) +
+  labs(x = "Body mass (g)") +
+  theme_bw()
+```
+
+Another common option for visualization is the **boxplot**. A boxplot doesn't show the whole distribution, but rather a summary of it. In particular, it displays the median, first and third quartiles, the smallest and largest non-outlier values, and any outliers.
+
+```{r, message=F, warning=F}
+penguins |>
+  ggplot(aes(y = body_mass_g)) +
+  geom_boxplot() +
+  labs(y = "Body mass (g)") +
+  theme_bw()
+```
+
+Other tools include density plots (`geom_density`) and violin plots (`geom_violin`).
+
+#### Describe
+
+* Shape (symmetric vs. skewed, number of modes, location of modes)
+* Center (usually mean or median)
+* Spread (usually standard deviation or IQR)
+* Any unusual features?
+* Any potential outliers?
+
+## Bivariate exploratory data analysis
+
+What if we want to look at the relationship between two variables? 
+
+### Two categorical variables
+
+#### Summarize
+
+We can count the number of observations in each group:
+
+```{r}
+penguins |>
+  count(species, island)
+```
+
+Sometimes, it is nice to display the result as a two-way table, where categories for one variable are in the rows, and categories for the second variable are in the columns:
+
+```{r}
+penguins |>
+  count(species, island) |>
+  spread(island, n)
+```
+
+(Note that here, NA means that this combination of values did not appear in the dataset. So, e.g., there were no Chinstrap penguins from Biscoe island).
+
+#### Visualize
+
+A common way to visualize the relationship between two categorical variables is with a **stacked bar graph**:
+
+```{r}
+penguins |>
+  ggplot(aes(x = species, fill = island)) +
+  geom_bar() +
+  labs(x = "Species",
+       fill = "Island") +
+  theme_bw()
+```
+
+Other options include mosaic plots.
+
+#### Describe
+
+* Which combination of categories has the most observations? The least?
+* Are there any combinations which do not appear in the data?
+* Is the distribution for the second variable the same for each level of the first variable? (E.g., in the `penguins` example above, there appears to be a relationship between species and island, because the distribution of penguins in each island is different for the three species. Adelie penguins are found on all three islands, whereas Chinstrap and Gentoo penguins are only on one).
+
+### Two quantitative variables
+
+#### Visualize
+
+To visualize the relationship between two quantitative variables, we can use a **scatterplot**:
+
+```{r, message=F, warning=F}
+penguins |>
+  ggplot(aes(x = flipper_length_mm, 
+             y = body_mass_g)) +
+  geom_point() +
+  labs(x = "Flipper length (mm)",
+       y = "Body mass (g)") +
+  theme_bw()
+```
+
+#### Summarize
+
+If the relationship looks *linear*, we can calculate the sample correlation coefficient, $r$, to summarize the strength of the linear relationship.  Recall that $r$ takes values between -1 and 1, with $r = -1$ a very strong negative relationship, $r = 0$ no relationship, and $r = 1$ a very strong positive relationship.
+
+When calculating the correlation, we have to handle NAs, if missing values are present in the data. This can be done either by removing all rows with NAs before hand (`drop_na()`), or by ignoring NAs when computing correlation (`use = "complete.obs"`).
+
+```{r}
+penguins |>
+  summarize(r = cor(flipper_length_mm, 
+                    body_mass_g, 
+                    use="complete.obs"))
+```
+
+#### Describe
+
+* does there appear to be a relationship?
+* if so, does the relationship appear to be positive or negative?
+* what is the general shape of the relationship? Does it look linear?
+* if the relationship looks linear, report the sample correlation coefficient
+
+### One categorical, one quantitative
+
+#### Visualize
+
+There are several options for visualizing the relationship between a categorical and a quantitative variable. A common choice is to make a **boxplot** for each level of the categorical variable:
+
+```{r, warning=F}
+penguins |>
+  ggplot(aes(x = species, y = body_mass_g)) +
+  geom_boxplot() +
+  labs(x = "Species", y = "Body mass (g)") +
+  theme_bw()
+```
+
+While boxplots are just summaries of a distribution, they are very handy for comparing across groups.
+
+Another option, if the number of categories isn't too large, is to create a **histogram** faceted by the categorical variable:
+
+```{r, warning=F}
+penguins |>
+  ggplot(aes(x = body_mass_g)) +
+  geom_histogram(bins = 20) +
+  facet_wrap(~species) +
+  labs(x = "Body mass (g)") +
+  theme_bw()
+```
+
+#### Summarize
+
+To summarize the relationship, we can calculate summary statistics for the quantitative variable at each level of the categorical variable. The `group_by` function is very helpful here.
+
+```{r}
+penguins |>
+  group_by(species) |>
+  summarize(mean_mass = mean(body_mass_g, na.rm=TRUE),
+            median_mass = median(body_mass_g, na.rm=TRUE))
+```
+
+#### Describe
+
+Is the distribution of the quantitative variable different across levels of the categorical variable? If so, how? (e.g., differences in shape, center, spread)
+
+## More than two variables
+
+With more than two variables, you can get a lot of combinations. Here are just a couple examples. Using additional aesthetics and faceting is helpful for visualization. Using grouping is helpful for summary statistics.
+
+### Quantitative, quantitative, categorical
+
+```{r, message=F, warning=F}
+penguins |>
+  ggplot(aes(x = bill_depth_mm, 
+             y = body_mass_g, 
+             color = species)) +
+  geom_point() +
+  labs(x = "Bill depth (mm)",
+       y = "Body mass (g)",
+       color = "Species") +
+  theme_bw()
+
+penguins |>
+  group_by(species) |>
+  summarize(r = cor(bill_depth_mm, 
+                    body_mass_g, 
+                    use="complete.obs"))
+```
+
+### Quantitative, categorical, categorical
+
+```{r, message=F, warning=F}
+penguins |>
+  ggplot(aes(x = island, 
+             y = body_mass_g)) +
+  geom_boxplot() +
+  facet_wrap(~species) +
+  labs(x = "Island", 
+       y = "Body mass (g)") +
+  theme_bw()
+
+penguins |>
+  ggplot(aes(x = body_mass_g)) +
+  geom_histogram(bins=15) +
+  facet_grid(island~species) +
+  labs(x = "Body mass (g)") +
+  theme_bw()
+
+penguins |>
+  group_by(species, island) |>
+  summarize(mean_mass = mean(body_mass_g, na.rm=TRUE),
+            median_mass = median(body_mass_g, na.rm=TRUE))
+```
+
+# Logistic regression
+
+In this section, we will continue to use the `penguins` data from the `palmerpenguins` package (see the EDA section above for instructions on loading the data).
+
+## Two components of a parametric model
+
+In the `penguins` data, `sex` is a categorical variable which is recorded as either male or female. Suppose we want to predict penguin sex based on physical characteristics like flipper length and body mass. Let $Y_i = 0$ if sex = female, and $Y_i = 1$ if sex = 1 (I am coding male as 1 here because by default, R will order the levels of `sex` alphabetically, so female and then male). Then we might propose the following **population** logistic regression model:
+
+$$Y_i \sim Bernoulli(\pi_i)$$
+$$\log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 FlipperLength_i + \beta_2 BodyMass_i$$
+Here $\pi_i$ denotes the probability that $Y_i = 1$, and the log odds are a linear function of flipper length and body mass. 
+
+The first line of this model is called the **random** component: it specifies the distribution of the random variable $Y_i$. The second line is called the **systematic** component: it specifies how $\pi_i$ is related to the explanatory variables.
+
+## Fitting logistic regression models
+
+To fit the above logistic regression model in R, we use the `glm` function:
+
+```{r}
+m1 <- glm(sex ~ flipper_length_mm + body_mass_g, 
+          data = penguins, family = binomial)
+
+summary(m1)
+```
+
+The `glm` function stands for *generalized linear model*. We specify the response variable on the left hand side of the `~`, and the explanatory variables on the right hand side. To fit logistic regression, we specify `family = binomial`.
+
+The `summary` function summarizes our fitted model. We can see that $\widehat{\beta}_0 = 7.087$, $\widehat{\beta}_1 = -0.093$, and $\widehat{\beta}_2 = 0.003$. Our **fitted** logistic regression model is therefore
+
+$$Y_i \sim Bernoulli(\pi_i)$$
+$$\log \left( \dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} \right) = 7.087 -0.093 FlipperLength_i + 0.003 BodyMass_i$$
+
+Note that the equation of the *fitted* model includes hats on the $\pi_i$.
+
+## Interpreting regression coefficients
+
+The fitted coefficients above can be interpreted on the *log odds* scale, or on the *odds* scale.
+
+**Log odds:**
+
+* The estimated log odds that a penguin is male when flipper length and body mass are both 0 is 7.087. (Since all penguins have flippers and no penguins weigh 0g, this interpretation doesn't mean much)
+* A one mm increase in flipper length is associated with an estimated decrease in the log odds that a penguin is male by 0.093, holding body mass constant
+* A one g increase in body mass is associated with an estimated increase in the log odds that a penguin is male by 0.003, holding flipper length constant
+
+**Odds:**
+
+* The estimated log odds that a penguin is male when flipper length and body mass are both 0 is $\exp\{7.087\} = 1196$. (Since all penguins have flippers and no penguins weigh 0g, this interpretation doesn't mean much)
+* A one mm increase in flipper length is associated with an estimated decrease in the log odds that a penguin is male by a factor of $\exp\{-0.093\} = 0.911$, holding body mass constant
+* A one g increase in body mass is associated with an estimated increase in the log odds that a penguin is male by a factor of $\exp\{0.003\} = 1.003$, holding flipper length constant
+
+## Quantile residual plots
+
+Quantile residual plots can be created using the `qresid()` function of the `statmod` package. For example, suppose we fit a logistic regression on the `titanic` data with Survival as the response and Fare as the explanatory variable:
+
+```{r}
+m1 <- glm(Survived ~ Fare, data = titanic, family = binomial)
+```
+
+Let's assess whether the shape assumption is reasonable for Fare with a quantile residual plot:
+
+```{r}
+library(statmod)
+titanic |>
+  mutate(residuals = qresid(m1)) |>
+  ggplot(aes(x = Fare, y = residuals)) +
+  geom_point() +
+  geom_smooth() +
+  theme_bw()
+```
+
+The results aren't amazing...what if we try transforming Fare? Let's try a square root:
+
+```{r}
+m2 <- glm(Survived ~ sqrt(Fare), data = titanic, family = binomial)
+titanic |>
+  mutate(residuals = qresid(m2)) |>
+  ggplot(aes(x = sqrt(Fare), y = residuals)) +
+  geom_point() +
+  geom_smooth() +
+  theme_bw()
+```
+
+Looks a bit better!
+
+
+# Poisson regression (and variants)
+
+In this section, we will work with the PhD `articles` data from class on March 3. Our data contains information on 915 biochemistry PhD students, with variables
+
+* `art`: articles published in last three years of Ph.D.
+* `fem`: gender (recorded as male or female)
+* `mar`: marital status (recorded as married or single)
+* `kid5`: number of children under age six
+* `phd`: prestige of Ph.D. program
+* `ment`: articles published by their mentor in last three years
+
+The data can be loaded by:
+
+```{r message=F, warning=F}
+library(foreign)
+articles <- read.dta("http://www.stata-press.com/data/lf2/couart2.dta")
+```
+
+## Count variables and the Poisson distribution
+
+Suppose we want to model the number of articles published by each student. This is a *count* variable: it takes values 0, 1, 2, 3, etc. (non-negative integers). Here is a histogram showing the distribution of the number of articles published in the `articles` data:
+
+```{r}
+articles |>
+  ggplot(aes(x = art)) +
+  geom_histogram(bins = 15) +
+  theme_bw() +
+  labs(x = "Number of articles published")
+```
+
+We can see that this is a unimodal, right-skewed count distribution. How should we model such a variable? One option is the *Poisson* distribution: we say that $Y \sim Poisson(\lambda)$ if 
+$$P(Y = y) = \frac{e^{-\lambda}\lambda^y}{y!}$$
+The value of $\lambda$ changes the Poisson distribution: $\lambda$ is both the mean and variance of the distribution, so as $\lambda$ increases, the distribution shifts right and becomes more spread out. Here are some plots showing samples from Poisson distributions with different values of $\lambda$:
+
+```{r echo=F, message=FALSE, warning=F, fig.align='center', fig.width=8, fig.height=6}
+library(gridExtra)
+
+set.seed(3)
+
+x1 <- rpois(1000, 15)
+x2 <- rpois(1000, 4)
+x3 <- rpois(1000, 2)
+x4 <- rpois(1000, 7)
+
+p1 <- data.frame(Count = x1) |>
+  ggplot(aes(x = Count)) +
+  geom_bar() +
+  labs(title = "lambda = 15") +
+  theme_bw() +
+  theme(text = element_text(size = 20)) +
+  scale_x_continuous(limits=c(0, 25))
+
+p2 <- data.frame(Count = x2) |>
+  ggplot(aes(x = Count)) +
+  geom_bar() +
+  labs(title = "lambda = 4") +
+  theme_bw() +
+  theme(text = element_text(size = 20)) +
+  scale_x_continuous(limits=c(0, 25))
+
+p3 <- data.frame(Count = x3) |>
+  ggplot(aes(x = Count)) +
+  geom_bar() +
+  labs(title = "lambda = 2") +
+  theme_bw() +
+  theme(text = element_text(size = 20)) +
+  scale_x_continuous(limits=c(0, 25))
+
+p4 <- data.frame(Count = x4) |>
+  ggplot(aes(x = Count)) +
+  geom_bar() +
+  labs(title = "lambda = 7") +
+  theme_bw() +
+  theme(text = element_text(size = 20)) +
+  scale_x_continuous(limits=c(0, 25))
+
+grid.arrange(p1, p2, p3, p4, ncol=2)
+```
+
+## Fitting a Poisson regression model
+
+Suppose that we want to model the number of articles published, using the number of articles published by the a student's mentor and the prestige of their PhD program as the explanatory variables. Our population model is
+
+$$Articles_i \sim Poisson(\lambda_i)$$
+
+$$\log(\lambda_i) = \beta_0 + \beta_1 Prestige_i + \beta_2 Mentor_i$$
+The *random component* specifies that we are using a Poisson distribution for the response, with parameter $\lambda_i$. Our systematic component tells us that $\lambda_i$ depends on prestige and the number of mentor articles. We use $\log(\lambda_i)$ as our link function, because $\lambda_i \in (0, \infty)$ and so $\log(\lambda_i) \in (-\infty, \infty)$.
+
+To fit this model in R, we use the `glm` function, and specify `family=poisson`:
+
+```{r}
+m_art <- glm(art ~ phd + ment, family = poisson, data = articles)
+summary(m_art)
+```
+
+## Interpreting coefficients
+
+The coefficients of a Poisson regression model can be interpret on the *log* scale, or on the original scale of the data. For example, in the model above, $\widehat{\beta}_1 = 0.012$. This means that a one-unit increase in PhD prestige is associated with an increase of 0.012 in the log-mean number of articles published by PhD students, after accounting for the number of articles published by their mentor. Or, a one-unit increase in PhD prestige is associated with an increase in the *mean* number of articles published by a PhD student by a *factor* of $\exp{0.012} = 1.012$, after accounting for the number of articles published by their mentor.
+
+## Assumptions and diagnostics
+
+The Poisson regression model makes several assumptions:
+
+* Shape: the log mean is a linear function of the explanatory variables (we can use transformed explanatory variables if needed)
+* Distribution: the Poisson distribution is a reasonable distribution for the response variable
+* Independence: the observed data are independent (needed for maximum likelihood estimation)
+
+To generally assess whether the proposed model is a good fit to the data, we can use a goodness-of-fit test. To explore the shape assumption, we can use empirical log means plots and quantile residual plots. To explore the distribution assumption, we can use a quantile residual plot.
+
+### Goodness-of-fit
+
+The goodness-of-fit test tests the hypotheses
+
+$$H_0: \text{ the model is a good fit to the data}$$
+$$H_A: \text{ the model is not a good fit to the data}$$
+
+**For a Poisson regression model**, if the model is a good fit, then the *residual deviance* should follow a $\chi^2_{n-p}$ distribution, where $n$ is the number of observations in the data and $p$ is the number of parameters in the model (including the intercept).
+
+In the model above, the residual deviance is 1669.4 and $n - p = 912$. Our p-value for the goodness-of-fit test is therefore
+
+```{r}
+pchisq(1669.4, 912, lower.tail=F)
+```
+
+Our p-value is very close to 0, so perhaps our model is not a good fit to the data. This could occur if we need to include more variables in the model, if our shape assumption is violated, or if the Poisson distribution was the wrong choice.
+
+**Important note:** The goodness-of-fit test cannot be used with binary logistic regression, quasi-Poisson models, or negative binomial models. In this course, only the Poisson model allows the goodness-of-fit test
+
+### Quantile residual plots
+
+As with logistic regression, quantile residual plots can be used for assessing the shape assumption:
+
+```{r}
+articles |>
+  mutate(residuals = qresid(m_art)) |>
+  ggplot(aes(x = phd, y = residuals)) +
+  geom_point() +
+  geom_smooth() +
+  theme_bw()
+```
+
+For count data, we are looking for three things in our quantile residual plots:
+
+* Is there a pattern to the residuals? (i.e., does the trend line look sufficiently different from a horizontal line?) If so, we may have a violation of the shape assumption. On the other hand, if the residuals are randomly scattered above and below 0, then the shape assumption is reasonable.
+* Are the residuals mostly between -2 and 2? If not, we may have *overdispersion* in our data. Overdispersion in a Poisson regression model suggests we may need a quasi-Poisson or negative binomial model instead
+* Is the variance of the residuals constant for each value of the explanatory variable? If not, then we may have the wrong mean-variance relationship. Non-constant variance in the quantile residual plot for a Poisson regression model suggests we may need a negative binomial model instead
+
+### Overdispersion and quasi-Poisson models
+
+The Poisson distribution has the same mean and variance ( $\lambda$ ), so when we fit a Poisson model we are assuming the mean and variance of the response are the same. Sometimes, however, the variance is larger than the mean, which causes problems with hypothesis tests and confidence intervals.
+
+The *dispersion parameter* is $\phi = \dfrac{\text{Variance}}{\text{Mean}}$. The Poisson distribution assumes that $\phi = 1$. Overdispersion occurs when $\phi > 1$.
+
+To allow for $\phi \neq 1$, we can fit a **quasi-Poisson** model:
+
+```{r}
+m_art_qp <- glm(art ~ phd + ment, family = quasipoisson, data = articles)
+summary(m_art_qp)
+```
+
+The estimated dispersion parameter for this quasi-Poisson model is $\widehat{\phi} - 1.89$, which means that the variance of our response is approximately 1.89 times the mean of our response.
+
+### Rootograms
+
+Another method for assessing goodness-of-fit is a **rootogram**, which compares the frequencies of the observed counts to the expected counts from the fitted models:
+
+```{r}
+# note: to install the topmodels package, run the following
+# install.packages("topmodels", repos = "https://R-Forge.R-project.org")
+
+library(topmodels)
+rootogram(m_art)
+```
+
+Bars below 0 mean we observed *more* occurrences that predicted by the model, while bars above 0 mean we observerd *fewer* occurrences than predicted by the model. In this plot, you can see that 0 articles occurs more than expected, as does 4, 5, 6, and 7 articles. On the other hand, there were fewer instances of 1, 2, and 3 publications than the model expected.
+
+This pattern means that the tails of the observed data are heavier than predicted by the model, so there is more variability in our data than the model accounts for. In other words, overdispersion!
+
+### Negative binomial models
+
+An alternative to the quasi-Poisson is the **negative binomial**. If $Y \sim NB(\theta, p)$, then $Y$ takes values $y = 0, 1, 2, 3, ...$ with probabilities
+
+$$P(Y = y) = \dfrac{(y + \theta - 1)!}{y!(\theta - 1)!} (1 - p)^\theta p^y$$
+
+* $\theta > 0$, $\ \ \ p \in [0, 1]$
+* Mean = $\dfrac{p \theta}{1 - p} = \mu$
+* Variance = $\dfrac{p \theta}{(1 - p)^2} = \mu + \dfrac{\mu^2}{\theta}$
+* Variance is a *quadratic* function of the mean
+
+An example of a negative binomial regression model for the articles data would be
+
+$$Articles_i \sim NB(\theta, p_i)$$
+
+$$\log(\mu_i) = \beta_0 + \beta_1 Prestige_i + \beta_2 Mentor_i$$
+
+Note that we have changed the distribution of the response, but the systematic component is the same: we assume the log-mean number of articles is a linear function of the explanatory variables.
+
+### Fitting and interpreting negative binomial models
+
+We can fit negative binomial models using the `glm.nb` function from the `MASS` package:
+
+```{r}
+library(MASS)
+m_art_nb <- glm.nb(art ~ phd + ment, data = articles)
+summary(m_art_nb)
+```
+
+Notice that we do not need to specify a family, because the `glm.nb` function is specific to negative binomial models. Interpretation is very similar to a Poisson; for example, here $\widehat{\beta}_1 = 0.013$, so a one-unit increase in PhD prestige is associated with an increase of 0.013 in the log-mean number of articles published by PhD students, after accounting for the number of articles published by their mentor. Or, a one-unit increase in PhD prestige is associated with an increase in the *mean* number of articles published by a PhD student by a *factor* of $\exp{0.013} = 1.013$, after accounting for the number of articles published by their mentor.
+
+### Rootograms
+
+Rootograms can be used to assess negative binomial models too. Above we saw that the Poisson model for the articles data did not account for all the variability in the response. Here we see that the negative binomial model does a better job:
+
+```{r}
+rootogram(m_art_nb)
+```
+
+The bars are much closer in general to the horizontal line at 0 -- in other words, the observed counts more closely match the expected counts from the model.
+
+
+### Poisson vs. quasi-Poisson vs. negative binomial
+
+**Poisson:**
+
+* Mean = $\lambda_i$
+* Variance = $\lambda_i$ (mean and variance are the same)
+
+**quasi-Poisson:**
+
+* Mean = $\lambda_i$
+* Variance = $\phi \lambda_i$ (variance is linear function of the mean)
+
+**negative binomial:**
+
+* Mean = $\mu_i$
+* Variance = $\mu_i + \dfrac{\mu_i^2}{\theta}$ (variance is a quadratic function of the mean)
+
+A natural question is, **how do we choose which of these models to use?** Quantile residual plots and rootograms can be helpful here. Below are four quantile residual plots and the corresponding rootograms: 
+
+```{r, echo=F, message=F, warning=F}
+rqpois <- function(n, mean, dispersion){
+  return(rnbinom(n, mu = mean, size = mean/(dispersion - 1)))
+}
+
+r <- 1
+x <- rnorm(1000, mean=0, sd=1.2)
+y1 <- rpois(1000, lambda = exp(x))
+y2 <- rnbinom(1000, size=r, mu=exp(x))
+y3 <- rqpois(1000, mean = exp(x), dispersion = 3)
+
+sim_m1 <- glm(y1 ~ x, family = poisson)
+sim_m2 <- glm.nb(y1 ~ x)
+sim_m3 <- glm(y3 ~ x, family = poisson)
+
+p1 <- data.frame(x = x, resids = qresid(sim_m1)) |>
+  ggplot(aes(x = x, y = resids)) +
+  geom_point() +
+  geom_smooth() +
+  labs(x = "X", y = "Quantile residuals",
+       title = "(a) Poisson regression on Poisson data") +
+  theme_bw()
+
+p11 <- rootogram(sim_m1, main = "(a) Poisson regression on Poisson data",
+                 plot=F) |> autoplot() +
+  labs(title = "(a) Poisson regression on Poisson data")
+
+p2 <- data.frame(x = x, resids = qresid(sim_m3)) |>
+  ggplot(aes(x = x, y = resids)) +
+  geom_point() +
+  geom_smooth() +
+  labs(x = "X", y = "Quantile residuals",
+       title = "(b) Poisson regression on overdispersed data") +
+  theme_bw()
+
+p22 <- rootogram(sim_m3, 
+                 main = "(b) Poisson regression on overdispersed data",
+                 plot = F) |> autoplot() +
+  labs(title = "(b) Poisson regression on overdispersed data")
+
+sim_m1 <- glm(y2 ~ x, family = poisson)
+sim_m2 <- glm.nb(y2 ~ x)
+
+p3 <- data.frame(x = x, resids = qresid(sim_m1)) |>
+  ggplot(aes(x = x, y = resids)) +
+  geom_point() +
+  geom_smooth() +
+  labs(x = "X", y = "Quantile residuals",
+       title = "(c) Poisson regression on negative binomial data") +
+  theme_bw()
+
+p33 <- rootogram(sim_m1, main = "(c) Poisson regression on negative binomial data",
+                 plot = F) |> autoplot() +
+  labs(title = "(c) Poisson regression on negative binomial data")
+
+p4 <- data.frame(x = x, resids = qresid(sim_m2)) |>
+  ggplot(aes(x = x, y = resids)) +
+  geom_point() +
+  geom_smooth() +
+  labs(x = "X", y = "Quantile residuals",
+       title = "(d) Negative binomial regression on negative binomial data") +
+  theme_bw()
+
+p44 <- rootogram(sim_m2, 
+                 main = "(d) Negative binomial regression on negative binomial data",
+                 plot = F) |> autoplot() +
+  labs(title = "(d) Negative binomial regression on negative binomial data")
+
+grid.arrange(p1, p2, p3, p4, ncol=2)
+grid.arrange(p11, p22, p33, p44, ncol=2)
+```
+
+* (a): data come from a Poisson distribution, and we fit a Poisson regression model. Most quantile residuals are between -2 and 2, and the variance of the quantile residuals appears constant. The rootogram shows no signs of overdispersion, with the bars generally falling close to the horizontal line at 0. So, a Poisson regression model is appropriate.
+* (b): here we have overdispersed data (variance is too large for a Poisson), but we fit a Poisson model anyway. Variance is constant, but the spread of the quantile residuals is too large (many residuals above 3), so either a quasi-Poisson or negative binomial model could be used. The overdispersion is also visible in the rootogram, with bars in the middle falling about the horizontal line at 0, and bars at the tails falling below the line.
+* (c): Here we have data from a negative binomial distribution, but we fit a Poisson model anyway. There is clear non-constant variance, and the spread of the residuals is too large. Overdispersion is also visible in the rootogrma. A negative binomial model should be used.
+* (d): Same data as in (c), but now we fit the (correct) negative binomial model. The plots look much better!
+
+**Steps for choosing a count model:**
+
+* First, fit a Poisson model and look at the quantile residual plots. Address any violations of the shape assumption before proceeding
+* For the Poisson quantile residual plots, look at the spread of the residuals. Also create a rootogram.
+* If the rootogram shows no clear evidence of overdispersion, and the quantile residuals have constant variance and are mostly between -2 and 2 (and almost all between -3 and 3), then a Poisson distribution is reasonable!
+* If the rootogram shows overdispersion and the residuals have constant variance but the spread is too large, choose either a quasi-Poisson or negative binomial
+* If the rootogram shows overdispersion and the residuals have non-constant variance, choose a negative binomial
+
+# Zero-inflated Poisson (ZIP) models
+
+In this section, we will consider the campus drinking data from class. We have survey data from 77 college students on a dry campus (i.e., alcohol is prohibited) in the US. Survey asks students "How many alcoholic drinks did you consume last weekend?"
+
+* `drinks`: the number of drinks the student reports consuming
+* `sex`: an indicator for whether the student identifies as male
+* `OffCampus`: an indicator for whether the student lives off campus
+* `FirstYear`: an indicator for whether the student is a first-year student
+
+Suppose we want to model the number of drinks students consume. This is still a count variable, but let's look at a histogram:
+
+```{r echo=F, message=F, warning=F, fig.align='center', fig.width=7, fig.height=5}
+wdrinks <- read_csv("https://sta279-s22.github.io/slides/weekendDrinks.csv")
+
+FirstYear <- ifelse( wdrinks$dorm %in% c("mohn","kittlesby", "kildahl"), "TRUE", "FALSE")
+OffCampus <- ifelse( wdrinks$dorm == "off campus", "TRUE", "FALSE")
+
+wdrinks <- cbind(wdrinks, FirstYear, OffCampus)
+
+wdrinks |>
+  ggplot(aes(x = drinks)) +
+  geom_bar() +
+  theme_bw()
+```
+
+There is a *big* spike in the data near 0, because many of the students reported consuming 0 drinks. This is too many zeros for a Poisson distribution, and suggests we have *zero-inflated* data.
+
+Zero-inflation often occurs when we have different sources of 0s. In this example, students may report 0 drinks because they simply chose not to drink last weekend (but do sometimes drink), or because they *never* drink. To model the number of drinks consumed, we need a mixture of the drinkers and the non-drinkers.
+
+## The ZIP model
+
+Here is a ZIP model for the number of drinks consumed, where the logistic component includes whether or not the student was a first year, and the Poisson component includes whether the student lives off campus, and whether they identify as male:
+
+$$P(Y_i = y) = \begin{cases} e^{-\lambda_i}(1 - \alpha_i) + \alpha_i & y = 0 \\ \dfrac{e^{-\lambda_i} \lambda_i^y}{y!}(1 - \alpha_i) & y > 0 \end{cases}$$
+
+$\log \left( \dfrac{\alpha_i}{1 - \alpha_i} \right) = \gamma_0 + \gamma_1 FirstYear_i$
+
+$\log(\lambda_i) = \beta_0 + \beta_1 OffCampus_i + \beta_2 Male_i$
+
+**Parameters:**
+
+* $\alpha_i = P(Z_i = 1)$, where $Z_i$ is our latent variable. In this example, $Z_i = 1$ denotes that the student *never* drinks, so $\alpha_i$ is the probability a student is a non-drinker
+* $\lambda_i = \mathbb{E}[Y_i|Z_i = 0]$ (the mean of $Y_i$ for the group $Z_i = 0$). In this example, $\lambda_i$ is the mean number of drinks consumed by students who sometimes drink.
+* The $\gamma$s are the coefficients relating $\alpha_i$ to the explanatory variables
+* The $\beta$s are the coefficients relating $\lambda_i$ to the explanatory variables
+
+## Fitting and interpreting the model
+
+To fit the model, we use the `zeroinfl` function from the `pscl` package:
+
+```{r message=F}
+library(pscl)
+m_zip <- zeroinfl(drinks ~ OffCampus + sex | FirstYear,
+                  data = wdrinks)
+summary(m_zip)
+```
+
+We interpret the coefficients separately for the logistic and Poisson components. For example, $\widehat{\gamma}_1 = 1.14$, so the odds of being a non-drinker are higher by a factor of $\exp\{1.14\} = 3.13$ for first-year students. And $\widehat{\beta}_1 = 0.42$, so among students who *do* drink, the average number of drinks consumed is higher by a factor of $\exp\{0.42\} = 1.52$ for students who live off-campus, holding sex fixed.
+
+## Diagnostics for the ZIP model
+
+We can use quantile residual plots to assess the shape assumptions for the ZIP model, though when violations occur, it is challenging to identify which component of the model (logistic or Poisson) is violated. The `qresid` function in the `statmod` package does not support ZIP models, so I have provided my own:
+
+```{r}
+qresid_zeroinfl <- function(zip_m){
+  y <- zip_m$y
+  pred_probs <- predict(zip_m, type="prob")
+  resids <- c()
+  for(i in 1:length(y)){
+    cdf_b <- sum(pred_probs[i,1:(y[i]+1)])
+    if(y[i] == 0){
+      cdf_a <- 0
+    } else {
+      cdf_a <- sum(pred_probs[i,1:y[i]])
+    }
+    
+    resids[i] <- qnorm(runif(1, cdf_a, cdf_b))
+  }
+  return(resids)
+}
+```
+
+
+### Example
+
+```{r, include=F}
+heart_data <- read_csv("https://sta214-f22.github.io/class_activities/framingham.csv")
+
+heart_data <- heart_data |>
+  drop_na(male, age, education, diabetes, cigsPerDay) |>
+  mutate(education = as.factor(education))
+```
+
+Here is an example of a quantile residual plot for the Framingham heart data from class:
+
+```{r message=F, warning=F}
+m_zip <- zeroinfl(cigsPerDay ~ age + education + diabetes | 
+                    age + education + diabetes, 
+               data = heart_data)
+
+heart_data |>
+  mutate(resids = qresid_zeroinfl(m_zip)) |>
+  ggplot(aes(x = age, y = resids)) +
+  geom_point() +
+  geom_smooth() +
+  labs(x = "Age", y = "Quantile residuals") +
+  theme_bw()
+```
+
+The shape assumption looks good here! Unfortunately there is a bit more variance in the quantile residuals than we would like, which suggests a Poisson distribution may not be the best choice. We could use a zero-inflated negative binomial instead...
+
+# R structures, loops, and simulation
+
+## vectors
+
+A *vector* is a simple way of storing multiple items. For example, here is a vector containing the numbers 2, 1, 4:
+
+```{r}
+v <- c(2, 1, 4)
+v
+```
+
+The `c()` in R means "combine" or "concatenate" the elements of the vector together. The items inside the parentheses are the elements of the vector.
+
+### Length
+
+Every vector has a *length*, which tells us how many elements it contains:
+
+```{r}
+length(v)
+```
+
+### Indexing
+
+We can access each item in the vector by its *index*. That is, we specify the position of the vector, and get back the element at that position:
+
+```{r}
+v[1]
+
+v[2]
+
+v[3]
+```
+
+We specify the index inside the square brackets `[...]`. For example, `v[2]` is the second element of the vector `v`.
+
+Vectors can store elements other than numbers. For example, here is a vector containing the letters 'a', 'b', 'c', and 'd':
+
+```{r}
+w <- c('a', 'b', 'c', 'd')
+w
+```
+
+We can combine two vectors together with the `c()` function:
+
+```{r}
+c(v, w)
+```
+
+### Sequences (`seq`)
+
+Suppose we want to create a vector containing the numbers 0, 0.1, 0.2,...,0.9, 1. In other words, a sequence of numbers between 0 and 1, incremented by steps of 0.1. We can use the `seq` function:
+
+```{r}
+seq(from=0, to=1, by=0.1)
+```
+
+Here's a sequence from 1 to 10, incremented by steps of 1:
+
+```{r}
+seq(from=1, to=10, by=1)
+```
+
+When we want to increment by steps of 1, R has a handy shorthand:
+
+```{r}
+1:10
+```
+
+### Repetitions (`rep`)
+
+Other times, we want to create a vector containing one value repeated many times. We can use the `rep` function. For example, suppose we want to create a vector of eleven 0s:
+
+```{r}
+rep(0, 11)
+```
+
+## `for` loops
+
+Suppose we want to repeat a process many times (e.g., simulate many sets of data). A `for` loop allows us to do this efficiently. Here is a simple `for` loop which prints out the number 214 five times:
+
+```{r}
+for(i in 1:5){
+  print(214)
+}
+```
+
+`for(...)` indicates that we are making a `for` loop. The code inside the curly braces `{ ... }` is the code which will get repeated. The index `i` here tells us how many times we run this code. Remember that `1:5` is R shorthand for 1,2,3,4,5. So `i in 1:5` means "run the code inside the loop for `i=1`, `i=2`, `i=3`, `i=4`, and `i=5`".
+
+The really neat thing about a `for` loop is that what we do inside the loop can depend on the index `i`! For example, suppose we want to print out the numbers 1 to 5, instead of 214:
+
+```{r}
+for(i in 1:5){
+  print(i)
+}
+```
+
+### Example: calculating a likelihood
+
+Suppose we have a coin with an unknown probability of heads $\pi$. Let $Y_i$ denote the outcome of a flip, with $Y_i = 0$ for tails and $Y_i = 1$ for heads. Then $Y_i \sim Bernoulli(\pi)$.
+
+Now suppose we observe five flips of the coin: T, T, T, T, H (i.e., 0, 0, 0, 0, 1). Given this observed data, the likelihood of a value for $\pi$ is
+
+$$L(\pi) = \pi(1 - \pi)^4$$
+
+We want to evaluate $L(\pi)$ for different values of $\pi$ between 0 and 1; say, $\pi = 0, 0.1, 0.2, ..., 0.9, 1$. We can do this calculation efficiently with a `for` loop:
+
+```{r}
+pis <- seq(from=0, to=1, by=0.1) # values of pi to consider
+likelihoods <- c() # empty vector to store the likelihoods we calculate
+for(i in 1:length(pis)){
+  # likelihood = pi*(1 - pi)^4, for each value of pi
+  likelihoods[i] <- pis[i]*(1 - pis[i])^4
+}
+
+likelihoods
+```
+
+**Note:** R does a good job at *vectorizing* functions (when you apply a function to a vector, it gets applied to every entry in that vector). So we could write this code without the `for` loop:
+
+```{r}
+pis <- seq(from=0, to=1, by=0.1)
+likelihoods <- pis*(1 - pis)^4
+
+likelihoods
+```
+
+# Some useful notation and math
+
+## Sum and product notation
+
+At its core, statistics relies on math, and math often uses notation to make equations and expressions simpler. Some notation that we will often encounter in STA 214 is **sum** ($\sum$) and **product** ($\prod$) notation.
+
+Suppose we have $n$ observations, $Y_1,...,Y_n$. We want to take the sum of these observations:
+$$Y_1 + Y_2 + Y_3 + \cdots + Y_n$$
+Great! But this requires us to write out each of the terms, or use $\cdots$ to express that there are terms we haven't written out. Regardless, it is a little clunky. We can make this neater by using $\sum$ as a shorthand for "sum" ($\Sigma$ is the capital sigma in Greek, so think "S for Sum"). Using this notation,
+$$\sum \limits_{i=1}^n Y_i = Y_1 + Y_2 + \cdots + Y_n$$
+This shorthand means "sum up all the $Y_i$, starting with $i = 1$ and going to $i = n$". In other words, sum up $Y_1,...,Y_n$.
+
+What about products? The product of $Y_1,...,Y_n$ is 
+$$Y_1 Y_2 \cdots Y_n$$
+which we can write more cleanly as $\prod \limits_{i=1}^n Y_i$. Here $\prod \limits_{i=1}^n$ just means "multiply these $n$ things together". ($\Pi$ is the capital pi in Greek, so think "P for Product")
+
+## Logs and properties of logs
+
+Recall that logarithms (*logs* for short) are what we use to undo exponents. That is, $\log(x) = y$ means that $x = e^{y}$. (By default, $\log$ in math and statistics is the *natural* log. Equivalent definitions exist for other bases: $\log_{10}(x) = y$ means that $x = 10^{y}$).
+
+There are some useful properties of logs that we use in STA 214, particularly for maximum likelihood estimation:
+
+* Logs turn products into sums:
+$$\log(a \cdot b) = \log(a) + \log(b)$$
+More generally,
+$$\log \left( \prod \limits_{i=1}^n a_i \right) = \sum \limits_{i=1}^n \log(a_i)$$
+Likewise, 
+$$\log(a/b) = \log(a) - \log(b)$$
+
+* Logs turn exponents into multiples:
+$$\log(x^a) = a \log(x)$$
+
+* Logs have nice derivatives:
+$$ \dfrac{d}{dx} \log(x) = \dfrac{1}{x}$$
+
+## Calculus review: differentiation
+
+Recall the following rules for derivative:
+
+* $\dfrac{d}{dx} c f(x) = c \dfrac{d}{dx} f(x)$ for constant $c$
+More generally
+* $\dfrac{d}{dx} (f(x) + c) = \dfrac{d}{dx} f(x)$ for constant $c$
+* The derivative of a sum is the sum of derivatives:
+$$\dfrac{d}{dx} (f(x) + g(x)) = \dfrac{d}{dx} f(x) + \dfrac{d}{dx} g(x)$$
+More generally, this means that derivatives can move inside $\sum$:
+$$\dfrac{d}{dx} \sum \limits_{i=1}^n f_i(x) = \sum \limits_{i=1}^n \dfrac{d}{dx} f_i(x)$$
+* Chain rule:
+$$\dfrac{d}{dx} f(g(x)) = f'(g(x)) g'(x)$$
+
+# Writing math in Quarto and R Markdown
+
+If you want to write mathematical notation, we need to tell Markdown, “Hey, we’re going to make a math symbol!” To do that, you use dollar signs. For instance, to make $\widehat{\beta}_1$, you simply put `$\widehathat{\beta}_1$` into the white space (not a chunk) in your Quarto or R Markdown.
+
+Here are some examples of writing math, which you can adapt:
+
+| Math | Code |
+| --- | --- |
+| $Y_i \sim Bernoulli(\pi_i)$ | `$Y_i \sim Bernoulli(\pi_i)$` |
+| $\log \left( \dfrac{\pi_i}{1 - \pi_i} \right)$ | `$\log \left( \dfrac{\pi_i}{1 - \pi_i} \right)$` |
+| $\widehat{\pi}_i$ | `$\widehat{\pi}_i$` |
+| $\beta_0 + \beta_1 X_i$ | `$\beta_0 + \beta_1 X_i$` |
+| $\sum \limits_{i=1}^n$ | `$\sum \limits_{i=1}^n$` |
+| $\prod \limits_{i=1}^n$ | `$\prod \limits_{i=1}^n$` |
+| $\begin{cases} e^{-\lambda_i}(1 - \alpha_i) + \alpha_i & y = 0 \\ \dfrac{e^{-\lambda_i} \lambda_i^y}{y!}(1 - \alpha_i) & y > 0 \end{cases}$ | `$\begin{cases} e^{-\lambda_i}(1 - \alpha_i) + \alpha_i & y = 0 \\ \dfrac{e^{-\lambda_i} \lambda_i^y}{y!}(1 - \alpha_i) & y > 0 \end{cases}$` |
+
+
+<div id="license">
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc/4.0/88x31.png" /></a><br />This work was created by Ciaran Evans and is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>. Last updated 2025 August 12.
+</div>

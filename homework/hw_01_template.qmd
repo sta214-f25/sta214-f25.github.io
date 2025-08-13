@@ -1,0 +1,53 @@
+---
+---
+---
+title: "Homework 1"
+format: 
+  html:
+    embed-resources: true
+editor: source
+author: "Your name"
+---
+
+**Collaborators:** (leave blank if none)
+
+**Instructions:** 
+
+* Answer each question on the homework assignment
+* When done, Render this file to HTML and submit the HTML on Canvas
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+
+grad_app <- read.csv("https://stats.idre.ucla.edu/stat/data/binary.csv")
+```
+
+## Question 1
+
+### (a)
+
+```{r}
+
+```
+
+(Type your answer to question 1(a) here)
+
+
+### (b)
+
+```{r}
+
+```
+
+(Type your answer to question 1(b) here)
+
+### (c)
+
+```{r}
+
+```
+
+(Type your answer to question 1(c) here)
+
+(Now add space and chunks to answer the remaining questions)

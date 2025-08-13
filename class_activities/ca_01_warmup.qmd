@@ -1,0 +1,35 @@
+---
+title: "Warmup: dengue data"
+format: pdf
+editor: source
+---
+
+\vspace{-2.5cm}
+
+**Group members:**
+
+**Instructions:** Work with a neighbor on the following activity. I will collect the handout at the end of class, and it will be part of your class participation grade. You will be graded only on effort -- it is ok if you don't finish all the questions, or get them all correct.
+
+
+## Dengue data
+
+**Dengue fever** is a mosquito-borne viral disease affecting 400 million people a year. A research study on dengue fever was conducted, and data were collected on 5720 Vietnamese children, admitted to the hospital with possible dengue fever. Variables include:
+
+* *Sex*: patient's sex (female or male)
+* *Age*: patient's age (in years)
+* *WBC*: white blood cell count
+* *PLT*: platelet count
+* other diagnostic variables...
+* *Dengue*: whether the patient has dengue (0 = no, 1 = yes)
+
+The researchers are interested in the following research questions:
+
+* How well can we predict whether a patient has dengue?
+* Which diagnostic measurements are most useful?
+* Is there a significant relationship between age and dengue?
+
+### Questions
+
+1. How might you try to address each of these questions? Brainstorm potential approaches here.
+
+
