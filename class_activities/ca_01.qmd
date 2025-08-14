@@ -47,3 +47,13 @@ One way to examine the relationship between age and dengue status is with a tabl
 
 3. If $\pi$ is the probability of some event, then the *odds* are $\dfrac{\pi}{1 - \pi}$. Calculate the (empirical) odds that a 5 year old patient has dengue.
 
+\vspace{3cm}
+
+## Ethics and human subjects research
+
+Research involving patients falls under the category of *human subjects research* (HSR), which is tightly monitored and regulated. Guiding principles for HSR (see the [Belmont Report](https://www.hhs.gov/ohrp/regulations-and-policy/belmont-report/read-the-belmont-report/index.html)) require that the participants provide informed consent, that the researchers carefully assess the potential risks and benefits of their study, and that there be fair procedures and outcomes in the selection of research subjects.
+ 
+The data from the dengue study consist of patients between 1 and 15 years old, who presented to the hospital with potential dengue fever (that is, their symptoms made the doctors suspect they might have dengue fever).
+
+4. What do you think are some of the potential risks and benefits of the dengue study?
+

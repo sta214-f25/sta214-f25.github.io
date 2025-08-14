@@ -1,0 +1,108 @@
+---
+author: "Ciaran Evans"
+title: Logistic regression interpretation
+output:
+  xaringan::moon_reader:
+    css: "lab-slides.css"
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+editor_options: 
+  chunk_output_type: console
+---
+
+### Warmup activity
+
+.large[
+Work on the activity (handout) with a neighbor, then we will discuss as a class.
+]
+
+---
+
+
+### Warmup
+
+.large[
+$$\hspace{1cm} \log \left( \dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} \right) = -2.45 + 0.22 \ Age_i$$
+
+.question[
+What is the predicted probability of dengue for a 10 year old patient?
+]
+]
+
+---
+
+### Warmup
+
+.large[
+$$\hspace{1cm} \log \left( \dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} \right) = -2.45 + 0.22 \ Age_i$$
+
+.question[
+Suppose we want to identify patients for whom the predicted probability of dengue is at least 0.5. What age range should we focus on?
+]
+]
+
+---
+
+### Warmup
+
+.large[
+$$\hspace{1cm} \log \left( \dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} \right) = -2.45 + 0.22 \ Age_i$$
+
+.question[
+Compare the odds of dengue for a 12 year old patient to the odds of dengue for an 11 year old patient. What do you notice?
+]
+]
+
+---
+
+### Interpretation
+
+.large[
+$$\hspace{1cm} \log \left( \dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} \right) = -2.45 + 0.22 \ Age_i$$
+]
+
+---
+
+### Recap: logistic regression
+
+.large[
+$$\hspace{1cm} Y_i \sim Bernoulli(\pi_i)$$
+
+$$\hspace{1cm} \log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 \ Age_i$$
+]
+
+---
+
+### Adding more variables
+
+.large[
+Now let's add WBC as a variable to the model:
+
+```{r, eval=F}
+m2 <- glm(Dengue ~ Age + WBC, data = dengue,
+          family = binomial)
+summary(m2)
+```
+
+$$\hspace{1cm} \log \left( \dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} \right) = 0.34 + 0.15 \ Age_i - 0.31 WBC_i$$
+
+.question[
+How should I interpret each coefficient in the fitted model?
+]
+]
+
+---
+
+### For next time
+
+.large[
+**Reading:** in the textbook, read
+
+* sections 6.7.1 - 6.7.3
+* sections 2.2 - 2.4
+]
+
+

@@ -4,6 +4,7 @@ title: Binary data and logistic regression
 
 August 25
 : Welcome to STA 214, EDA + logistic regression
+  : [slides](https://sta214-f25.github.io/slides/lecture_1.pdf), [warmup](https://sta214-f25.github.io/class_activities/ca_01_warmup.pdf), [class activity](https://sta214-f25.github.io/class_activities/ca_01.pdf)
 
 : **Homework 1 released**{: .label .label-yellow }
   : [HW 1](https://sta214-f25.github.io/homework/HW1.pdf)
@@ -27,4 +28,4 @@ August 29
 : Interpreting logistic regression
 
 : Reading for Monday's class
-  : Beyond MLR [6.7.1-6.7.3](https://bookdown.org/roback/bookdown-BeyondMLR/ch-logreg.html#case-study-trying-to-lose-weight)
+  : Beyond MLR [6.7.1-6.7.3](https://bookdown.org/roback/bookdown-BeyondMLR/ch-logreg.html#case-study-trying-to-lose-weight), [2.2 - 2.4](https://bookdown.org/roback/bookdown-BeyondMLR/ch-beyondmost.html#case-study-does-sex-run-in-families)

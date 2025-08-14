@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="" xml:lang="">
   <head>
-    <title>Welcome to STA 214</title>
+    <title>Logistic regression interpretation</title>
     <meta charset="utf-8" />
     <meta name="author" content="Ciaran Evans" />
     <script src="libs/header-attrs-2.29/header-attrs.js"></script>
@@ -12,7 +12,7 @@
 class: center, middle, inverse, title-slide
 
 .title[
-# Welcome to STA 214
+# Logistic regression interpretation
 ]
 .author[
 ### Ciaran Evans
@@ -20,44 +20,6 @@ class: center, middle, inverse, title-slide
 
 ---
 
-
-### Agenda
-
-.large[
-* Introductions
-* Beginning logistic regression
-* Plan for week 1 and the semester
-* Syllabus highlights
-]
-
----
-
-### Motivating example: Dengue fever
-
-.large[
-**Dengue fever:** a mosquito-borne viral disease affecting 400 million people a year
-]
-
-.center[
-&lt;img src="DengueSymptomsUpdated.jpg" alt="drawing" width="350"/&gt;
-]
-
----
-
-### Motivating example: Dengue data
-
-.large[
-**Data:** Data on 5720 Vietnamese children, admitted to the hospital with possible dengue fever. Variables include:
-
-* *Sex*: patient's sex (female or male)
-* *Age*: patient's age (in years)
-* *WBC*: white blood cell count
-* *PLT*: platelet count
-* other diagnostic variables...
-* *Dengue*: whether the patient has dengue (0 = no, 1 = yes)
-]
-
----
 
 ### Warmup activity
 
@@ -67,254 +29,78 @@ Work on the activity (handout) with a neighbor, then we will discuss as a class.
 
 ---
 
-### Research questions
+
+### Warmup
 
 .large[
-* How well can we predict whether a patient has dengue?
-* Which diagnostic measurements are most useful?
-* Is there a significant relationship between age and dengue?
-]
-
-.large[
-.question[
-How might you try to address each of these questions?
-]
-]
-
----
-
-### Exploratory data analysis (EDA)
-
-.large[
-.question[
-What plot can we use to visualize the response (dengue status)?
-]
-]
-
----
-
-### Exploratory data analysis (EDA)
-
-.large[
-.question[
-What plot can we use to visualize the response (dengue status)?
-]
-
-**Answer:** Bar chart
-]
-
-&lt;img src="lecture_1_files/figure-html/unnamed-chunk-1-1.png" style="display: block; margin: auto;" /&gt;
-
----
-
-### Exploratory data analysis (EDA)
-
-.large[
-.question[
-What plot can we use to visualize an explanatory variable like Age?
-]
-]
-
----
-
-### Exploratory data analysis (EDA)
-
-.large[
-.question[
-What plot can we use to visualize an explanatory variable like Age?
-]
-
-**Answer:** Histogram (or boxplot)
-]
-
-&lt;img src="lecture_1_files/figure-html/unnamed-chunk-2-1.png" style="display: block; margin: auto;" /&gt;
-
----
-
-### Class activity
-
-.large[
-In the class activity (handout), you'll start to explore the relationship between age and dengue.
-
-Spend a few minutes to do the following:
-
-* Say hi to the people around you, introduce yourself
-* Work in groups on the class activity
-* I will collect the handout at the end of class
-]
-
----
-
-### Class activity
-
-.large[
-.question[
-What do you think are some of the potential risks and benefits of the dengue study?
-]
-]
-
----
-
-### Class activity
-
-.large[
-.question[
-What is the (empirical) probability that a patient in the study has dengue?
-]
-]
-
-.large[
-`\(P(\text{Dengue} = 1) =\)`
-]
-
----
-
-### Class activity
-
-.large[
-.question[
-What is the (empirical) probability that a 5 year old patient has dengue? What about a 10 year old patient?
-]
-]
-
-.large[
-`\(P(\text{Dengue} = 1 | \text{Age} = 5) =\)`
-
-`\(P(\text{Dengue} = 1 | \text{Age} = 10) =\)`
-]
-
-
----
-
-
-## Odds
-
-.large[
-.question[
-What are the (empirical) odds that a 5 year old patient has dengue?
-]
-]
-
-
----
-
-### Fitting a model: linear regression?
-
-.large[
-**Response variable:** `\(Y_i = \text{dengue status of } i\text{th  patient}\)`
-
-**Explanatory variable:** `\(Age_i = \text{dengue status of } i\text{th  patient}\)`
+`$$\hspace{1cm} \log \left( \dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} \right) = -2.45 + 0.22 \ Age_i$$`
 
 .question[
-What would a *linear* regression model look like for these variables?
+What is the predicted probability of dengue for a 10 year old patient?
 ]
 ]
 
 ---
 
-### Fitting a model: initial attempt
+### Warmup
 
 .large[
-What if we try a linear regression model?
+`$$\hspace{1cm} \log \left( \dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} \right) = -2.45 + 0.22 \ Age_i$$`
 
-`$$Y_i = \text{dengue status of } i\text{th  patient}$$`
-
-`$$Y_i = \beta_0 + \beta_1 Age_i + \varepsilon_i \hspace{1cm} \varepsilon_i \overset{iid}{\sim} N(0, \sigma_\varepsilon^2)$$`
-]
-
-.large[
 .question[
-What are some potential issues with this linear regression model? Discuss with your neighbors for 1--2 minutes, then we will discuss as a class.
+Suppose we want to identify patients for whom the predicted probability of dengue is at least 0.5. What age range should we focus on?
 ]
 ]
 
 ---
 
-### Don't fit linear regression with a binary response
-
-&lt;img src="lecture_1_files/figure-html/setup-1.png" style="display: block; margin: auto;" /&gt;
-
----
-
-### Next steps
+### Warmup
 
 .large[
-* We will spend the next few weeks talking in depth about logistic regression
-* Download R and RStudio today or tomorrow
-    - Instructions on course website
-    - Please contact me if you have problems!
-* Bring laptop to class
-* HW 1 released on the course website
-* Course codebook also on the course website
+`$$\hspace{1cm} \log \left( \dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} \right) = -2.45 + 0.22 \ Age_i$$`
+
+.question[
+Compare the odds of dengue for a 12 year old patient to the odds of dengue for an 11 year old patient. What do you notice?
+]
 ]
 
 ---
 
-### Semester plan (tentative)
+### Interpretation
 
 .large[
-* Logistic regression
-* Poisson regression + modifications
-* Mixed effects
-* Parametric bootstrapping (time permitting)
-
-**Course goals:**
-
-* Be able to model data with different types of response variables
-* Extend tools from 112 to address violations of the usual linear regression assumptions
-* Emphasize sound statistical and data analysis practices
+`$$\hspace{1cm} \log \left( \dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} \right) = -2.45 + 0.22 \ Age_i$$`
 ]
 
 ---
 
-### Course prerequisites
+### Recap: logistic regression
 
 .large[
-Prerequisites:
+`$$\hspace{1cm} Y_i \sim Bernoulli(\pi_i)$$`
 
-* STA 112 and MTH 111 (Calculus I)
-
-I expect you to be familiar with:
-
-* EDA (Exploratory data analysis)
-* Linear regression with multiple predictors
-* Comparing and interpreting models
-* Confidence intervals and hypothesis tests
-* Basic R computing
+`$$\hspace{1cm} \log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 \ Age_i$$`
 ]
 
 ---
 
-### Expectations
+### Adding more variables
 
 .large[
-* Complete any assigned reading ahead of class
-* Bring laptop each day
-* Submit class activities (graded for effort, not completeness or correctness)
-* Attend department seminars (more info to follow)
+Now let's add WBC as a variable to the model:
+
+
+``` r
+m2 &lt;- glm(Dengue ~ Age + WBC, data = dengue,
+          family = binomial)
+summary(m2)
+```
+
+`$$\hspace{1cm} \log \left( \dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} \right) = 0.34 + 0.15 \ Age_i - 0.31 WBC_i$$`
+
+.question[
+How should I interpret each coefficient in the fitted model?
 ]
-
----
-
-### Course components
-
-.large[
-* Class participation (graded for effort)
-* HW assignments (roughly one per week)
-* Exams (2 midterms, 1 final)
-* Project
-]
-
----
-
-### AI policy
-
-.large[
-* I will *never* use AI to grade your work; all feedback you receive will be directly from me and the TA
-* Collaboration with other students, and AI assistance, is permitted on homework
-    * Assistance does *not* mean uploading the assignment to ChatGPT and copying the answers
-    * You must cite collaborators and external resources
-* See syllabus for further details
 ]
 
 ---
@@ -322,10 +108,13 @@ I expect you to be familiar with:
 ### For next time
 
 .large[
-* Make sure R and RStudio are installed
-* Instructions are provided on the course website
-* **Reading:** sections 3.3.1 and 6.2 in the textbook
+**Reading:** in the textbook, read
+
+* sections 6.7.1 - 6.7.3
+* sections 2.2 - 2.4
 ]
+
+
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

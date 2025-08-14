@@ -159,6 +159,16 @@ Spend a few minutes to do the following:
 
 .large[
 .question[
+What do you think are some of the potential risks and benefits of the dengue study?
+]
+]
+
+---
+
+### Class activity
+
+.large[
+.question[
 What is the (empirical) probability that a patient in the study has dengue?
 ]
 ]
