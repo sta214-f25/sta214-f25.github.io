@@ -105,6 +105,27 @@ How should I interpret each coefficient in the fitted model?
 
 ---
 
+### Adding more variables
+
+.large[
+What about a *categorical* predictor?
+
+
+``` r
+m3 &lt;- glm(Dengue ~ Age + Abdominal, data = dengue,
+          family = binomial)
+summary(m3)
+```
+
+`$$\hspace{1cm} \log \left( \dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} \right) = -0.25 + 0.22 \ Age_i + 0.21 Abdominal_i$$`
+
+.question[
+How should I interpret the coefficient on abdominal pain?
+]
+]
+
+---
+
 ### For next time
 
 .large[
