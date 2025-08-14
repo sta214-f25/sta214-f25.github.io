@@ -1,0 +1,45 @@
+---
+title: "Class activity solutions"
+format: html
+---
+
+## Dengue data
+
+**Dengue fever** is a mosquito-borne viral disease affecting 400 million people a year. In this activity, you will start to investigate the relationship between age and dengue status, from the dataset of 5720 Vietnamese children admitted to hospital with potential dengue fever.
+
+One way to examine the relationship between age and dengue status is with a table:
+
+| Age|  Dengue = 0| Dengue =  1|
+|---:|---:|---:|
+|   1| 184|  16|
+|   2| 419|  42|
+|   3| 532|  68|
+|   4| 457| 108|
+|   5| 487| 122|
+|   6| 369| 110|
+|   7| 360| 148|
+|   8| 289| 161|
+|   9| 244| 186|
+|  10| 185| 185|
+|  11| 165| 148|
+|  12| 126| 137|
+|  13|  96| 107|
+|  14|  68|  97|
+|  15|  42|  62|
+| **Total**  | 4023 | 1697 |
+
+
+1. What is the (empirical) probability that a patient in the study has dengue? (I say *empirical* probability here because we are estimating it from the observed data).
+
+**Solution:** $\dfrac{1697}{5720} \approx 0.297$
+
+2. What is the (empirical) probability that a 5 year old patient has dengue? What about a 10 year old patient?
+
+**Solution:** 
+
+* For a 5 year old patient: $\dfrac{122}{122 + 487} \approx 0.2$
+* For a 10 year old patient: $\dfrac{185}{185 + 185} = 0.5$
+
+3. If $\pi$ is the probability of some event, then the *odds* are $\dfrac{\pi}{1 - \pi}$. Calculate the (empirical) odds that a 5 year old patient has dengue.
+
+**Solution:** $\text{odds} = \dfrac{0.2}{1 - 0.2} = 0.25$

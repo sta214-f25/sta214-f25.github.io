@@ -1,0 +1,25 @@
+---
+title: "Class activity solutions"
+format: html
+---
+
+## Fitted model
+
+In this activity, we will work with the fitted logistic regression model from the dengue data. The fitted logistic regression model is 
+
+$$\hspace{1cm} Y_i \sim Bernoulli(\pi_i)$$
+$$\hspace{1cm} \log \left( \dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} \right) = -2.45 + 0.22 \ Age_i$$
+
+1. Does the probability of dengue increase or decrease with age?
+
+**Solution:** As probability increases, odds and log-odds increase. Likewise, as the log-odds increase, so does the probability. The coefficient on age (0.22) is positive, so an increase in age is associated with an increase in the log-odds of dengue, and therefore with an increase in the probability of dengue.
+
+2.  What is the predicted odds of dengue for a 5 year old patient?
+
+**Solution:** $\log \left( \dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} \right) = -2.45 + 0.22 (5) = -1.35$
+
+The predicted log-odds are $-1.35$, so the predicted *odds* are $\exp\{-1.35\} = 0.26$.
+
+3. Based on your answer to question 2, for a 5 year old patient is the predicted *probability* of dengue $> 0.5$, $< 0.5$, or $= 0.5$? (You should answer this without performing any calculations).
+
+**Solution:** The "break-even" point (a probability of 0.5) corresponds to a log-odds of 0 and an odds of 1. The log-odds here is negative (equivalently, the odds is less than 1), and so the probability must be less than 0.5.
