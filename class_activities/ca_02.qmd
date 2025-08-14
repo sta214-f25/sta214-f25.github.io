@@ -1,0 +1,33 @@
+---
+title: "Class activity: fitted logistic regression model"
+format: pdf
+editor: source
+---
+
+\vspace{-2.5cm}
+
+**Group members:**
+
+**Instructions:** Work with a neighbor on the following activity. I will collect the handout at the end of class, and it will be part of your class participation grade. You will be graded only on effort -- it is ok if you don't finish all the questions, or get them all correct.
+
+
+## Fitted model
+
+In this activity, we will work with the fitted logistic regression model from the dengue data. The fitted logistic regression model is 
+
+$$\hspace{1cm} Y_i \sim Bernoulli(\pi_i)$$
+$$\hspace{1cm} \log \left( \dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} \right) = -2.45 + 0.22 \ Age_i$$
+
+1. Does the probability of dengue increase or decrease with age?
+
+\vspace{3cm}
+
+2.  What is the predicted odds of dengue for a 5 year old patient?
+
+\vspace{3cm}
+
+3. Based on your answer to question 2, for a 5 year old patient is the predicted *probability* of dengue $> 0.5$, $< 0.5$, or $= 0.5$? (You should answer this without performing any calculations).
+
+
+
+

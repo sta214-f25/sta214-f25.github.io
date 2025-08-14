@@ -25,3 +25,6 @@ August 27
   
 August 29
 : Interpreting logistic regression
+
+: Reading for Monday's class
+  : Beyond MLR [6.7.1-6.7.3](https://bookdown.org/roback/bookdown-BeyondMLR/ch-logreg.html#case-study-trying-to-lose-weight)

@@ -1,0 +1,41 @@
+---
+title: "Warmup: odds and log-odds"
+format: pdf
+editor: source
+---
+
+\vspace{-2.5cm}
+
+**Group members:**
+
+**Instructions:** Work with a neighbor on the following activity. I will collect the handout at the end of class, and it will be part of your class participation grade. You will be graded only on effort -- it is ok if you don't finish all the questions, or get them all correct.
+
+
+## Odds
+
+Last time, you calculated that the empirical probability that a 5 year old patient has dengue is 0.2.
+
+Recall that if $\pi$ is the *probability* of an event, then the *odds* are given by
+
+$$\text{odds} = \dfrac{\pi}{1 - \pi}$$
+
+1. If $\pi = 0.2$, calculate the odds.
+
+\vspace{3cm}
+
+2. Repeat the calculation for $\pi = 0.1$ and $\pi = 0.9$. What happens to the odds as $\pi \to 0$? As $\pi \to 1$?
+
+\vspace{3cm}
+
+## Log-odds
+
+As we shall see, we often work with the *log-odds* when modeling binary data. If $\pi$ is the probability of an event, then the log-odds are
+
+$$\text{log-odds} = \log (\text{odds}) = \log \left( \dfrac{\pi}{1 - \pi} \right)$$
+
+3. If $\pi = 0.2$, calculate the log-odds.
+
+\vspace{3cm}
+
+4. What happens to the log-odds as $\pi \to 0$? As $\pi \to 1$?
+
