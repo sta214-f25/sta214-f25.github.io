@@ -146,10 +146,22 @@ Laptops will be used regularly in class, and you must bring one each day. You ma
 
 In general, I expect you to come to class and participate in the lecture and activities. Your class participation grade will consist of class activities and attendance at departmental seminars.
 
-* **Class activities:** This course includes regular, short activities during class time to help your learning. Participation in class activities is expected, and you will submit your work on these activities at the end of class. Most class periods will have at least one activity; some class periods will have multiple activities. Class activities will be graded for effort, not for completeness or correctness.
-* **Department seminars:** Throughout the semester, the department will host visiting speakers who will give talks on a range of statistical topics. You will attend these seminars and submit a short (one or two paragraph) reflection on the talk and how it relates to material you have learned in your statistics courses. If you cannot attend the seminars due to a conflict, I will provide alternative talks available on YouTube. If you are simultaneously enrolled in another of my courses, the same seminar attendance and reflection may count for both courses.
+**Class activities:** This course includes regular, short activities during class time to help your learning. Participation in class activities is expected, and you will submit your work on these activities at the end of class. Most class periods will have at least one activity; some class periods will have multiple activities. Class activities will be graded for effort, not for completeness or correctness.
 
-If you are unable to attend class due to illness or extenuating circumstances, please let me know. Class activities and quizzes may be made up at a later date at the instructor's discretion. Persistent absences, however, will not be permitted except in special circumstances such as a medical or family emergency.
+
+**Department seminars:** Throughout the semester, the department will host visiting speakers who will give talks on a range of statistical topics. You will attend these seminars and submit a short (one or two paragraph) reflection on the talk and how it relates to material you have learned in your statistics courses. If you cannot attend the seminars due to a conflict, I will provide alternative talks available on YouTube. If you are simultaneously enrolled in another of my courses, the same seminar attendance and reflection may count for both courses.
+
+Reflections on department seminars will be due the day after the seminar (except in extenuating circumstances). Note: it is ok if you don't understand everything in a seminar talk! The goal is to be exposed to a broad range of topics in statistics and data science, and make connections with material you have seen in your statistics courses.
+
+**Seminar dates:** (additional seminars may be added later)
+
+* September 11 (11am): Robert Langefeld
+* September 30 (11am): Michael Hudgens
+* October 7 (11am): Nate Josephs
+* October 28 (11am): Fan Li
+* November 11 (11am): Jessica Hullman
+
+If you are unable to attend class due to illness or extenuating circumstances, please let me know. Class activities may be made up at a later date at the instructor's discretion. Persistent absences, however, will not be permitted except in special circumstances such as a medical or family emergency.
 
 ### Homework
 
