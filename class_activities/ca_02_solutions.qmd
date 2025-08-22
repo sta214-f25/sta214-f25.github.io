@@ -1,6 +1,8 @@
 ---
 title: "Class activity solutions"
-format: html
+format: 
+  html:
+    embed-resources: true
 ---
 
 ## Fitted model

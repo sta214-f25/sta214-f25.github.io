@@ -146,7 +146,10 @@ Laptops will be used regularly in class, and you must bring one each day. You ma
 
 In general, I expect you to come to class and participate in the lecture and activities. Your class participation grade will consist of class activities and attendance at departmental seminars.
 
+
 **Class activities:** This course includes regular, short activities during class time to help your learning. Participation in class activities is expected, and you will submit your work on these activities at the end of class. Most class periods will have at least one activity; some class periods will have multiple activities. Class activities will be graded for effort, not for completeness or correctness.
+
+If you are unable to attend class due to illness or extenuating circumstances, please let me know. Class activities may be made up at a later date at the instructor's discretion. Persistent absences, however, will not be permitted except in special circumstances such as a medical or family emergency.
 
 
 **Department seminars:** Throughout the semester, the department will host visiting speakers who will give talks on a range of statistical topics. You will attend these seminars and submit a short (one or two paragraph) reflection on the talk and how it relates to material you have learned in your statistics courses. If you cannot attend the seminars due to a conflict, I will provide alternative talks available on YouTube. If you are simultaneously enrolled in another of my courses, the same seminar attendance and reflection may count for both courses.
@@ -160,8 +163,6 @@ Reflections on department seminars will be due the day after the seminar (except
 * October 7 (11am): Nate Josephs
 * October 28 (11am): Fan Li
 * November 11 (11am): Jessica Hullman
-
-If you are unable to attend class due to illness or extenuating circumstances, please let me know. Class activities may be made up at a later date at the instructor's discretion. Persistent absences, however, will not be permitted except in special circumstances such as a medical or family emergency.
 
 ### Homework
 
@@ -180,7 +181,13 @@ There will be one project in this course. Further instructions and grading infor
 
 ### Exams
 
-We will have two in-class exams (dates TBA) and one final exam.
+We will have two in-class exams and one final exam.
+
+**Exam 1:** October 10 (tentative), in class
+
+**Exam 2:** November 21 (tentative), in class
+
+**Final exam:** December 13, 2pm
 
 
 ## Grading
@@ -200,7 +207,7 @@ I will use the standard grading scale (above a 93 is an A, above a 90 is an A-, 
 
 * 30 minutes -- 24 hours late (after extensions): lose 20% of points
 * 24 -- 48 hours late (after extensions): lose 40% of points.
-* > 48 hours late (after extensions): no credit
+* more than 48 hours late (after extensions): no credit
 
 If you know you cannot turn in assignment (for instance, if you are ill or there is a family emergency), let me know before the assignment is due, and we will work something out. There will be no grade changes after our last day of class.
 
