@@ -13,7 +13,144 @@ editor_options:
   chunk_output_type: console
 ---
 
-### Warmup activity
+```{r include=F}
+dengue <- read.csv("https://sta279-s22.github.io/labs/dengue.csv")
+```
+
+
+### Logistic regression model
+
+.large[
+
+$Y_i =$ dengue status (0 = negative, 1 = positive) 
+
+$Age_i =$ age (in years)
+
+**Random component:** $\hspace{1cm} Y_i \sim Bernoulli(\pi_i)$
+
+**Systematic component:** $\hspace{1cm} \log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 \ Age_i$
+
+]
+
+---
+
+### Where did the $\varepsilon$ term go?
+
+.large[
+Linear regression, written two ways:
+
+**Option 1:** 
+
+$$Y_i = \beta_0 + \beta_1 X_i + \varepsilon_i \hspace{1cm} \varepsilon_i \sim N(0, \sigma^2)$$
+
+**Option 2:**
+
+$$Y_i \sim N(\mu_i, \sigma^2)$$
+$$\mu_i = \beta_0 + \beta_1 X_i$$
+]
+
+---
+
+### Fitting the logistic regression model
+
+.large[
+$$\hspace{1cm} Y_i \sim Bernoulli(\pi_i)$$
+$$\hspace{1cm} \log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 \ Age_i$$
+
+```{r, include=F}
+library(knitr)
+hook_output <- knit_hooks$get("output")
+knit_hooks$set(output = function(x, options) {
+   lines <- options$output.lines
+   if (is.null(lines)) {
+     return(hook_output(x, options))  # pass to default hook
+   }
+   x <- unlist(strsplit(x, "\n"))
+   more <- "..."
+   if (length(lines)==1) {        # first n lines
+     if (length(x) > lines) {
+       # truncate the output, but add ....
+       x <- c(head(x, lines), more)
+     }
+   } else {
+     x <- c(more, x[lines], more)
+   }
+   # paste these lines together
+   x <- paste(c(x, ""), collapse = "\n")
+   hook_output(x, options)
+ })
+```
+
+```{r, eval=F}
+m1 <- glm(Dengue ~ Age, data = dengue, 
+          family = binomial)
+summary(m1)
+```
+]
+
+---
+
+### Fitting the logistic regression model
+
+.large[
+$$\hspace{1cm} Y_i \sim Bernoulli(\pi_i)$$
+$$\hspace{1cm} \log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 \ Age_i$$
+
+```{r, output.lines = 5:8}
+m1 <- glm(Dengue ~ Age, data = dengue, 
+          family = binomial)
+summary(m1)
+```
+]
+
+---
+
+### Activity 1
+
+.large[
+Work on the activity (handout) with a neighbor, then we will discuss as a class.
+]
+
+---
+
+### Activity
+
+.large[
+$$\hspace{1cm} \log \left( \dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} \right) = -2.45 + 0.22 \ Age_i$$
+
+.question[
+Does the probability of dengue increase or decrease with age?
+]
+]
+
+---
+
+### Activity
+
+.large[
+$$\hspace{1cm} \log \left( \dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} \right) = -2.45 + 0.22 \ Age_i$$
+
+.question[
+What are the predicted odds of dengue for a 5 year old patient?
+]
+]
+
+---
+
+### Activity
+
+.large[
+$$\hspace{1cm} \log \left( \dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} \right) = -2.45 + 0.22 \ Age_i$$
+
+.question[
+For a 5 year old patient: is the predicted *probability* of dengue $> 0.5$, $< 0.5$, or $= 0.5$?
+]
+]
+
+
+---
+
+### Activity 2
 
 .large[
 Work on the activity (handout) with a neighbor, then we will discuss as a class.
@@ -22,7 +159,7 @@ Work on the activity (handout) with a neighbor, then we will discuss as a class.
 ---
 
 
-### Warmup
+### Activity
 
 .large[
 $$\hspace{1cm} \log \left( \dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} \right) = -2.45 + 0.22 \ Age_i$$
@@ -34,7 +171,7 @@ What is the predicted probability of dengue for a 10 year old patient?
 
 ---
 
-### Warmup
+### Activity 
 
 .large[
 $$\hspace{1cm} \log \left( \dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} \right) = -2.45 + 0.22 \ Age_i$$
@@ -46,7 +183,7 @@ Suppose we want to identify patients for whom the predicted probability of dengu
 
 ---
 
-### Warmup
+### Activity 
 
 .large[
 $$\hspace{1cm} \log \left( \dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} \right) = -2.45 + 0.22 \ Age_i$$
@@ -116,13 +253,15 @@ How should I interpret the coefficient on abdominal pain?
 
 ---
 
-### For next time
+### For next week
 
 .large[
 **Reading:** in the textbook, read
 
 * sections 6.7.1 - 6.7.3
 * sections 2.2 - 2.4
+
+**Class on Monday:** lab day (most of the class period to work on HW 1)
 ]
 
 

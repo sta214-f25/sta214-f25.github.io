@@ -1,5 +1,5 @@
 ---
-title: "Warmup: fitted logistic regression model"
+title: "Class activity part 2: fitted logistic regression model"
 format: pdf
 editor: source
 ---

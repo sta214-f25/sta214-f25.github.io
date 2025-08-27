@@ -21,7 +21,131 @@ class: center, middle, inverse, title-slide
 ---
 
 
-### Warmup activity
+
+
+
+### Logistic regression model
+
+.large[
+
+`\(Y_i =\)` dengue status (0 = negative, 1 = positive) 
+
+`\(Age_i =\)` age (in years)
+
+**Random component:** `\(\hspace{1cm} Y_i \sim Bernoulli(\pi_i)\)`
+
+**Systematic component:** `\(\hspace{1cm} \log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 \ Age_i\)`
+
+]
+
+---
+
+### Where did the `\(\varepsilon\)` term go?
+
+.large[
+Linear regression, written two ways:
+
+**Option 1:** 
+
+`$$Y_i = \beta_0 + \beta_1 X_i + \varepsilon_i \hspace{1cm} \varepsilon_i \sim N(0, \sigma^2)$$`
+
+**Option 2:**
+
+`$$Y_i \sim N(\mu_i, \sigma^2)$$`
+`$$\mu_i = \beta_0 + \beta_1 X_i$$`
+]
+
+---
+
+### Fitting the logistic regression model
+
+.large[
+`$$\hspace{1cm} Y_i \sim Bernoulli(\pi_i)$$`
+`$$\hspace{1cm} \log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 \ Age_i$$`
+
+
+
+
+``` r
+m1 &lt;- glm(Dengue ~ Age, data = dengue, 
+          family = binomial)
+summary(m1)
+```
+]
+
+---
+
+### Fitting the logistic regression model
+
+.large[
+`$$\hspace{1cm} Y_i \sim Bernoulli(\pi_i)$$`
+`$$\hspace{1cm} \log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 \ Age_i$$`
+
+
+``` r
+m1 &lt;- glm(Dengue ~ Age, data = dengue, 
+          family = binomial)
+summary(m1)
+```
+
+```
+...
+## Coefficients:
+##              Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept) -2.454345   0.075068  -32.70   &lt;2e-16 ***
+## Age          0.217312   0.008826   24.62   &lt;2e-16 ***
+...
+```
+]
+
+---
+
+### Activity 1
+
+.large[
+Work on the activity (handout) with a neighbor, then we will discuss as a class.
+]
+
+---
+
+### Activity
+
+.large[
+`$$\hspace{1cm} \log \left( \dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} \right) = -2.45 + 0.22 \ Age_i$$`
+
+.question[
+Does the probability of dengue increase or decrease with age?
+]
+]
+
+---
+
+### Activity
+
+.large[
+`$$\hspace{1cm} \log \left( \dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} \right) = -2.45 + 0.22 \ Age_i$$`
+
+.question[
+What are the predicted odds of dengue for a 5 year old patient?
+]
+]
+
+---
+
+### Activity
+
+.large[
+`$$\hspace{1cm} \log \left( \dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} \right) = -2.45 + 0.22 \ Age_i$$`
+
+.question[
+For a 5 year old patient: is the predicted *probability* of dengue `\(&gt; 0.5\)`, `\(&lt; 0.5\)`, or `\(= 0.5\)`?
+]
+]
+
+
+---
+
+### Activity 2
 
 .large[
 Work on the activity (handout) with a neighbor, then we will discuss as a class.
@@ -30,7 +154,7 @@ Work on the activity (handout) with a neighbor, then we will discuss as a class.
 ---
 
 
-### Warmup
+### Activity
 
 .large[
 `$$\hspace{1cm} \log \left( \dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} \right) = -2.45 + 0.22 \ Age_i$$`
@@ -42,7 +166,7 @@ What is the predicted probability of dengue for a 10 year old patient?
 
 ---
 
-### Warmup
+### Activity 
 
 .large[
 `$$\hspace{1cm} \log \left( \dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} \right) = -2.45 + 0.22 \ Age_i$$`
@@ -54,7 +178,7 @@ Suppose we want to identify patients for whom the predicted probability of dengu
 
 ---
 
-### Warmup
+### Activity 
 
 .large[
 `$$\hspace{1cm} \log \left( \dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} \right) = -2.45 + 0.22 \ Age_i$$`
@@ -126,13 +250,15 @@ How should I interpret the coefficient on abdominal pain?
 
 ---
 
-### For next time
+### For next week
 
 .large[
 **Reading:** in the textbook, read
 
 * sections 6.7.1 - 6.7.3
 * sections 2.2 - 2.4
+
+**Class on Monday:** lab day (most of the class period to work on HW 1)
 ]
 
 
