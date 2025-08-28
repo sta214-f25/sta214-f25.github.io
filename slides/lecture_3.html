@@ -203,16 +203,31 @@ Compare the odds of dengue for a 12 year old patient to the odds of dengue for a
 
 .large[
 `$$\hspace{1cm} \log \left( \dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} \right) = -2.45 + 0.22 \ Age_i$$`
+
+**Slope:**
+
+* A one-year increase in age is associated with an increase in the *log odds* of dengue of 0.22.
+* A one-year increase in age is associated with an increase in the *odds* of dengue by a *factor* of `\(e^{0.22} = 1.25\)`.
+
+**Intercept:**
 ]
 
 ---
 
-### Recap: logistic regression
+### Interpretation
 
 .large[
-`$$\hspace{1cm} Y_i \sim Bernoulli(\pi_i)$$`
+`$$\hspace{1cm} \log \left( \dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} \right) = -2.45 + 0.22 \ Age_i$$`
 
-`$$\hspace{1cm} \log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 \ Age_i$$`
+**Slope:**
+
+* A one-year increase in age is associated with an increase in the *log odds* of dengue of 0.22.
+* A one-year increase in age is associated with an increase in the *odds* of dengue by a *factor* of `\(e^{0.22} = 1.25\)`.
+
+**Intercept:**
+
+* when age is 0, the estimated log odds of dengue is `\(-2.45\)`
+* when age is 0, the estimated odds of dengue is `\(e^{-2.45} = 0.086\)`
 ]
 
 ---
