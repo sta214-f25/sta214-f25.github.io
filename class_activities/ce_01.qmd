@@ -1,0 +1,23 @@
+---
+title: "Communication exercise 1"
+format: pdf
+editor: source
+---
+
+\vspace{-2.5cm}
+
+**Name:**
+
+**Instructions:** Complete the following activity individually, then we will discuss as a class.
+
+## Activity
+
+**Context:** You are a statistical consultant, and a client reaches out to you to ask about some data they are working with. The client is a staff librarian for the county library system.
+
+**Client's email:**
+
+> We are trying to predict whether a library book will be returned on time or not, using information on the genre of book, the number of pages, and when it was published. We fit a least squares regression model, but the results are confusing -- for one book the model predicted a 110% chance that it was returned on time. What does this mean?
+
+**Your task:** Write a short email to your client below, answering their question.
+
+
