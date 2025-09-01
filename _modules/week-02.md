@@ -11,6 +11,7 @@ September 1
 
 September 3
 : Parameter estimation
+  : [slides](https://sta214-f25.github.io/slides/lecture_5.pdf), [activity 1](https://sta214-f25.github.io/class_activities/ca_05_1.pdf), [activity 2](https://sta214-f25.github.io/class_activities/ca_05_2.pdf)
   
 September 5
 : Maximum likelihood estimation
