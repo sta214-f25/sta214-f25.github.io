@@ -1,0 +1,108 @@
+---
+author: "Ciaran Evans"
+title: Logistic regression interpretation
+output:
+  xaringan::moon_reader:
+    css: "lab-slides.css"
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r include=F}
+dengue <- read.csv("https://sta279-s22.github.io/labs/dengue.csv")
+```
+
+
+### Recap: logistic regression model
+
+.large[
+
+$Y_i =$ dengue status (0 = negative, 1 = positive) 
+
+$Age_i =$ age (in years)
+
+**Random component:** $\hspace{1cm} Y_i \sim Bernoulli(\pi_i)$
+
+**Systematic component:** $\hspace{1cm} \log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 \ Age_i$
+
+]
+
+---
+
+### Recap: interpretation
+
+.large[
+$$\hspace{1cm} \log \left( \dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} \right) = -2.45 + 0.22 \ Age_i$$
+
+**Slope:**
+
+* A one-year increase in age is associated with an increase in the *log odds* of dengue of 0.22.
+* A one-year increase in age is associated with an increase in the *odds* of dengue by a *factor* of $e^{0.22} = 1.25$.
+
+**Intercept:**
+
+* when age is 0, the estimated log odds of dengue is $-2.45$
+* when age is 0, the estimated odds of dengue is $e^{-2.45} = 0.086$
+]
+
+---
+
+### Recap: adding more variables
+
+.large[
+Now let's add WBC as a variable to the model:
+
+```{r, eval=F}
+m2 <- glm(Dengue ~ Age + WBC, data = dengue,
+          family = binomial)
+summary(m2)
+```
+
+$$\hspace{1cm} \log \left( \dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} \right) = 0.34 + 0.15 \ Age_i - 0.31 WBC_i$$
+
+A one-year increase in age is associated with an increase in the odds of dengue by a factor of $e^{0.15} = 1.16$, holding white blood cell count fixed.
+]
+
+---
+
+### Adding more variables
+
+.large[
+What about a *categorical* predictor?
+
+```{r, eval=F}
+m3 <- glm(Dengue ~ Age + Abdominal, data = dengue,
+          family = binomial)
+summary(m3)
+```
+
+$$\hspace{1cm} \log \left( \dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} \right) = -0.25 + 0.22 \ Age_i + 0.21 Abdominal_i$$
+
+.question[
+How should I interpret the coefficient on abdominal pain?
+]
+]
+
+---
+
+### Interpretation
+
+.large[
+$$\hspace{1cm} \log \left( \dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} \right) = -2.45 + 0.22 \ Age_i$$
+
+**Slope:**
+
+* A one-year increase in age is associated with an increase in the *log odds* of dengue of 0.22.
+* A one-year increase in age is associated with an increase in the *odds* of dengue by a *factor* of $e^{0.22} = 1.25$.
+
+.question[
+Can I interpret the coefficient in terms of the *probability* (rather than odds or log odds)?
+]
+]
+
+
