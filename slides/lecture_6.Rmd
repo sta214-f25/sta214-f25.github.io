@@ -24,6 +24,9 @@ editor_options:
 * Today:
     * Statistical communication exercise (write a brief email to a client)
     * Maximum likelihood estimation
+* Department seminar coming up on 9/11
+    * Attendance part of class participation grade
+    * If you can't attend in person, can instead watch a seminar on YouTube
 ]
 
 ---
