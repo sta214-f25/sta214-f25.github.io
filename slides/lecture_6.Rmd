@@ -1,0 +1,209 @@
+---
+author: "Ciaran Evans"
+title: Maximum likelihood estimation
+output:
+  xaringan::moon_reader:
+    css: "lab-slides.css"
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+editor_options: 
+  chunk_output_type: console
+---
+
+### Agenda and reminders
+
+.large[
+* HW 1 due tonight
+* HW 2 released, due next Friday
+* Project part 1 released (choosing a dataset + EDA)
+    * Project will be released in several pieces
+    * Due in 2 weeks
+* Today:
+    * Statistical communication exercise (write a brief email to a client)
+    * Maximum likelihood estimation
+]
+
+---
+
+### Communication exercise
+
+.large[
+Spend a few minutes replying to your client's question, then we will discuss as a class.
+]
+
+---
+
+### Communication exercise
+
+*We are trying to predict whether a library book will be returned on time or not, using information on the genre of book, the number of pages, and when it was published. We fit a least squares regression model, but the results are confusing -- for one book the model predicted a 110% chance that it was returned on time. What does this mean?*
+
+.large[
+.question[
+What is going on here?
+]
+]
+
+---
+
+### Recap
+
+.large[
+**Definition:** The *likelihood* $L(Model) = P(Data | Model)$ of a model is the probability of the observed data, given that we assume a certain model and certain values for the parameters that define that model.
+]
+
+.large[
+Coin example: flip a coin 5 times, with $\pi = P(Heads)$
+* Model: $Y_i \sim Bernoulli(\pi)$, and $\widehat{\pi} = 0.9$
+* Data: $y_1,...,y_5 = T, T, T, T, H$
+* Likelihood: $L(\widehat{\pi}) = P(y_1,...y_5 | \pi = 0.9) = 0.00009$
+]
+
+---
+
+### Recap
+
+.large[
+**Maximum likelihood estimation:** pick the parameter estimate that maximizes the likelihood.
+
+Coin example: flip a coin 5 times, with $\pi = P(Heads)$
+
+* Observed data: T, T, T, T, H
+* Likelihood: $L(\widehat{\pi}) = (1 - \widehat{\pi})^4(\widehat{\pi})$
+* Choose $\widehat{\pi}$ to maximize $L(\widehat{\pi})$
+]
+
+---
+
+### Recap
+
+.large[
+**Maximum likelihood estimation:** pick the parameter estimate that maximizes the likelihood.
+
+Coin example: flip a coin 5 times, with $\pi = P(Heads)$
+
+* Observed data: T, T, T, T, H
+* Likelihood: $L(\widehat{\pi}) = (1 - \widehat{\pi})^4(\widehat{\pi})$
+* Choose $\widehat{\pi}$ to maximize $L(\widehat{\pi})$
+
+.question[
+How do I maximize functions?
+]
+]
+
+---
+
+### Maximum likelihood estimation with calculus
+
+.large[
+**Maximum likelihood estimation:** pick the parameter estimate that maximizes the likelihood.
+
+Coin example: flip a coin 5 times, with $\pi = P(Heads)$
+
+* Observed data: T, T, T, T, H
+* Likelihood: $L(\widehat{\pi}) = (1 - \widehat{\pi})^4(\widehat{\pi})$
+* Choose $\widehat{\pi}$ to maximize $L(\widehat{\pi})$
+
+**Step 1:** Write down the likelihood
+
+$$L(\widehat{\pi}) = (1 - \widehat{\pi})^4(\widehat{\pi})$$
+]
+
+---
+
+### Maximum likelihood estimation with calculus
+
+.large[
+**Maximum likelihood estimation:** pick the parameter estimate that maximizes the likelihood.
+
+Coin example: flip a coin 5 times, with $\pi = P(Heads)$
+
+* Observed data: T, T, T, T, H
+* Likelihood: $L(\widehat{\pi}) = (1 - \widehat{\pi})^4(\widehat{\pi})$
+* Choose $\widehat{\pi}$ to maximize $L(\widehat{\pi})$
+
+**Step 2:** Take the log
+
+$$\log L(\widehat{\pi}) = \hspace{6cm}$$
+
+
+]
+
+---
+
+### Maximum likelihood estimation with calculus
+
+.large[
+**Maximum likelihood estimation:** pick the parameter estimate that maximizes the likelihood.
+
+Coin example: flip a coin 5 times, with $\pi = P(Heads)$
+
+* Observed data: T, T, T, T, H
+* Likelihood: $L(\widehat{\pi}) = (1 - \widehat{\pi})^4(\widehat{\pi})$
+* Choose $\widehat{\pi}$ to maximize $L(\widehat{\pi})$
+
+**Step 3:** maximize
+
+$$\log L(\widehat{\pi}) = 4 \log(1 - \widehat{\pi}) + \log(\widehat{\pi})$$
+
+.question[
+How do we find where maxima/minima occur for a function?
+]
+]
+
+---
+
+### Maximum likelihood estimation with calculus
+
+.large[
+* Observed data: T, T, T, T, H
+* Likelihood: $L(\widehat{\pi}) = (1 - \widehat{\pi})^4(\widehat{\pi})$
+* Choose $\widehat{\pi}$ to maximize $L(\widehat{\pi})$
+
+**Step 3:** maximize -- take first derivative and set equal to 0
+
+$$\log L(\widehat{\pi}) = 4 \log(1 - \widehat{\pi}) + \log(\widehat{\pi})$$
+
+$$\dfrac{d}{d \widehat{\pi}} \log L(\widehat{\pi}) = \hspace{6cm}$$
+]
+
+---
+
+### Class activity
+
+.large[
+Work on the activity (handout) with a neighbor, then we will
+discuss as a class
+]
+
+---
+
+### Class activity
+
+.large[
+* $P(Y_i = 0) = \pi_0$
+* $P(Y_i = -1) = 2 \pi_0$
+* $P(Y_i = 1) = 1 - 3 \pi_0$
+
+Observe data $-1, -1, 0, 1, 0, -1$.
+
+$L(\widehat{\pi}_0) = \ ?$
+]
+
+---
+
+### Class activity
+
+.large[
+.center[
+$\log L(\widehat{\pi}_0) = 3 \log(2) + 3 \log(\widehat{\pi}_0) + 2 \log( \widehat{\pi}_0) + \log(1 - 3 \widehat{\pi}_0)$
+
+$\dfrac{d}{d \widehat{\pi}_0} \log L(\widehat{\pi}_0) =$
+]
+]
+
+
+
+
