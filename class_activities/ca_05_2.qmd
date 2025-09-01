@@ -1,0 +1,33 @@
+---
+title: "Class activity part 2"
+format: pdf
+editor: source
+---
+
+\vspace{-2.5cm}
+
+**Group members:**
+
+**Instructions:** Work with a neighbor on the following activity. I will collect the handout at the end of class, and it will be part of your class participation grade. You will be graded only on effort -- it is ok if you don't finish all the questions, or get them all correct.
+
+In a study of patients with tumors, scientists were interesting in determining the relationship between the size of tumors in centimeters ( $X$ ) found on lymph nodes and whether or not the tumor was cancerous ( $Y$ ). Let $Y_i = 1$ if patient $i$ in the study has a tumor that is cancerous, and $Y_i = 0$ if the tumor is not cancerous. Let $\pi_i = P(Y_i = 1)$.
+
+The data from the first five patients in the study are:
+
+| Tumor cancerous | Yes | No | No | Yes | No |
+| :---: | :---: | :---: | :---: | :---: | :---: |
+| Size of tumor (cm) | 6 | 1 | 0.5 | 4 | 1.2 |
+
+# Part II
+
+A second scientist (Scientist B) proposes that the probability $\pi_i$ *does* depend on tumor size, and suggests the logistic regression model
+
+$Y_i \sim Bernoulli(\pi_i)$
+
+$\log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 \ Size_i$
+
+3. Scientist B suggests $\widehat{\beta}_0 = -2$ and $\widehat{\beta}_1 = 0.5$. Calculate $\widehat{\pi}_i$ for each of the five patients in the data above.
+
+\vspace{3cm}
+
+4. Using your probability estimates from Exercise 3, calculate the likelihood $L(\widehat{\beta}_0, \widehat{\beta}_1) = P(y_1,...,y_5 | \widehat{\beta}_0, \widehat{\beta}_1)$.
