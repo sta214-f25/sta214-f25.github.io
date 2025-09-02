@@ -21,32 +21,9 @@ editor_options:
 * Project part 1 released (choosing a dataset + EDA)
     * Project will be released in several pieces
     * Due in 2 weeks
-* Today:
-    * Statistical communication exercise (write a brief email to a client)
-    * Maximum likelihood estimation
 * Department seminar coming up on 9/11
     * Attendance part of class participation grade
     * If you can't attend in person, can instead watch a seminar on YouTube
-]
-
----
-
-### Communication exercise
-
-.large[
-Spend a few minutes replying to your client's question, then we will discuss as a class.
-]
-
----
-
-### Communication exercise
-
-*We are trying to predict whether a library book will be returned on time or not, using information on the genre of book, the number of pages, and when it was published. We fit a least squares regression model, but the results are confusing -- for one book the model predicted a 110% chance that it was returned on time. What does this mean?*
-
-.large[
-.question[
-What is going on here?
-]
 ]
 
 ---
@@ -207,6 +184,69 @@ $\dfrac{d}{d \widehat{\pi}_0} \log L(\widehat{\pi}_0) =$
 ]
 ]
 
+---
+
+### Maximum likelihood in more generality
+
+.large[
+Suppose that $Y_i \sim Bernoulli(\pi)$. We observe $n$ observations $Y_1,...,Y_n$ and want to estimate $\pi$.
+]
+
+.large[
+**Step 1:** Write down the likelihood
+
+* Let $\widehat{\pi}$ be the estimate of $\pi$
+* Let $k$ be the number of times $Y_i = 1$ in the data
+
+.center[
+$L(\widehat{\pi}) =$
+]
+
+]
+
+---
+
+### Maximum likelihood in more generality
+
+.large[
+**Step 1:** Write down the likelihood
+
+.center[
+$L(\widehat{\pi}) = \widehat{\pi}^k(1 - \widehat{\pi})^{n-k}$
+]
+
+**Step 2:** Take the log
+]
+
+.large[
+$\log L(\widehat{\pi}) =$
+]
+
+---
+
+### Maximum likelihood in more generality
+
+.large[
+**Step 3:** take the first derivative, and set = 0
+.center[
+$\log L(\widehat{\pi}) = k \log (\widehat{\pi}) + (n - k) \log (1 - \widehat{\pi})$
+]
+]
+
+.large[
+$\dfrac{d}{d \widehat{\pi}} \log L(\widehat{\pi}) =$
+]
+
+---
+
+### Maximum likelihood in more generality
+
+.large[
+So our maximum likelihood estimate is $\widehat{\pi} = \dfrac{k}{n}$, the sample proportion
+
+* Example data: T, T, T, T, H
+* This implies that $\widehat{\pi} = \dfrac{1}{5} = 0.2$
+]
 
 
 
