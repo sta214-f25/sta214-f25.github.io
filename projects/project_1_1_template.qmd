@@ -1,0 +1,27 @@
+---
+---
+---
+title: "Project Part 1"
+author: "Your Name"
+format: 
+  html:
+    embed-resources: true
+editor: source
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+```
+
+## Research question
+
+
+## Data summary
+
+
+## Univariate EDA
+
+
+## Multivariate EDA
+
+

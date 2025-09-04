@@ -133,18 +133,7 @@ We want to use this observed data to estimate $\pi_0$.
 
 \item We want to consider other possible values of $\pi_0$. Write down the likelihood $L(\pi_0)$ as a function of $\pi_0$, using the observed sequence of data.
 
-\item Adapting code from class, fill in the \verb;...; in the following code to make a plot of $L(\pi_0)$ as a function of $\pi_0$:
-
-\begin{verbatim}
-pi0 <- seq(0, 1, 0.01) 
-likelihood <- rep(0, length(pi0))
-for(i in 1:length(pi0)){
-  likelihood[i] <- ...
-}
-plot(pi0, likelihood, type="l")
-\end{verbatim}
-
-Approximately which value of $\pi_0$ maximizes the likelihood?
+\item Make a plot in R showing the likelihood $L(\pi_0)$ as a function of $\pi_0$. Approximately which value of $\pi_0$ maximizes the likelihood?
 
 \item Use calculus to calculate the maximum likelihood estimate $\widehat{\pi}_0$ from the observed data. You will:
 \begin{itemize}

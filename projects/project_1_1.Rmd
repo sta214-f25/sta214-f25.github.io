@@ -7,8 +7,12 @@ output:
 link-citations: yes
 ---
 
-**Due dates:** Friday, September 19 at 10pm on Canvas. Submit *both* your rendered HTML file and the Quarto file to Canvas.
+**Due dates:** Friday, September 19 at 10pm on Canvas.
 
+**Submission:** A template file is provided, with a rough outline: [project_1_1_template.qmd](https://sta214-f25.github.io/projects/project_1_1_template.qmd)
+
+Once you have completed the report, submit *both* your 
+rendered HTML file and the Quarto file to Canvas.
 
 # Overview
 
@@ -33,7 +37,9 @@ includes warnings and other stray code output – hide it all.
 replicate your results, could look at your .qmd file and completely reproduce the results and figures in the rendered report.
 
 
-Your written report for part 1 will contain three sections: Data Summary, Univariate EDA, and Multivariate EDA. Your goal is to create any visualizations necessary to exploring the data before fitting a model.
+Your written report for part 1 will contain three sections: Research question, Data summary, Univariate EDA, and Multivariate EDA. Your goal is to create any visualizations necessary to exploring the data before fitting a model.
+
+There is no minimum or maximum length required. However, your analysis should be thorough, with your report addressing the research question, and containing all the elements described below.
 
 ### Research question and data
 
@@ -48,8 +54,9 @@ Come up with a research question that you can answer with data, and find a datas
     * At least one of these variables must be categorical
     * At least two of these variables must be quantitative
 * Everyone must choose their own data and research question
+    * In the unlikely event that two students choose the same data and research question, the first student to submit the assignment will receive priority
 
-### Data Summary
+### Data summary
 
 Write 1-2 paragraphs which:
 
@@ -63,6 +70,27 @@ Choose at least **3** variables that are relevant to the research questions. For
 ### Multivariate EDA
 
 Using the variables from Univariate EDA, create one or more plots that allow you to address the research question. You may be able to address the question with a single plot, or you may need to make multiple plots. Calculate any appropriate summary statistics. Use the plot(s) and summary statistics to address the research questions in a 1–2 paragraphs.
+
+# A few ideas for data sources
+
+Here are some ideas for data sources, but you are also welcome to find data elsewhere!
+
+* [CORGIS: The Collection of Really Great, Interesting, Situated Dataset](https://corgis-edu.github.io/corgis/csv/)
+* [Awesome Public Datasets](https://github.com/awesomedata/awesome-public-datasets) - large but categorized list by topic and data type
+* [Driven Data](https://www.drivendata.org/competitions/)
+* You can create data from the US Census Bureau using [tidyCensus](https://walker-data.com/tidycensus/articles/basic-usage.html)
+* [Data on Fires in the US and resultant damage](https://www.usfa.fema.gov/statistics/data-sets/)
+* [Data Is Plural](https://www.data-is-plural.com/) -- Weekly feed (with archive) of interesting datasets
+* [AWS Data Exchange - Open Data](https://aws.amazon.com/marketplace/search/results?CONTRACT_TYPE=OPEN_DATA_LICENSES&filters=CONTRACT_TYPE)
+* The OpenIntro textbooks have a great [list of datasets](https://www.openintro.org/data/)
+* Shonda Kuiper has compiled a [list](https://stat2labs.sites.grinnell.edu/DataResources.html) of different data sources
+* The [TidyTuesday](https://github.com/rfordatascience/tidytuesday) project has a long list of many different datasets
+* The [nhanesA](https://cran.r-project.org/web/packages/nhanesA/vignettes/Introducing_nhanesA.html) package allows you to explore and retrieve data from the National Health and Nutrition Examination Survey
+* [College ScoreCard data](https://collegescorecard.ed.gov/) for many different institutions
+* [American time use survey data](https://github.com/swang87/atus)
+* [Lahman baseball data](https://cran.r-project.org/web/packages/Lahman/index.html)
+* CDC [Behaviorial Risk Factor Surveillance System](https://www.cdc.gov/brfss/) data
+* National Park [visitor use statistics](https://irma.nps.gov/Stats/)
 
 # Appearance and style
 
@@ -94,7 +122,7 @@ Figures should have labeled axes, and should be clear and easy to read. Figures 
 
 ````
 ```{r, echo=F, message=F, warning=F, fig.cap="Figure 2.1: Bill depth vs. bill length for penguins near Palmer Station, Antarctica."}`r ''`
-penguins %>%
+penguins |>
   ggplot(aes(x = bill_length_mm, 
              y = bill_depth_mm)) +
   geom_point() +
@@ -112,7 +140,7 @@ library(palmerpenguins)
 ```
 
 ```{r, echo=F, message=F, warning=F, fig.cap="Figure 1: Bill depth vs. bill length for penguins near Palmer Station, Antarctica."}
-penguins %>%
+penguins |>
   ggplot(aes(x = bill_length_mm, 
              y = bill_depth_mm)) +
   geom_point() +
@@ -131,7 +159,7 @@ For example,
 
 ````
 ```{r, echo=F, message=F}`r''`
-table(penguins$island, penguins$species) %>%
+table(penguins$island, penguins$species) |>
   knitr::kable(caption = "Table 3.2: Penguins by island and species")
 ```
 ````
@@ -139,11 +167,11 @@ table(penguins$island, penguins$species) %>%
 is displayed as
 
 ```{r, echo=F, message=F}
-table(penguins$island, penguins$species) %>%
+table(penguins$island, penguins$species) |>
   knitr::kable(caption = "Table 3.2: Penguins by island and species")
 ```
 
-### Writing math in Quarto or Quarto
+### Writing math in Quarto or R Markdown
 
 If you want to write mathematical notation, we need to tell Markdown, “Hey, we’re going to make a math symbol!” To do that, you use dollar signs. For instance, to make $\widehat{\beta}_1$, you simply put `$\widehathat{\beta}_1$` into the white space (not a chunk) in youQuarto.
 
@@ -155,3 +183,34 @@ Here are some examples of writing math, which you can adapt:
 | $\log \left( \dfrac{\pi_i}{1 - \pi_i} \right)$ | `$\log \left( \dfrac{\pi_i}{1 - \pi_i} \right)$` |
 | $\widehat{\pi}_i$ | `$\widehat{\pi}_i$` |
 
+# Checklist
+
+* Change name in Quarto YAML
+* Four sections: Research question, Data summary, Univariate EDA, Multivariate EDA
+* Research question: a description of the research question you will investigate
+  * Chosen data must have binary outcome of interest
+  * Chosen data must have at least 5 other variables, including at least one categorical variable and two quantitative variables
+* Data Summary:
+  * What does a row in the data represent? 
+  * How many rows and columns are there? 
+  * What variables are in the data?
+  * Are there any missing data?
+* Univariate EDA:
+  * Pick three variables *relevant to the research question*
+  * Plot, appropriate summary statistics, and describe distribution for each variable
+* Multivariate EDA:
+  * One or more plots that examine the relationships between the three variables from univariate EDA
+  * Plots allow you to address the research question
+  * Discuss plots in context of research question
+* Writing:
+  * Each section written as a paragraph, with full sentences
+  * No bullet points or lists
+* Code:
+  * Code is included in the Quarto document, but *not* displayed in the rendered HTML
+  * The only R output shown in the report is figures and tables
+* Figures:
+  * Include meaningful caption and axis labels (see above for details on including a caption)
+  * Each figure included in the report is discussed in your writing, and referred to by its figure number
+* Submission:
+  * Submit *both* the rendered HMTL and the .qmd file to Canvas
+  * Deadline is Friday, September 12 at 10pm

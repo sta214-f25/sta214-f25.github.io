@@ -20,7 +20,7 @@ editor_options:
 * HW 2 released, due next Friday
 * Project part 1 released (choosing a dataset + EDA)
     * Project will be released in several pieces
-    * Due in 2 weeks
+    * Part 1 due in 2 weeks
 * Department seminar coming up on 9/11
     * Attendance part of class participation grade
     * If you can't attend in person, can instead watch a seminar on YouTube
