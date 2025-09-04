@@ -1,0 +1,89 @@
+---
+title: "Class activity: maximum likelihood and logistic regression"
+format: html
+---
+
+# Maximum likelihood for logistic regression
+
+In class, we have seen how to estimate parameters by maximum likelihood. The same principle can be applied to estimate the coefficients in a logistic regression model.
+
+Consider the model
+
+$$Y_i \sim Bernoulli(\pi_i)$$
+
+$$\log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 X_i$$
+
+It turns out that the log-likelihood for this model is
+
+$$\log L(\beta_0, \beta_1) = \sum \limits_{i=1}^n [ Y_i \log(\pi_i) + (1 - Y_i) \log(1 - \pi_i) ] $$
+
+## Example
+
+Consider the grad applications data from HW 1. On HW, we fit a model with gpa as the explanatory variable:
+
+```{r}
+grad_app <- read.csv("https://stats.idre.ucla.edu/stat/data/binary.csv")
+
+m1 <- glm(admit ~ gpa, data = grad_app, family = binomial)
+```
+
+We can find the log-likelihood for the fitted model with the `logLik` function in R:
+
+```{r}
+logLik(m1)
+```
+
+Alternatively, we can calculate the log-likelihood using the equation above.
+
+1. Run the code below to calculate the log-likelihood for the fitted model, using the formula given above:
+
+```{r, eval=F}
+beta0 <- m1$coefficients[1]
+beta1 <- m1$coefficients[2]
+
+probs <- exp(beta0 + beta1*grad_app$gpa)/
+  (1 + exp(beta0 + beta1*grad_app$gpa))
+
+sum(grad_app$admit*log(probs) + (1 - grad_app$admit)*log(1 - probs))
+```
+
+2. How does the result compare to the log-likelihood returned by the `logLik` function?
+
+3. Change the values of `beta0` and `beta` and re-run the code. How does the log-likelihood change?
+
+
+## Maximizing
+
+Maximizing the log-likelihood for the logistic regression model above is not a trivial task -- in fact, there is no closed-form solution. 
+
+How do we optimize functions if there is no closed-form solution? General-purpose optimization algorithms are provided in R with the `optim` function. To use `optim`, we need to specify (a) initial estimates for the parameters (the regression coefficients), and (b) the function to optimize.
+
+Here is a function in R to calculate the log-likelihood for the grad app data with GPA as the explanatory variable:
+
+```{r}
+app_log_lik <- function(beta){
+  beta0 <- beta[1]
+  beta1 <- beta[2]
+  
+  probs <- exp(beta0 + beta1*grad_app$gpa)/
+    (1 + exp(beta0 + beta1*grad_app$gpa))
+  
+  sum(grad_app$admit*log(probs) + (1 - grad_app$admit)*log(1 - probs))
+}
+
+# examples
+app_log_lik(c(-4, 1))
+app_log_lik(m1$coefficients)
+```
+
+4. Run the code below to maximize the log-likelihood when our initial guess for $\beta_0$ is -4 and our initial guess for $\beta_1$ is 1:
+
+```{r, eval=F}
+optim(c(-4, 1), app_log_lik, method="Nelder-Mead",
+      control = list(fnscale = -1))
+```
+
+
+How do the estimated coefficients (`$par`) and the log-likelihood (`$value`) compare to the fitted model from `glm`?
+
+
