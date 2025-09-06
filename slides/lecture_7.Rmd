@@ -1,0 +1,398 @@
+---
+title: Logistic regression assumptions and diagnostics
+output:
+  xaringan::moon_reader:
+    css: "lab-slides.css"
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+editor_options: 
+  chunk_output_type: console
+---
+
+### Motivating example: Dengue data
+
+.large[
+**Data:** Data on 5720 Vietnamese children, admitted to the hospital with possible dengue fever. Variables include:
+
+* *Sex*: patient's sex (female or male)
+* *Age*: patient's age (in years)
+* *WBC*: white blood cell count
+* *PLT*: platelet count
+* other diagnostic variables...
+* *Dengue*: whether the patient has dengue (0 = no, 1 = yes)
+]
+
+---
+
+### Previously: Logistic regression model
+
+.large[
+$$Y_i = \text{dengue status (0 = negative, 1 = positive)}$$
+
+$$Y_i \sim Bernoulli(\pi_i)$$
+
+$$\log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 WBC_i$$
+
+.question[
+What assumptions does this logistic regression model make? How should we assess these assumptions? Discuss with your neighbor for 2--3 minutes, then we will discuss as a group.
+]
+]
+
+---
+
+### Residual plots for linear regression
+
+.large[
+$$PLT_i = \beta_0 + \beta_1 WBC_i + \varepsilon_i$$
+]
+
+```{r echo=F, message=F, fig.width=10, fig.height = 5, fig.align='center'}
+library(tidyverse)
+library(gridExtra)
+dengue <- read.csv("https://sta279-s22.github.io/labs/dengue.csv")
+
+m1 <- lm(PLT ~ WBC, data = dengue)
+p1 <- dengue |>
+  ggplot(aes(x = WBC, y = PLT)) +
+  geom_point(size=1.5) +
+  geom_smooth(se=F, method="lm", formula = y ~ x, color="blue", lwd=1.2) +
+  theme_bw() +
+  theme(text = element_text(size = 20))
+
+p2 <- data.frame(WBC = dengue$WBC,
+           Residual = dengue$PLT - m1$fitted.values) %>%
+  ggplot(aes(x = WBC, y = Residual)) +
+  geom_point(size=1.5) +
+  geom_abline(slope = 0, intercept = 0, color="blue", lwd=1.2) +
+  theme_bw() +
+  theme(text = element_text(size = 20))
+
+grid.arrange(p1, p2, ncol=2)
+```
+
+
+
+
+---
+
+### Don't use raw residuals for logistic regression
+
+.large[
+Fitted model: $\log \left(\dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i}\right) = 1.737 - 0.361 \ WBC_i$
+]
+
+.large[
+Raw residuals $Y_i - \widehat{\pi}_i$:
+]
+
+```{r echo=F, message=F, fig.width=7, fig.height = 5, fig.align='center'}
+
+
+m1 <- glm(Dengue ~ WBC, data = dengue, family = binomial)
+data.frame(WBC = dengue$WBC,
+           Residual = dengue$Dengue - m1$fitted.values) %>%
+  ggplot(aes(x = WBC, y = Residual)) +
+  geom_point(size=1.5) +
+  geom_abline(slope = 0, intercept = 0, color="blue", lwd=1.2) +
+  theme_bw() +
+  theme(text = element_text(size = 20))
+```
+
+---
+
+### Assessing shape with empirical logit plots
+
+.large[
+**Example:** Putting data. Interested in the relationship between the length of a putt, and whether it was made:
+
+$$Y_i \sim Bernoulli(\pi_i)$$
+
+$$\log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 \ Length_i$$
+
+| Length | 3 | 4 | 5 | 6 | 7 |
+| --- | --- | --- | --- | --- | --- |
+| Number of successes | 84 | 88 | 61 | 61 | 44 |
+| Number of failures | 17 | 31 | 47 | 64 | 90 |
+| Total | 101 | 119 | 108 | 125 | 134 |
+]
+
+---
+
+### Empirical logits
+
+.large[
+**Step 1:** estimate the probability of success for each length of putt
+
+| Length | 3 | 4 | 5 | 6 | 7 |
+| --- | --- | --- | --- | --- | --- |
+| Number of successes | 84 | 88 | 61 | 61 | 44 |
+| Number of failures | 17 | 31 | 47 | 64 | 90 |
+| Total | 101 | 119 | 108 | 125 | 134 |
+| Probability of success $\widehat{\pi}$ | 0.832 | 0.739 | 0.565 | 0.488 | 0.328 |
+]
+
+---
+
+### Empirical logits
+
+.large[
+**Step 2:** convert empirical probabilities to empirical log odds
+
+| Length | 3 | 4 | 5 | 6 | 7 |
+| --- | --- | --- | --- | --- | --- |
+| Number of successes | 84 | 88 | 61 | 61 | 44 |
+| Number of failures | 17 | 31 | 47 | 64 | 90 |
+| Total | 101 | 119 | 108 | 125 | 134 |
+| Probability of success $\widehat{\pi}$ | 0.832 | 0.739 | 0.565 | 0.488 | 0.328 |
+| Odds $\dfrac{\widehat{\pi}}{1 - \widehat{\pi}}$ | 4.941 | 2.839 | 1.298 | 0.953 | 0.489 |
+| Log-odds $\log \left( \dfrac{\widehat{\pi}}{1 - \widehat{\pi}} \right)$ | 1.60 | 1.04 | 0.26 | -0.05 | -0.72 |
+]
+
+---
+
+### Empirical logits
+
+.large[
+**Step 3:** plot empirical log-odds against predictor, and add a least-squares line
+
+```{r echo=F, message=F, fig.width=7, fig.height=4.5, fig.align='center'}
+data.frame(length = c(3, 4, 5, 6, 7),
+  log_odds = c(1.6, 1.04, 0.26, -0.05, -0.72)) %>% 
+  ggplot(aes(x = length, y = log_odds)) + 
+  geom_point(size=3) + 
+  geom_smooth(se=F, method="lm") +
+  labs(x = "Length (feet)",
+       y = "Empirical log-odds") +
+  theme_bw() +
+  theme(text = element_text(size = 25))
+```
+
+.question[
+Does it seem reasonable that the log-odds are a linear function of length?
+]
+]
+
+---
+
+### Back to the dengue data...
+
+.large[
+
+| WBC | 0.90 | 1.15 | 1.23 | 1.25 | 1.54 | 1.58 | ... |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Dengue = 0 | 0 | 0 | 0 | 0 | 0 | 0 | ... |
+| Dengue = 1 | 1 | 2 | 1 | 1 | 3 | 1 | ... |
+
+.question[
+What problem do I run into?
+]
+]
+
+---
+
+### Binned empirical logit plots
+
+```{r echo=F, message=F, fig.align='center', fig.width=7, fig.height=5}
+logodds_plot <- function(data, reg_formula, group,
+                         num_bins = 5){
+  
+  var_names <- all.vars(reg_formula)
+
+  if(length(var_names) != 2){
+    stop("Only one variable can appear on the x-axis")
+  }
+
+  if(!is.numeric(data[[var_names[2]]])){
+    stop("The explanatory variable must be numeric")
+  }
+  
+  # to do: error message if outcome is not binary
+  
+  data <- data |>
+    select(all_of(var_names), {{group}}) |>
+    drop_na()
+
+  dat <- model.frame(reg_formula, data)
+  
+
+  xname <- colnames(dat)[2]
+  yname <- colnames(dat)[1]
+  colnames(dat) <- c("y", "x")
+
+  if(any(is.infinite(dat$x))){
+    stop(paste("There are non-finite values in", xname))
+  }
+
+  if(!missing(group)){
+    dat <- dat |>
+      mutate({{group}} := as.factor(data |> pull({{group}})))
+  }
+
+  dat |>
+    arrange({{group}}, x) |>
+    group_by({{group}}) |>
+    mutate(bin = rep(1:num_bins,
+                     each=ceiling(n()/num_bins))[1:n()]) |>
+    group_by(bin, {{group}}) |>
+    summarize(x = mean(x),
+                prop = (sum(y) + 0.5)/(n() + 1),
+                num_obs = n(),
+                .groups = "drop") |>
+    mutate(logodds = log(prop/(1 - prop))) |>
+    ggplot(aes(x = x,
+               y = logodds,
+               color = {{group}})) +
+    geom_point() +
+    geom_smooth(se=F, method="lm", formula = y ~ x) +
+    theme_bw() +
+    labs(x = xname,
+         y = "Empirical log odds")
+}
+
+dengue |>
+  logodds_plot(Dengue ~ WBC, num_bins = 15) +
+  theme(text = element_text(size=20))
+```
+
+---
+
+### Binned empirical logit plots
+
+```{r echo=F, message=F, fig.align='center', fig.width=7, fig.height=5}
+dengue |>
+  logodds_plot(Dengue ~ WBC, num_bins = 15) +
+  theme(text = element_text(size=20))
+```
+
+.large[
+.question[
+Does it seem reasonable that the log-odds are a linear function of WBC?
+]
+]
+
+---
+
+### Class activity, Part I
+
+.large[
+[https://sta214-f25.github.io/class_activities/ca_7.html](https://sta214-f25.github.io/class_activities/ca_7.html)
+]
+
+---
+
+### Class activity
+
+```{r, echo=F, message=F, warning=F, fig.align='center', fig.width=6, fig.height=5}
+titanic <- read.csv("https://sta214-s23.github.io/homework/Titanic.csv")
+
+titanic |>
+  logodds_plot(Survived ~ Fare, num_bins = 20) +
+  theme(text = element_text(size=20))
+```
+
+---
+
+### Class activity
+
+```{r, echo=F, message=F, warning=F, fig.align='center', fig.width=6, fig.height=5}
+titanic |>
+  logodds_plot(Survived ~ log(Fare + 1),
+               num_bins = 20) +
+  theme(text = element_text(size=20))
+```
+
+---
+
+### Why residuals in linear regression are nice
+
+```{r, echo=F, message=F, warning=F, fig.align='center', fig.width=7, fig.height=7}
+x <- runif(100, -1, 1)
+y <- x + rnorm(100, sd=0.2)
+
+p1 <- data.frame(x, y) |>
+  ggplot(aes(x = x, y = y)) +
+  geom_point() +
+  theme_bw() +
+  theme(text = element_text(size = 20)) +
+  labs(title = "Dataset 1")
+
+m1 <- lm(y ~ x)
+p2 <- data.frame(x = x,
+           Residual = y - m1$fitted.values) %>%
+  ggplot(aes(x = x, y = Residual)) +
+  geom_point(size=1.5) +
+  geom_abline(slope = 0, intercept = 0, color="blue", lwd=1.2) +
+  theme_bw() +
+  theme(text = element_text(size = 20)) +
+  labs(title = "Residuals 1")
+
+
+y <- x^2 + rnorm(100, sd=0.2)
+
+p3 <- data.frame(x, y) |>
+  ggplot(aes(x = x, y = y)) +
+  geom_point() +
+  theme_bw() +
+  theme(text = element_text(size = 20)) +
+  labs(title = "Dataset 2")
+
+m1 <- lm(y ~ x)
+p4 <- data.frame(x = x,
+           Residual = y - m1$fitted.values) %>%
+  ggplot(aes(x = x, y = Residual)) +
+  geom_point(size=1.5) +
+  geom_abline(slope = 0, intercept = 0, color="blue", lwd=1.2) +
+  theme_bw() +
+  theme(text = element_text(size = 20)) +
+  labs(title = "Residuals 2")
+
+
+grid.arrange(p1, p3, p2, p4, ncol = 2)
+```
+
+
+---
+
+### Quantile residuals for logistic regression
+
+```{r, echo=F, message=F, warning=F, fig.align='center', fig.width=10, fig.height=4}
+library(statmod)
+set.seed(12)
+
+m1 <- glm(Survived ~ Fare, data = titanic, family = binomial)
+p1 <- data.frame(Fare = titanic$Fare, residuals = qresid(m1)) %>%
+  ggplot(aes(x = Fare, y = residuals)) +
+  geom_point(alpha = 0.3) +
+  geom_smooth(lwd = 1.2, span=0.75) +
+  theme_bw() +
+  labs(title = "Survived ~ Fare",
+       y = "Quantile residuals") +
+  scale_x_continuous(limits = c(0, 200)) +
+  theme(text = element_text(size = 20))
+
+
+m1 <- glm(Survived ~ log(Fare + 1), data = titanic, family = binomial)
+p2 <- data.frame(Fare = log(titanic$Fare + 1), residuals = qresid(m1)) %>%
+  ggplot(aes(x = Fare, y = residuals)) +
+  geom_point(alpha = 0.3) +
+  geom_smooth(lwd = 1.2, span=0.75) +
+  theme_bw() +
+  labs(title = "Survived ~ log(Fare+1)",
+       x = "log(Fare + 1)",
+       y = "Quantile residuals") +
+  theme(text = element_text(size = 20))
+
+grid.arrange(p1, p2, ncol=2)
+```
+
+
+---
+
+### Class activity, Part II
+
+.large[
+[https://sta214-f25.github.io/class_activities/ca_7.html](https://sta214-f25.github.io/class_activities/ca_7.html)
+]
