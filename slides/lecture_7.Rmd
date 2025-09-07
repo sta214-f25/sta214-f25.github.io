@@ -278,7 +278,9 @@ Does it seem reasonable that the log-odds are a linear function of WBC?
 ### Class activity, Part I
 
 .large[
-[https://sta214-f25.github.io/class_activities/ca_7.html](https://sta214-f25.github.io/class_activities/ca_7.html)
+[https://sta214-f25.github.io/class_activities/ca_07.html](https://sta214-f25.github.io/class_activities/ca_07.html)
+
+(Don't need to submit this one)
 ]
 
 ---
@@ -394,5 +396,7 @@ grid.arrange(p1, p2, ncol=2)
 ### Class activity, Part II
 
 .large[
-[https://sta214-f25.github.io/class_activities/ca_7.html](https://sta214-f25.github.io/class_activities/ca_7.html)
+[https://sta214-f25.github.io/class_activities/ca_07.html](https://sta214-f25.github.io/class_activities/ca_07.html)
+
+(Don't need to submit this one)
 ]
