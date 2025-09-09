@@ -1,0 +1,117 @@
+---
+title: "Class activity: logistic regression diagnostics"
+format: html
+---
+
+**Instructions:** 
+
+* Work individually or with a neighbor to answer the following questions 
+* To get started, download the [class activity template](https://sta214-f25.github.io/class_activities/ca_08_template.qmd) file
+* When you are finished, render the file as an HTML and submit the HTML to Canvas (let me know if you encounter any problems)
+
+# Multicollinearity
+
+In the first part of this class activity, we will explore the effects of multicollinearity on a fitted logistic regression model.
+
+The following code generates three correlated explanatory variables. The correlation between the three variables, $\rho$, is specified by `rho` in the code. Simulating the explanatory variables uses the `rmvnorm(...)` function of the `mvtnorm` package; you may need to install the `mvtnorm` package.
+
+We then simulate data $Y_i \sim Bernoulli(\pi_i)$, with 
+
+$$\pi_i = \dfrac{e^{\beta_0 + \beta_1 X_{i,1} + \beta_2 X_{i,2} + \beta_3 X_{i,3}}}{1 + e^{\beta_0 + \beta_1 X_{i,1} + \beta_2 X_{i,2} + \beta_3 X_{i,3}}}$$
+
+```{r, eval=F}
+library(mvtnorm) # you will need to install mvtnorm first!
+
+n <- 1000
+rho <- 0
+beta <- c(0, 1, 1, 1)
+
+# Create the covariance matrix sigma
+sigma <- diag(rep(1 - rho, 3)) + matrix(rep(rho, 9), nrow=3)
+
+# Generate Xs from a multivariate normal distribution
+X <- rmvnorm(n, sigma = sigma)
+
+# make a design matrix X_complete which includes the initial column of 1s for 
+# the intercept
+X_complete <- cbind(1, X)
+
+# generate probabilities p
+p <- exp(X_complete %*% beta)/(1 + exp(X_complete %*% beta))
+
+# generate bernoulli response y
+y <- rbinom(n, 1, p)
+
+# fit a model to all the explanatory variables
+m1 <- glm(y ~ X, family = binomial)
+summary(m1)
+```
+
+## Questions
+
+1. Run the code above with $\rho = 0$. Then use the code below to check for multicollinearity in the data. Does multicollinearity appear to be a concern?
+
+```{r, eval=F}
+library(tidyverse)
+library(GGally)
+
+data.frame(X) |>
+  ggpairs() +
+  theme_classic()
+```
+
+2. When $\rho = 0$, how do the coefficient estimates compare to the *true* values in the simulation ($\beta_0 = 0, \ \beta_1 =  1, \ \beta_2 = 1, \ \beta_3 = 1)$)? Run the code several times to confirm.
+
+3. Report the approximate standard errors of the estimated coefficients (from the `summary` output) when $\rho = 0$.
+
+4. Now change the correlation $\rho$ to `rho = 0.6` in the simulation, and remake the pairs plot to check for multicollinearity. Does multicollinearity appear to be a concern?
+
+5. Report the approximate standard errors of the estimated coefficients (from the `summary` output) when $\rho = 0.6$. How do these values compare to the results in question 3?
+
+6. Finally, change the correlation $\rho$ to `rho = 1` in the simulation, and run the code. What changes?
+
+# Influential points
+
+In the second part of this class activity, we will explore the effects of influential points on our fitted regression model. The following code simulates data from the logistic regression model
+
+$$Y_i \sim Bernoulli(\pi_i)$$
+
+$$\log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = -1 + 2 X_i$$
+then adds a potential outlier at $X = -2$.
+
+```{r, eval=F}
+# simulate a single explanatory variable from a Normal distribution
+x <- rnorm(100)
+
+# create P(Y = 1 | X) for each entry in x
+# Here log odds = -1 + 2x
+p <- exp(-1 + 2*x)/(1 + exp(-1 + 2*x))
+
+# Finally, simulate a binary response at each x
+y <- rbinom(100, 1, p)
+
+x1 <- c(x, -5)
+y1 <- c(y, 1)
+
+# Fit a model WITH the unusual observation
+m1 <- glm(y1 ~ x1, family = binomial)
+summary(m1)
+
+# Fit a model WITHOUT the unusual observation
+m2 <- glm(y ~ x, family = binomial)
+summary(m2)
+```
+
+## Questions
+
+7. Run the code several times. How does the potential outlier impact the parameter estimates?
+
+8. One way to check for influential points is with *Cook's distance*. The code below creates a plot of Cook's distance for the model with the potential outlier. How does Cook's distance for the potential outlier ($X = -2$) compare to the other values of Cook's distance in the plot?
+
+```{r, eval=F}
+plot(x1, cooks.distance(m1))
+```
+
+
+9. Play with the location of the potential outlier (e.g., try $X = -5$, or $X = -10$). Then re-run the code several times. How does the location of the outlier change its influence on the parameter estimates? What about the value of Cook's distance?
+

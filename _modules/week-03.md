@@ -8,6 +8,7 @@ September 8
 
 September 10
 : Multicollinearity and influential points
+  : [slides](https://sta214-f25.github.io/slides/lecture_8.pdf), [activity](https://sta214-f25.github.io/class_activities/ca_08.html)
   
 September 12
 : Wrapping up diagnostics
