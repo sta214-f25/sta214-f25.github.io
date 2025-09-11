@@ -12,5 +12,7 @@ September 10
   
 September 12
 : Wrapping up diagnostics
+  : [activity](https://sta214-f25.github.io/class_activities/ca_09.html)
   
 : **Homework 3 released**{: .label .label-yellow }
+  : [HW 3](https://sta214-f25.github.io/homework/HW3.pdf)

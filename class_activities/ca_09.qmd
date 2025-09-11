@@ -1,0 +1,263 @@
+---
+title: "Class activity: logistic regression diagnostics"
+format: html
+---
+
+**Instructions:** 
+
+* Work individually or with a neighbor to answer the following questions 
+* To get started, download the [class activity template](https://sta214-f25.github.io/class_activities/ca_09_template.qmd) file
+* When you are finished, render the file as an HTML and submit the HTML to Canvas (let me know if you encounter any problems)
+
+**If you completed any part of this activity last time, you do not need to do it again! Move on the questions you have not yet completed**
+
+# Multicollinearity
+
+In the first part of this class activity, we will explore the effects of multicollinearity on a fitted logistic regression model.
+
+The following code generates three correlated explanatory variables. The correlation between the three variables, $\rho$, is specified by `rho` in the code. Simulating the explanatory variables uses the `rmvnorm(...)` function of the `mvtnorm` package; you may need to install the `mvtnorm` package.
+
+We then simulate data $Y_i \sim Bernoulli(\pi_i)$, with 
+
+$$\pi_i = \dfrac{e^{\beta_0 + \beta_1 X_{i,1} + \beta_2 X_{i,2} + \beta_3 X_{i,3}}}{1 + e^{\beta_0 + \beta_1 X_{i,1} + \beta_2 X_{i,2} + \beta_3 X_{i,3}}}$$
+
+```{r, eval=F}
+library(mvtnorm) # you will need to install mvtnorm first!
+
+n <- 1000
+rho <- 0
+beta <- c(0, 1, 1, 1)
+
+# Create the covariance matrix sigma
+sigma <- diag(rep(1 - rho, 3)) + matrix(rep(rho, 9), nrow=3)
+
+# Generate Xs from a multivariate normal distribution
+X <- rmvnorm(n, sigma = sigma)
+
+# make a design matrix X_complete which includes the initial column of 1s for 
+# the intercept
+X_complete <- cbind(1, X)
+
+# generate probabilities p
+p <- exp(X_complete %*% beta)/(1 + exp(X_complete %*% beta))
+
+# generate bernoulli response y
+y <- rbinom(n, 1, p)
+
+# fit a model to all the explanatory variables
+m1 <- glm(y ~ X, family = binomial)
+summary(m1)
+```
+
+## Questions
+
+1. Run the code above with $\rho = 0$. Then use the code below to check for multicollinearity in the data. Does multicollinearity appear to be a concern?
+
+```{r, eval=F}
+library(tidyverse)
+library(GGally)
+
+data.frame(X) |>
+  ggpairs() +
+  theme_classic()
+```
+
+2. When $\rho = 0$, how do the coefficient estimates compare to the *true* values in the simulation ($\beta_0 = 0, \ \beta_1 =  1, \ \beta_2 = 1, \ \beta_3 = 1)$)? Run the code several times to confirm.
+
+3. Report the approximate standard errors of the estimated coefficients (from the `summary` output) when $\rho = 0$.
+
+4. Now change the correlation $\rho$ to `rho = 0.6` in the simulation, and remake the pairs plot to check for multicollinearity. Does multicollinearity appear to be a concern?
+
+5. Report the approximate standard errors of the estimated coefficients (from the `summary` output) when $\rho = 0.6$. How do these values compare to the results in question 3?
+
+6. Finally, change the correlation $\rho$ to `rho = 1` in the simulation, and run the code. What changes?
+
+# Influential points
+
+In the second part of this class activity, we will explore the effects of influential points on our fitted regression model. The following code simulates data from the logistic regression model
+
+$$Y_i \sim Bernoulli(\pi_i)$$
+
+$$\log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = -1 + 2 X_i$$
+then adds a potential outlier at $X = -2$.
+
+```{r, eval=F}
+# simulate a single explanatory variable from a Normal distribution
+x <- rnorm(100)
+
+# create P(Y = 1 | X) for each entry in x
+# Here log odds = -1 + 2x
+p <- exp(-1 + 2*x)/(1 + exp(-1 + 2*x))
+
+# Finally, simulate a binary response at each x
+y <- rbinom(100, 1, p)
+
+x1 <- c(x, -5)
+y1 <- c(y, 1)
+
+# Fit a model WITH the unusual observation
+m1 <- glm(y1 ~ x1, family = binomial)
+summary(m1)
+
+# Fit a model WITHOUT the unusual observation
+m2 <- glm(y ~ x, family = binomial)
+summary(m2)
+```
+
+## Questions
+
+7. Run the code several times. How does the potential outlier impact the parameter estimates?
+
+### Cook's distance
+
+One way to check for influential points is with a measure called *Cook's distance*. For a logistic regression model with coefficients $\beta_0, \beta_1,...,\beta_k$, the Cook's distance for the $i$th observation is defined as
+
+$$D_i = \dfrac{(Y_i - \widehat{\pi}_i)^2}{(k+1) \widehat{\pi}_i(1 - \widehat{\pi}_i)} \cdot \dfrac{h_i}{(1 - h_i)^2}$$
+
+where $h_i$ is a metric called *leverage*. The precise definition of $h_i$ is outside the scope of this class; the key point is that higher values of $h_i$ mean that the $i$th observation is "unusual" in the $X$ direction.
+
+So what is Cook's distance doing? It is combining distance in the $Y$ direction -- that is, $(Y_i - \widehat{\pi}_i)^2$ -- with distance in the $X$ direction (the leverage $h_i$). The precise mathematical definition isn't essential in 214; what matters is that for a point to be influential, it needs to be unusual in both the $X$ and $Y$ directions.
+
+
+8. The code below creates a plot of Cook's distance for the model with the potential outlier. How does Cook's distance for the potential outlier ($X = -2$) compare to the other values of Cook's distance in the plot?
+
+```{r, eval=F}
+plot(x1, cooks.distance(m1))
+```
+
+
+9. Play with the location of the potential outlier (e.g., try $X = -5$, or $X = -10$). Then re-run the code several times. How does the location of the outlier change its influence on the parameter estimates? What about the value of Cook's distance?
+
+## Putting it all together
+
+In the second part of this class activity, we will work with a dataset on US small business loans. 
+
+The US Small Business Administration (SBA) is a government agency dedicated to helping support small businesses. The SBA provides loans to small businesses, but some businesses *default* on their loan (i.e., fail to pay it back). Researchers at the SBA are interested in predicting whether a business will default on the loan, and they have collected a random sample of 4991 different loans.
+
+To predict default rates, the SBA would like to build a model which accounts for the loan amount, the term of the loan, the size of the business, whether the business is urban or rural, and whether the business is new. They have collected the following variables for each loan in the data:
+
+* `Default`: whether the business defaulted on the loan (1 = yes, 0 = no)
+* `UrbanRural`: 1 if business is in urban area, 2 if business is in rural area, 0 if unknown
+* `NewExist`: 1 if business already existed, 2 if business is new, 0 if unknown
+* `Term`: Length of the loan term (months)
+* `NoEmp`: Number of employees of the business before receiving the loan
+* `GrAppv`: Gross amount of loan approved by the bank, in dollars
+* `SBA_Appv`: Amount of the loan guaranteed by the SBA, in dollars
+* `DisbursementGross`: The amount of money disbursed (loaned), in dollars
+
+You can load the SBA data into R with
+
+```{r, eval=F}
+sba <- read.csv("https://sta214-f25.github.io/class_activities/sba_small.csv")
+```
+
+## Questions
+
+10. Before building a model, we should check for potential multicollinearity in the explanatory variables. Which of the explanatory variables may be highly correlated?
+
+To explore correlation in the quantitative explanatory variables, we can use a pairs plot (a matrix of scatterplots and correlations). The code below will create a nicely formatted pairs plot using the `ggpairs` function in the `GGally` package.
+
+```{r, eval=F}
+library(tidyverse)
+library(GGally)
+
+sba |>
+  select(GrAppv, SBA_Appv, DisbursementGross,
+         Term, NoEmp) |>
+  ggpairs(upper = list(continuous = "points"),
+          lower = list(continuous = 
+                         GGally::wrap(ggally_cor, stars = F))) +
+  theme_classic()
+```
+
+11. Run the code to create the pairs plot. Which variables appear highly correlated? Which variables will be easiest to interpret? Choose a subset of variables with which to predict loan default in the SBA data, and explain your choice. (You may create new variables if you wish)
+
+Now let's explore the shape assumption with empirical logit plots. The code below creates an empirical logit plot for `Term`:
+
+```{r, eval=F}
+logodds_plot <- function(data, reg_formula, group,
+                         num_bins = 5){
+  
+  var_names <- all.vars(reg_formula)
+
+  if(length(var_names) != 2){
+    stop("Only one variable can appear on the x-axis")
+  }
+
+  if(!is.numeric(data[[var_names[2]]])){
+    stop("The explanatory variable must be numeric")
+  }
+  
+  if(n_distinct(data[[var_names[1]]]) != 2){
+    stop("The response variable must be binary")
+  }
+  
+  data <- data |>
+    select(all_of(var_names), {{group}}) |>
+    drop_na()
+
+  dat <- model.frame(reg_formula, data)
+  
+
+  xname <- colnames(dat)[2]
+  yname <- colnames(dat)[1]
+  colnames(dat) <- c("y", "x")
+
+  if(any(is.infinite(dat$x))){
+    stop(paste("There are non-finite values in", xname))
+  }
+
+  if(!missing(group)){
+    dat <- dat |>
+      mutate({{group}} := as.factor(data |> pull({{group}})))
+  }
+
+  dat |>
+    arrange({{group}}, x) |>
+    group_by({{group}}) |>
+    mutate(bin = rep(1:num_bins,
+                     each=ceiling(n()/num_bins))[1:n()]) |>
+    group_by(bin, {{group}}) |>
+    summarize(x = mean(x),
+                prop = (sum(y) + 0.5)/(n() + 1),
+                num_obs = n(),
+                .groups = "drop") |>
+    mutate(logodds = log(prop/(1 - prop))) |>
+    ggplot(aes(x = x,
+               y = logodds,
+               color = {{group}})) +
+    geom_point() +
+    geom_smooth(se=F, method="lm", formula = y ~ x) +
+    theme_bw() +
+    labs(x = xname,
+         y = "Empirical log odds")
+}
+
+logodds_plot(sba, Default ~ Term, 
+             num_bins = 20)
+```
+
+12. Does the shape assumption seem reasonable? Create empirical logit plots for some other quantitative explanatory variables, and experiment with transformations if needed.
+
+13. Fill in the code below to fit a logistic regression model to predict `Default`, using your explanatory variables from question 11, and any transformations from question 12. Make sure categorical variables are coded as categorical variables!
+
+```{r, eval=F}
+m1 <- glm(Default ~ ...,
+          data = sba, family = binomial)
+summary(m1)
+```
+
+13. Check again for multicollinearity using VIFs. Do you see any issues? If so, make further adjustments to your model.
+
+```{r, eval=F}
+library(car) # you may need to install this package first!
+vif(m1)
+```
+
+Finally, let's check Cook's distance for influential observations. The largest Cook's distance is given by
+
+```{r, eval=F}
+max(cooks.distance(m1))
+```
+
+14. We are typically concerned about influential points if Cook's distance is larger than 0.5 or 1. Should we be concerned here?
