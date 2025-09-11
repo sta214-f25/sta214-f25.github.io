@@ -1,0 +1,28 @@
+---
+---
+---
+title: "Homework 3"
+format: 
+  html:
+    embed-resources: true
+editor: source
+author: "Your name"
+---
+
+**Collaborators:** (leave blank if none)
+
+**Instructions:** 
+
+* Answer each question on the homework assignment
+* When done, Render this file to HTML and submit the HTML on Canvas
+* For part I, you may submit a separate scan of your written work to Canvas, if you prefer
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+
+sfn <- read.csv("https://sta214-f25.github.io/homework/sfn.csv")
+```
+
+## Question 1
+

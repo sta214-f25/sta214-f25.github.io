@@ -523,6 +523,94 @@ The fitted coefficients above can be interpreted on the *log odds* scale, or on 
 * A one mm increase in flipper length is associated with an estimated decrease in the log odds that a penguin is male by a factor of $\exp\{-0.093\} = 0.911$, holding body mass constant
 * A one g increase in body mass is associated with an estimated increase in the log odds that a penguin is male by a factor of $\exp\{0.003\} = 1.003$, holding flipper length constant
 
+## Empirical logit plots
+
+Before fitting a logistic regression model, we can use empirical logit plots to visualize the relationship between the binary response and individual quantitative explanatory variables. 
+
+Here is a function I have written to allow you to create an empirical logit plot:
+
+```{r}
+logodds_plot <- function(data, reg_formula, group,
+                         num_bins = 5){
+  
+  var_names <- all.vars(reg_formula)
+
+  if(length(var_names) != 2){
+    stop("Only one variable can appear on the x-axis")
+  }
+
+  if(!is.numeric(data[[var_names[2]]])){
+    stop("The explanatory variable must be numeric")
+  }
+  
+  if(n_distinct(data[[var_names[1]]]) != 2){
+    stop("The response variable must be binary")
+  }
+  
+  data <- data |>
+    select(all_of(var_names), {{group}}) |>
+    drop_na()
+
+  dat <- model.frame(reg_formula, data)
+  
+
+  xname <- colnames(dat)[2]
+  yname <- colnames(dat)[1]
+  colnames(dat) <- c("y", "x")
+
+  if(any(is.infinite(dat$x))){
+    stop(paste("There are non-finite values in", xname))
+  }
+
+  if(!missing(group)){
+    dat <- dat |>
+      mutate({{group}} := as.factor(data |> pull({{group}})))
+  }
+
+  dat |>
+    arrange({{group}}, x) |>
+    group_by({{group}}) |>
+    mutate(bin = rep(1:num_bins,
+                     each=ceiling(n()/num_bins))[1:n()]) |>
+    group_by(bin, {{group}}) |>
+    summarize(x = mean(x),
+                prop = (sum(y) + 0.5)/(n() + 1),
+                num_obs = n(),
+                .groups = "drop") |>
+    mutate(logodds = log(prop/(1 - prop))) |>
+    ggplot(aes(x = x,
+               y = logodds,
+               color = {{group}})) +
+    geom_point() +
+    geom_smooth(se=F, method="lm", formula = y ~ x) +
+    theme_bw() +
+    labs(x = xname,
+         y = "Empirical log odds")
+}
+```
+
+And here is an example of using the function with the titanic data:
+
+```{r}
+logodds_plot(titanic, Survived ~ Fare, 
+             num_bins = 20)
+```
+
+**Usage:**
+
+* The first argument is the dataset (in this case `titanic`)
+* The second argument specifies the response and explanatory variables (provided as a formula, just like we would do in a call to `glm`)
+* `num_bins` specifies the number of bins to use (i.e., the number of resulting points in the empirical logit plot)
+
+From the plot, it looks like we may need a transformation. Let's try a square root:
+
+```{r}
+logodds_plot(titanic, Survived ~ sqrt(Fare), 
+             num_bins = 20)
+```
+
+
+
 ## Quantile residual plots
 
 Quantile residual plots can be created using the `qresid()` function of the `statmod` package. For example, suppose we fit a logistic regression on the `titanic` data with Survival as the response and Fare as the explanatory variable:
