@@ -9,6 +9,11 @@ editor_options:
   chunk_output_type: console
 ---
 
+```{r, include=F}
+library(tidyverse)
+```
+
+
 **Use:** The purpose of this codebook is to summarize key code that we use in R to visualize and explore data, fit models, assess assumptions, and test hypotheses.
 
 Many tasks in R, such as visualizing data, can be done in multiple different ways. Throughout this codebook I will tend to use the `tidyverse` for visualizing and cleaning data, but be aware that other options exist.
@@ -34,6 +39,145 @@ library(tidyverse)
 ```
 
 (The code is similar for other packages, just replace the name `tidyverse`). You will need to include `library(...)` calls in the setup chunk of your Quarto or R Markdown documents.
+
+# Reading data into R
+
+For your projects, you will need to download data from the internet and load it into R. Most sites will allow you to download data as a CSV file. So, we need to know how to load a CSV file into R!
+
+In R, we can use the `read_csv` function in the `readr` package from the `tidyverse`. Your code will look something like this:
+
+```{r, eval=F}
+library(tidyverse)
+
+my_data <- read_csv("...")
+```
+
+where you will fill in the `...` with the path to your CSV file. 
+
+*What is a file path?* The file path is the location of the file on your computer. It includes the directory (Downloads, Desktop, Documents, etc.) in which the file is saved, and the name of the file. For example, suppose I download a CSV file called `cool_data.csv`. This file was probably saved to my downloads, so I would read it in like this:
+
+* On Mac:
+
+```{r, eval=F}
+my_data <- read_csv("~/Downloads/cool_data.csv")
+```
+
+* On Windows it might look something like this:
+
+```{r, eval=F}
+my_data <- read_csv("C:/Users/YourUser/Downloads/cool_data.csv")
+```
+
+If you moved the file somewhere else (such as your Desktop), then the file path will change! For example, if I moved the CSV to the Desktop:
+
+* On Mac:
+
+```{r, eval=F}
+my_data <- read_csv("~/Desktop/cool_data.csv")
+```
+
+* On Windows it might look something like this:
+
+```{r, eval=F}
+my_data <- read_csv("C:/Users/YourUser/Desktop/cool_data.csv")
+```
+
+## What if I downloaded an Excel file?
+
+Data in an Excel file will likely have a `.xlsx` file extension (rather than a `.csv`). You can either save the Excel file as a CSV, or you can do the following:
+
+* Install the `readxl` package
+* Replace `read_csv` with `read_excel` in the code above
+
+# Datasets used in this codebook
+
+This codebook will reference several different datasets for different examples. Here is a brief description of each dataset.
+
+## Penguins data
+
+The `penguins` dataset in the `palmerpenguins` package contains measurements for 344 penguins from Palmer Archipelago, in Antarctica. Variables include `species`, `island`, `bill_length_mm`, `bill_depth_mm`, `flipper_length_mm`, `body_mass_g`, `sex`, and `year`.
+
+To load the `penguins` data, run the following in R (you may need to install the `palmerpenguins` package):
+
+```{r, eval=F}
+library(palmerpenguins)
+```
+
+More information about the penguins can be obtained by running the following in your R console:
+
+```{r, eval=F}
+?penguins
+```
+
+
+## Titanic data
+
+The RMS Titanic was a huge, luxury passenger liner designed and built in the early 20th century. Despite the fact that the ship was believed to be unsinkable, during her maiden voyage on April 15, 1912, the Titanic collided with an iceberg and sank. Of all the passengers and crew, less than half survived. Part of the reason why so few people survived has been attributed to the fact that the Titanic did not carry enough lifeboats for its passengers and crew. This meant that there was competition for space in the boats, and not everyone was able to make it aboard. Communication errors, stress and shock...there were a great many factors that contributed to this tragedy.
+
+The loss of life during the Titanic tragedy was enormous, but there were survivors. Was it random chance that these particular people survived? Or were there some specific characteristics of these people that led to their positions in the life boats? Let's investigate.
+
+We have observations on 12 different variables, some categorical and some numeric:
+
+* `Passenger`: A unique ID number for each passenger.
+* `Survived`: An indicator for whether the passenger survived (1) or perished (0) during the disaster.
+* `Pclass`: Indicator for the class of the ticket held by this passengers; 1 = 1st class, 2 = 2nd class, 3 = 3rd class.
+* `Name`: The name of the passenger.
+* `Sex`: Binary indicator for the sex of the passenger.
+* `Age`: Age of the passenger in years; Age is fractional if the passenger was less than 1 year old.
+* `SibSp`: number of siblings/spouses the passenger had aboard the Titanic. Here, siblings are defined as brother, sister, stepbrother, and stepsister. Spouses are defined as husband and wife.
+* `Parch`: number of parents/children the passenger had aboard the Titanic. Here, parent is defined as mother/father and child is defined as daughter,son, stepdaughter or stepson. NOTE: Some children traveled only with a nanny, therefore parch=0 for them. There were no parents aboard for these children.
+* `Ticket`: The unique ticket number for each passenger.
+* `Fare`: How much the ticket cost in US dollars.
+* `Cabin`: The cabin number assigned to each passenger. Some cabins hold more than one passenger.
+* `Embarked`: Port where the passenger boarded the ship; C = Cherbourg, Q = Queenstown, S = Southampton
+
+
+The titanic data can be loaded by
+
+```{r, message=F, warning=F}
+titanic <- read_csv("https://sta214-f25.github.io/homework/Titanic.csv")
+```
+
+
+## SBA data
+
+The US Small Business Administration (SBA) is a government agency dedicated to helping support small businesses. The SBA provides loans to small businesses, but some businesses *default* on their loan (i.e., fail to pay it back). Researchers at the SBA are interested in predicting whether a business will default on the loan, and they have collected a random sample of 4991 different loans.
+
+They have collected the following variables for each loan in the data:
+
+* `Default`: whether the business defaulted on the loan (1 = yes, 0 = no)
+* `UrbanRural`: 1 if business is in urban area, 2 if business is in rural area, 0 if unknown
+* `NewExist`: 1 if business already existed, 2 if business is new, 0 if unknown
+* `Term`: Length of the loan term (months)
+* `NoEmp`: Number of employees of the business before receiving the loan
+* `GrAppv`: Gross amount of loan approved by the bank, in dollars
+* `SBA_Appv`: Amount of the loan guaranteed by the SBA, in dollars
+* `DisbursementGross`: The amount of money disbursed (loaned), in dollars
+
+You can load the SBA data into R with
+
+```{r, eval=F}
+sba <- read.csv("https://sta214-f25.github.io/class_activities/sba_small.csv")
+```
+
+## PhD articles data
+
+This dataset contains information on the publication records of 915 biochemistry PhD students, with variables
+
+* `art`: articles published in last three years of Ph.D.
+* `fem`: gender (recorded as male or female)
+* `mar`: marital status (recorded as married or single)
+* `kid5`: number of children under age six
+* `phd`: prestige of Ph.D. program
+* `ment`: articles published by their mentor in last three years
+
+The data can be loaded by:
+
+```{r message=F, warning=F}
+library(foreign)
+articles <- read.dta("http://www.stata-press.com/data/lf2/couart2.dta")
+```
+
 
 # Exploratory data analysis (EDA)
 
@@ -523,7 +667,22 @@ The fitted coefficients above can be interpreted on the *log odds* scale, or on 
 * A one mm increase in flipper length is associated with an estimated decrease in the log odds that a penguin is male by a factor of $\exp\{-0.093\} = 0.911$, holding body mass constant
 * A one g increase in body mass is associated with an estimated increase in the log odds that a penguin is male by a factor of $\exp\{0.003\} = 1.003$, holding flipper length constant
 
-## Empirical logit plots
+## Assumptions and diagnostics
+
+Before fitting a logistic regression model:
+
+* Check empirical logit plots; make transformations as needed
+* Check for multicollinearity with scatterplots / correlations between quantitative explanatory variables; if needed, choose a subset of variables or combine variables
+
+After fitting a logistic regression model:
+
+* Check quantile residual plots
+* Check for multicollinearity with VIFs
+* Check for influential points with Cook's distance
+    * If influential points are clearly an error, can remove
+    * Otherwise, report results with and without influential points
+
+### Empirical logit plots
 
 Before fitting a logistic regression model, we can use empirical logit plots to visualize the relationship between the binary response and individual quantitative explanatory variables. 
 
@@ -611,7 +770,7 @@ logodds_plot(titanic, Survived ~ sqrt(Fare),
 
 
 
-## Quantile residual plots
+### Quantile residual plots
 
 Quantile residual plots can be created using the `qresid()` function of the `statmod` package. For example, suppose we fit a logistic regression on the `titanic` data with Survival as the response and Fare as the explanatory variable:
 
@@ -645,24 +804,109 @@ titanic |>
 
 Looks a bit better!
 
+### Checking for multicollinearity -- scatterplots and correlation
+
+*Multicollinearity* refers to the presence of multiple explanatory variables which are highly correlated. When we have correlated explanatory variables in our model, it can cause issues for our estimates of model coefficients.
+
+One way to check for multicollinearity is by assessing scatterplots of pairs of quantitative explanatory variables, and calculating the correlation coefficient for each pair. This can be done with the `ggpairs` function in the `GGally` package. For example, with the SBA data:
+
+```{r, message=F, warning=F}
+library(tidyverse)
+library(GGally)
+
+sba <- read_csv("https://sta214-f25.github.io/class_activities/sba_small.csv")
+
+sba |>
+  select(GrAppv, SBA_Appv, DisbursementGross,
+         Term, NoEmp) |>
+  ggpairs(upper = list(continuous = "points"),
+          lower = list(continuous = 
+                         GGally::wrap(ggally_cor, stars = F))) +
+  theme_classic()
+```
+
+From this plot, we can see that the `GrAppv`, `SBA_Appv`, and `DisbursementGross` variables are all highly correlated -- as each of these variables measures a related aspect of the loan amount, this should not surprise us!
+
+This suggests that we may wish to choose only one of these three variables (e.g., `DisbursementGross`), or somehow combine these three variables into a single variable.
+
+### Checking for multicollinearity -- VIFs
+
+A *variance inflation factor* (VIF) measures how much the variability of a model's estimated coefficients increases when other explanatory variables are added to the model. The more correlation there is between explanatory variables, the harder it is to reliably estimate the model coefficients (the $\beta$s), and so the more variability there will be in the coeffficient estimates (the $\widehat{\beta}$s).
+
+Variance inflation factors can be calculated after we fit a model, to do a second check for multicollinearity. Variance inflation factors can be calculated with the `vif` function from the `car` package.
+
+For example, suppose we ignored the scatterplots and correlations from the previous section, and fit a model with the SBA data:
+
+```{r, message=F, warning=F}
+library(car)
+
+m_sba <- glm(Default ~ GrAppv + SBA_Appv + 
+               DisbursementGross + Term,
+             data = sba, family = binomial)
+
+vif(m_sba)
+```
+
+The VIFs for the three correlated variables are *very* high! All VIF values will be $> 1$, and a general rule of thumb is to be concerned by VIFs above 5.
+
+Now if we fit a more reasonable model, choosing only one of the three correlated variables, we get a lower VIF for `DisbursementGross`:
+
+```{r}
+m_sba <- glm(Default ~ DisbursementGross + Term,
+             data = sba, family = binomial)
+
+vif(m_sba)
+```
+
+These two VIFs are about as low as possible (remember the lower bound is 1).
+
+### Influential points and Cook's distance
+
+*Outliers* are points which do not follow the general trend of the data. For example, suppose that we have data from the following logistic regression model:
+
+$$Y_i \sim Bernoulli(\pi_i)$$
+
+$$\log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = -1 + 2 X_i$$
+
+If $X_i = -2$, then $\pi_i = 0.0067$, meaning that observing $Y_i = 1$ for this value of $X_i$ is quite unusual. The point $(X_i, Y_i) = (-2, 1)$ would therefore be an *outlier* in the data.
+
+Outliers are concerning because they have the potential to *influence* the fit of our model. A point is *influential* if it substantially changes the estimated coefficients of the model. So how do we determine if a point is influential?
+
+One way to check for influential points is with a measure called *Cook's distance*. For a logistic regression model with coefficients $\beta_0, \beta_1,...,\beta_k$, the Cook's distance for the $i$th observation is defined as
+
+$$D_i = \dfrac{(Y_i - \widehat{\pi}_i)^2}{(k+1) \widehat{\pi}_i(1 - \widehat{\pi}_i)} \cdot \dfrac{h_i}{(1 - h_i)^2}$$
+
+where $h_i$ is a metric called *leverage*. The precise definition of $h_i$ is outside the scope of this class; the key point is that higher values of $h_i$ mean that the $i$th observation is "unusual" in the $X$ direction.
+
+So what is Cook's distance doing? It is combining distance in the $Y$ direction -- that is, $(Y_i - \widehat{\pi}_i)^2$ -- with distance in the $X$ direction (the leverage $h_i$). The precise mathematical definition isn't essential in 214; what matters is that for a point to be influential, it needs to be unusual in both the $X$ and $Y$ directions.
+
+As a general rule of thumb, we are concerned about values of Cook's distance bigger than 0.5 or 1. Here is a plot of Cook's distance for the SBA data:
+
+```{r}
+plot(m_sba$fitted.values, cooks.distance(m_sba),
+     xlab = "Predicted probabilities", 
+     ylab = "Cook's distance")
+```
+
+All Cook's distance values are very small, so we are not concerned about influential points; the largest is only around 0.06:
+
+```{r}
+max(cooks.distance(m_sba))
+```
+
+#### Handling influential points
+
+If we do identify an outlier, how should we handle it?
+
+* If it is clearly an error in the data (e.g., a negative value for a variable that can't possibly be negative, like body mass), then it can be removed
+* Otherwise, check Cook's distance
+    * For a large Cook's distance: report the results with and without the influential point(s). That is, report the estimated coefficients, predictions, hypothesis tests, conclusions, etc.
+
+
 
 # Poisson regression (and variants)
 
-In this section, we will work with the PhD `articles` data from class on March 3. Our data contains information on 915 biochemistry PhD students, with variables
-
-* `art`: articles published in last three years of Ph.D.
-* `fem`: gender (recorded as male or female)
-* `mar`: marital status (recorded as married or single)
-* `kid5`: number of children under age six
-* `phd`: prestige of Ph.D. program
-* `ment`: articles published by their mentor in last three years
-
-The data can be loaded by:
-
-```{r message=F, warning=F}
-library(foreign)
-articles <- read.dta("http://www.stata-press.com/data/lf2/couart2.dta")
-```
+In this section, we will work with the PhD `articles` data. 
 
 ## Count variables and the Poisson distribution
 
