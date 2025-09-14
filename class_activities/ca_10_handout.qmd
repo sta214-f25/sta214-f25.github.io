@@ -1,0 +1,29 @@
+---
+title: "Warmup"
+format: pdf
+editor: source
+---
+
+\vspace{-2.5cm}
+
+**Group members:**
+
+**Instructions:** Work with a neighbor on the following activity. I will collect the handout at the end of class, and it will be part of your class participation grade. You will be graded only on effort -- it is ok if you don't finish all the questions, or get them all correct.
+
+## Titanic data
+
+Consider the fitted model for the Titanic data:
+
+Consider the model
+
+$Survived_i \sim Bernoulli(\pi_i)$
+
+$\log \left( \dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} \right) = 3.78 - 0.037 Age_i - 2.52 Male_i - 1.31 Class2_i - 2.58 Class3_i$
+
+
+1. What is the estimated *probability* of survival for a male, first-class passenger aged 20? What about for a male, second-class passenger aged 30?
+
+\vspace{4cm}
+
+2. For each of these two passengers, do you predict they will survive or not? (That is, make a binary prediction -- a "yes" or "no" answer -- for each passenger)
+

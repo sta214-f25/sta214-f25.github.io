@@ -1,0 +1,197 @@
+---
+title: Prediction
+output:
+  xaringan::moon_reader:
+    css: "lab-slides.css"
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+editor_options: 
+  chunk_output_type: console
+---
+
+### Diagnostics summary
+
+.large[
+Before fitting a model:
+
+* Check empirical logit plots; make transformations as needed
+* Check for multicollinearity with scatterplots / correlations between quantitative explanatory variables; if needed, choose a subset of variables or combine variables
+
+After fitting a model:
+
+* Check quantile residual plots
+* Check for multicollinearity with VIFs
+* Check for influential points with Cook's distance
+    * If influential points are clearly an error, can remove
+    * Otherwise, report results with and without influential points
+]
+
+---
+
+### Using logistic regression
+
+.large[
+Class so far:
+
+* Model fitting
+* Model interpretation
+* Calculating predictions
+* Assessing model assumptions
+
+What's next:
+
+* Assessing predictions
+* Variable selection
+* Inference
+]
+
+---
+
+### Warmup
+
+.large[
+Work on the warmup activity (handout), then we will discuss as a group
+]
+
+---
+
+### Class activity
+
+.large[
+Fitted model:
+]
+
+$\log \left( \dfrac{\widehat{\pi}_i}{1 - \widehat{\pi}_i} \right) = 3.78 - 0.037 Age_i - 2.52 Male_i - 1.31 Class2_i - 2.58 Class3_i$
+
+.large[
+.question[
+What is the predicted probability of survival for a male, first-class passenger aged 20? What about for a male, second-class passenger aged 30?
+]
+]
+
+---
+
+### Making predictions with the Titanic data
+
+.large[
+* For each passenger, we calculate $\widehat{\pi}_i$ (estimated probability of survival)
+* But, we want to predict *which* passengers actually survive
+
+.question[
+How do we turn $\widehat{\pi}_i$ into a binary prediction of survival / no survival?
+]
+]
+
+---
+
+### Confusion matrix
+
+```{r, include=F}
+library(tidyverse)
+titanic <- read.csv("https://sta214-s23.github.io/homework/Titanic.csv")
+```
+
+.large[
+```{r, eval=F}
+m1 <- glm(Survived ~ Age + Sex + as.factor(Pclass), 
+          data = titanic, family = binomial)
+
+table(Prediction = m1$fitted.values > 0.5, 
+      Truth = titanic$Survived)
+```
+
+```{r, echo=F}
+m1 <- glm(Survived ~ Age + Sex + as.factor(Pclass), 
+          data = titanic, family = binomial)
+
+table(Prediction = m1$fitted.values > 0.5, 
+      Truth = m1$y)
+```
+
+.question[
+Did we do a good job predicting survival?
+]
+]
+
+---
+
+### Confusion matrix
+
+.large[
+```{r, echo=F}
+table(Prediction = m1$fitted.values > 0.5, 
+      Truth = m1$y)
+```
+]
+
+---
+
+### Class activity
+
+.large[
+Predictions with the SBA data:
+
+[https://sta214-f25.github.io/class_activities/ca_10.html](https://sta214-f25.github.io/class_activities/ca_10.html)
+]
+
+
+---
+
+### Class activity
+
+```{r, include=F}
+sba <- read.csv("https://sta214-s23.github.io/class_activities/sba_small.csv")
+```
+
+.large[
+```{r}
+m1 <- glm(Default ~ log(DisbursementGross) + Term + 
+            as.factor(UrbanRural), 
+          family = binomial, data = sba)
+
+table(Prediction = m1$fitted.values > 0.5, 
+      Truth = sba$Default)
+```
+
+* Accuracy = 
+* Sensitivity = 
+* Specificity = 
+* PPV = 
+]
+
+---
+
+### Class activity
+
+.large[
+```{r, echo=F}
+table(Prediction = m1$fitted.values > 0.5, 
+      Truth = sba$Default)
+```
+
+.question[
+Is an accuracy of around 80% good?
+]
+]
+
+---
+
+### Class activity
+
+.large[
+Changing thresholds:
+
+```{r}
+table(Prediction = m1$fitted.values > 0.3, 
+      Truth = sba$Default)
+```
+
+```{r}
+table(Prediction = m1$fitted.values > 0.7, 
+      Truth = sba$Default)
+```
+
+]
