@@ -1,0 +1,72 @@
+---
+title: "Class activity: model selection"
+format: html
+---
+
+**Instructions:** 
+
+* Work individually or with a neighbor to answer the following questions 
+* To get started, download the [class activity template](https://sta214-f25.github.io/class_activities/ca_11_template.qmd) file
+* When you are finished, render the file as an HTML and submit the HTML to Canvas (let me know if you encounter any problems)
+
+## SBA data
+
+In this activity, we will experiment with stepwise selection, using AIC to compare models on the SBA data. Recall the SBA data contains the following variables:
+
+* `Default`: whether the business defaulted on the loan (1 = yes, 0 = no)
+* `UrbanRural`: 1 if business is in urban area, 2 if business is in rural area, 0 if unknown
+* `NewExist`: 1 if business already existed, 2 if business is new, 0 if unknown
+* `Term`: Length of the loan term (months)
+* `NoEmp`: Number of employees of the business before receiving the loan
+* `GrAppv`: Gross amount of loan approved by the bank, in dollars
+* `SBA_Appv`: Amount of the loan guaranteed by the SBA, in dollars
+* `DisbursementGross`: The amount of money disbursed (loaned), in dollars
+
+You can load the SBA data into R with
+
+```{r, eval=F}
+sba <- read.csv("https://sta214-f25.github.io/class_activities/sba_small.csv")
+```
+
+## Questions
+
+The code below uses forward stepwise selection to choose a model on the SBA data. The smallest model considered (our starting model) is the intercept-only model, and the largest model considered (`scope` in the code) includes all the available variables. The code uses the `stepAIC` function in the `MASS` package, which you may need to install.
+
+```{r, eval=F}
+library(MASS)
+
+# specify the starting model (intercept-only)
+m0 <- glm(Default ~ 1, data = sba, family = binomial)
+
+# forward selection using AIC
+# Note we have to specify the largest model we want to consider
+forward_aic <- stepAIC(m0, scope = ~ Term + DisbursementGross + 
+                         factor(UrbanRural) + NoEmp +
+                         GrAppv + SBA_Appv,
+                       direction = "forward",
+                       trace = 0)
+
+summary(forward_aic)
+```
+
+1. Run the code. Which variables are chosen using forward selection with AIC?
+
+2. Think back to our previous class activity, in which we performed model diagnostics with the SBA data. Are there any issues with our final fitted model? How would we correct them?
+
+3. Will stepwise selection detect multicollinearity in the explanatory variables?
+
+4. Will stepwise selection fix violations to the shape assumption?
+
+5. Using transformations to fix violations to the shape assumption, and choosing a subset of variables to handle issues with multicollinearity, modify the `scope` of the forward stepwise procedure. Which variables are now selected by the procedure?
+
+```{r, include=F, eval=F}
+forward_aic <- stepAIC(m0, scope = ~ Term + log(DisbursementGross) + 
+                         factor(UrbanRural) + NoEmp,
+                       direction = "forward",
+                       trace = 0)
+
+summary(forward_aic)
+```
+
+
+

@@ -1,0 +1,381 @@
+---
+title: Deviance, AIC, and model building
+output:
+  xaringan::moon_reader:
+    css: "lab-slides.css"
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+editor_options: 
+  chunk_output_type: console
+---
+
+### SBA data
+
+.large[
+Data on loan defaults for US Small Business Administration (SBA) loans:
+
+* `Default`: whether the business defaulted on the loan (1 = yes, 0 = no)
+* `UrbanRural`: 1 if business is in urban area, 2 if business is in rural area, 0 if unknown
+* `NewExist`: 1 if business already existed, 2 if business is new, 0 if unknown
+* `Term`: Length of the loan term (months)
+* `DisbursementGross`: The amount of money disbursed (loaned), in dollars
+* Many other variables...
+]
+
+---
+
+### Last time: Class activity
+
+```{r, include=F}
+sba <- read.csv("https://sta214-s23.github.io/class_activities/sba_small.csv")
+```
+
+.large[
+```{r}
+m1 <- glm(Default ~ log(DisbursementGross) + Term + 
+            as.factor(UrbanRural), 
+          family = binomial, data = sba)
+
+table(Prediction = m1$fitted.values > 0.5, 
+      Truth = sba$Default)
+```
+
+* Accuracy = 
+* Sensitivity = 
+* Specificity = 
+* PPV = 
+]
+
+---
+
+### Last time: Class activity
+
+.large[
+```{r, echo=F}
+table(Prediction = m1$fitted.values > 0.5, 
+      Truth = sba$Default)
+```
+
+.question[
+Is an accuracy of around 80% good?
+]
+]
+
+---
+
+### Last time: Class activity
+
+.large[
+Changing thresholds:
+
+```{r}
+table(Prediction = m1$fitted.values > 0.3, 
+      Truth = sba$Default)
+```
+
+```{r}
+table(Prediction = m1$fitted.values > 0.7, 
+      Truth = sba$Default)
+```
+
+]
+
+---
+
+### A new research question
+
+.large[
+* `Default`: whether the business defaulted on the loan (1 = yes, 0 = no)
+* `UrbanRural`: 1 if business is in urban area, 2 if business is in rural area, 0 if unknown
+* `NewExist`: 1 if business already existed, 2 if business is new, 0 if unknown
+* `Term`: Length of the loan term (months)
+* `DisbursementGross`: The amount of money disbursed (loaned), in dollars
+* Many other variables...
+
+.question[
+**Research question:** Which combination of variables "best" models loan default?
+]
+]
+
+---
+
+### A new research question
+
+.large[
+.question[
+**Research question:** Which combination of variables "best" models loan default?
+]
+
+We need:
+
+* A metric to compare different models
+* A way to efficiently search through many different models
+]
+
+---
+
+### Logistic regression
+
+.large[
+**Data:** Grad application data
+  * `admit`: accepted to grad school? (0 = no, 1 = yes)
+  * `gre`: GRE score
+  * `gpa`: undergrad GPA
+  * `rank`: prestige of undergrad institution
+  
+$Admit_i \sim Bernoulli(\pi_i) \hspace{0.5cm} \log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 GPA_i$
+
+**Goal:** Summarize how well our model fits the data
+
+.question[
+How do we summarize model fit in *linear* regression?
+]
+]
+
+---
+
+### Summarizing linear regression model fit
+
+```{r, include=F}
+library(tidyverse)
+grad_app <- read.csv("https://stats.idre.ucla.edu/stat/data/binary.csv")
+
+library(knitr)
+hook_output <- knit_hooks$get("output")
+knit_hooks$set(output = function(x, options) {
+   lines <- options$output.lines
+   if (is.null(lines)) {
+     return(hook_output(x, options))  # pass to default hook
+   }
+   x <- unlist(strsplit(x, "\n"))
+   more <- "..."
+   if (length(lines)==1) {        # first n lines
+     if (length(x) > lines) {
+       # truncate the output, but add ....
+       x <- c(head(x, lines), more)
+     }
+   } else {
+     x <- c(more, x[lines], more)
+   }
+   # paste these lines together
+   x <- paste(c(x, ""), collapse = "\n")
+   hook_output(x, options)
+ })
+```
+
+.large[
+Example model:
+]
+
+```{r, output.lines = c(9:12, 16:17)}
+linear_mod <- lm(gre ~ gpa, data = grad_app)
+summary(linear_mod)
+```
+
+---
+
+### Summarizing linear regression model fit
+
+.large[
+Example model:
+]
+
+```{r, output.lines = c(9:12, 16:17)}
+linear_mod <- lm(gre ~ gpa, data = grad_app)
+summary(linear_mod)
+```
+
+.large[
+.question[
+Is $R^2_{adj}$ appropriate for logistic regression?
+]
+]
+
+---
+
+### Summarizing logistic regression
+
+.large[
+```{r, output.lines = c(6:9, 14:15)}
+logistic_mod <- glm(admit ~ gpa, data = grad_app,
+                    family = binomial)
+summary(logistic_mod)
+```
+]
+
+---
+
+### Deviance
+
+.large[
+```{r, output.lines = c(6:9, 14:15)}
+logistic_mod <- glm(admit ~ gpa, data = grad_app,
+                    family = binomial)
+summary(logistic_mod)
+```
+]
+
+---
+
+### Deviance
+
+.large[
+Example:
+]
+
+```{r, output.lines=8:10}
+glm(admit ~ gre, family = binomial, data = grad_app)
+```
+
+```{r, output.lines=8:10}
+glm(admit ~ gpa, family = binomial, data = grad_app)
+```
+
+.large[
+.question[
+Which predictor (GRE or GPA) gives a model with a better fit?
+]
+]
+
+---
+
+### Comparing models
+
+
+```{r, output.lines=8:10}
+glm(admit ~ gre, family = binomial, data = grad_app)
+```
+
+```{r, eval=F}
+glm(admit ~ gre + gpa, family = binomial, data = grad_app)
+```
+
+.large[
+.question[
+How will deviance change when I add another variable to the model?
+]
+]
+
+---
+
+### Comparing models
+
+```{r, output.lines=8:10}
+glm(admit ~ gre, family = binomial, data = grad_app)
+```
+
+```{r, output.lines=8:10}
+glm(admit ~ gre + gpa, family = binomial, data = grad_app)
+```
+
+.large[
+Deviance will *never* increase when adding more explanatory variables to a model!
+]
+
+---
+
+### Comparing models
+
+.large[
+.question[
+In linear regression, what quantity did we use to compare models with different numbers of parameters?
+]
+]
+
+---
+
+### AIC
+
+```{r, output.lines=8:10}
+glm(admit ~ gre + gpa, family = binomial, data = grad_app)
+```
+
+.large[
+Suppose our model has $p$ parameters (the number of $\beta$s, including the intercept). Then the AIC is
+
+$$AIC = \text{deviance} + 2p$$
+]
+
+---
+
+### AIC
+
+.large[
+$$AIC = \text{deviance} + 2p$$
+]
+
+**Model 1:** 
+
+$$\log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 Term_i + \beta_2 \log(DisbursementGross_i)$$
+.large[
+`Residual Deviance: 3974 	AIC: 3980`
+]
+
+**Model 2:** 
+
+$$\log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 Term_i + \beta_2 Urban_i + \beta_3 Rural_i + \beta_4 Employees_i$$
+.large[
+`Residual Deviance: 3827   AIC:`
+
+.question[
+Which model do we prefer, based on AIC?
+]
+]
+
+---
+
+### Back to the research question
+
+.large[
+.question[
+**Research question:** Which combination of variables "best" models loan default?
+]
+
+We need:
+
+* A metric to compare different models
+  * Solution: AIC
+* A way to efficiently search through many different models
+
+.question[
+How should we search many different models?
+]
+]
+
+---
+
+### Some model search algorithms
+
+.large[
+Best subset selection:
+
+<br/>
+
+<br/>
+
+<br/>
+
+Stepwise selection:
+]
+
+---
+
+### Class activity
+
+.large[
+[https://sta214-f25.github.io/class_activities/ca_11.html](https://sta214-f25.github.io/class_activities/ca_11.html)
+]
+
+.large[
+* Work independently or with a neighbor
+* Submit HTML on Canvas when done
+]
+
+
+
+
+
+
