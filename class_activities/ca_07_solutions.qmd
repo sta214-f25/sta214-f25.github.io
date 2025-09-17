@@ -1,0 +1,175 @@
+---
+title: "Class activity: logistic regression diagnostics"
+format: html
+---
+
+
+# Part I
+
+In the first part of this class activity, we will return to the `titanic` data from HW 2:
+
+```{r}
+titanic <- read.csv("https://sta214-f25.github.io/homework/Titanic.csv")
+```
+
+Let's consider a variable we haven't worked with yet: Fare. Our model is
+
+$Survived \sim Bernoulli(\pi_i)$
+
+$\log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 Fare_i$
+
+## Questions
+
+The code below will make an empirical logit plot with Fare as the explanatory variable, Survived as the binary response, and 20 bins:
+
+```{r, message=F, warning=F}
+library(tidyverse)
+logodds_plot <- function(data, reg_formula, group,
+                         num_bins = 5){
+  
+  var_names <- all.vars(reg_formula)
+
+  if(length(var_names) != 2){
+    stop("Only one variable can appear on the x-axis")
+  }
+
+  if(!is.numeric(data[[var_names[2]]])){
+    stop("The explanatory variable must be numeric")
+  }
+  
+  if(n_distinct(data[[var_names[1]]]) != 2){
+    stop("The response variable must be binary")
+  }
+  
+  data <- data |>
+    select(all_of(var_names), {{group}}) |>
+    drop_na()
+
+  dat <- model.frame(reg_formula, data)
+  
+
+  xname <- colnames(dat)[2]
+  yname <- colnames(dat)[1]
+  colnames(dat) <- c("y", "x")
+
+  if(any(is.infinite(dat$x))){
+    stop(paste("There are non-finite values in", xname))
+  }
+
+  if(!missing(group)){
+    dat <- dat |>
+      mutate({{group}} := as.factor(data |> pull({{group}})))
+  }
+
+  dat |>
+    arrange({{group}}, x) |>
+    group_by({{group}}) |>
+    mutate(bin = rep(1:num_bins,
+                     each=ceiling(n()/num_bins))[1:n()]) |>
+    group_by(bin, {{group}}) |>
+    summarize(x = mean(x),
+                prop = (sum(y) + 0.5)/(n() + 1),
+                num_obs = n(),
+                .groups = "drop") |>
+    mutate(logodds = log(prop/(1 - prop))) |>
+    ggplot(aes(x = x,
+               y = logodds,
+               color = {{group}})) +
+    geom_point() +
+    geom_smooth(se=F, method="lm", formula = y ~ x) +
+    theme_bw() +
+    labs(x = xname,
+         y = "Empirical log odds")
+}
+
+logodds_plot(titanic, Survived ~ Fare, 
+             num_bins = 20)
+```
+
+1. Run the code to produce the empirical logit plot. Does it look like their is a linear relationship between Fare and the log odds of survival? Experiment with the number of bins in the final line of the code to be sure.
+
+**Solution:** No, it appears that there is not a linear relationship between Fare and the log odds of survival.
+
+2. You can try different transformations of Fare in the empirical logit plot by changing the formula. For example, you could try `Survived ~ sqrt(Fare)`. Experiment with a few different transformations -- which ones seem reasonable?
+
+**Solution:**
+
+```{r}
+logodds_plot(titanic, Survived ~ sqrt(Fare), 
+             num_bins = 20)
+
+logodds_plot(titanic, Survived ~ log(Fare + 1), 
+             num_bins = 20)
+```
+
+Either the square root or the log transform seem reasonable here (note that the log transform requires we add 1 first, since there are fares of 0 in the data).
+
+
+# Part II
+
+In the second part of this class activity, we will explore quantile residuals as a diagnostic tool for logistic regression. Quantile residuals can be calculated for a fitted GLM in R using the `qresid()` function in the `statmod` package (you may need to install this package).
+
+Here is some code to simulate data for which the logistic regression model assumptions hold:
+
+```{r, message=F, warning=F}
+library(tidyverse)
+library(statmod)
+
+# simulate a single explanatory variable from a Normal distribution
+x <- rnorm(1000)
+
+# create P(Y = 1 | X) for each entry in x
+# Here log odds = -1 + 2x
+p <- exp(-1 + 2*x)/(1 + exp(-1 + 2*x))
+
+# Finally, simulate a binary response at each x
+y <- rbinom(1000, 1, p)
+
+# fit the model and plot the quantile residuals against x
+# add a smooth fit to see if there is a relationship
+m1 <- glm(y ~ x, family = binomial)
+data.frame(x = x, residuals = qresid(m1)) %>%
+  ggplot(aes(x = x, y = residuals)) +
+  geom_point() +
+  geom_smooth() +
+  theme_bw()
+```
+
+## Questions
+
+1. Run the code above to simulate data, fit the model, and generate the quantile residual plot. Confirm that when the logistic regression assumptions are satisfied, the quantile residual plot looks good.
+
+**Solution:** When the assumptions are satisfied, the quantile residual plot looks good -- a nice random scatter of the residuals around the horizontal line at 0, with no clear patterns or trends.
+
+2. Modify the simulation code above so that the log odds are *not* a linear function of $X$. Fit the same logistic regression model as above (`y ~ x`, which is now wrong) and make a quantile residual plot. Does the plot show that the assumptions are violated?
+
+**Solution:** Suppose we now make the log-odds a quadratic function of `x`, but assume a linear function when we fit the model. Then, we can see a clear violation of the shape assumption in the quantile residual plot:
+
+```{r, message=F, warning=F}
+p <- exp(-1 + 2*x^2)/(1 + exp(-1 + 2*x^2))
+
+# Finally, simulate a binary response at each x
+y <- rbinom(1000, 1, p)
+
+# fit the model and plot the quantile residuals against x
+# add a smooth fit to see if there is a relationship
+m1 <- glm(y ~ x, family = binomial)
+data.frame(x = x, residuals = qresid(m1)) %>%
+  ggplot(aes(x = x, y = residuals)) +
+  geom_point() +
+  geom_smooth() +
+  theme_bw()
+```
+However, if we fit the *correct* model (with `x^2` as the predictor, instead of `x`), we can see that the quantile residual plot looks good:
+
+```{r, message=F, warning=F}
+m2 <- glm(y ~ I(x^2), family = binomial)
+data.frame(x = x, residuals = qresid(m2)) %>%
+  ggplot(aes(x = x, y = residuals)) +
+  geom_point() +
+  geom_smooth() +
+  theme_bw()
+```
+
+
+

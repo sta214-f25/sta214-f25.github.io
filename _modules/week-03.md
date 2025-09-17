@@ -4,7 +4,7 @@ title: Assumptions and diagnostics
 
 September 8
 : Shape assumption -- empirical logits and quantile residuals
-  : [slides](https://sta214-f25.github.io/slides/lecture_7.pdf), [activity](https://sta214-f25.github.io/class_activities/ca_07.html)
+  : [slides](https://sta214-f25.github.io/slides/lecture_7.pdf), [activity](https://sta214-f25.github.io/class_activities/ca_07.html), [activity solutions](https://sta214-f25.github.io/class_activities/ca_07_solutions.html)
 
 September 10
 : Multicollinearity and influential points
