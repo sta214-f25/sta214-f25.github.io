@@ -8,7 +8,7 @@ September 15
 
 September 17
 : Model selection and AIC
-  : [slides](https://sta214-f25.github.io/slides/lecture_11.pdf), [activity](https://sta214-f25.github.io/class_activities/ca_11.html)
+  : [slides](https://sta214-f25.github.io/slides/lecture_11.pdf), [activity](https://sta214-f25.github.io/class_activities/ca_11.html), [activity solutions](https://sta214-f25.github.io/class_activities/ca_11_solutions.html)
   
 September 19
 : Comparing models
