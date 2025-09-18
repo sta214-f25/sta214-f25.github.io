@@ -1646,7 +1646,22 @@ margin-left: 0 !important;
         </ul>
         <nav role="navigation" id="toc">
           <ul>
-          <li><a href="#conceptual-questions" id="toc-conceptual-questions">Conceptual questions</a></li>
+          <li><a href="#diagnostics-deviance-and-prediction" id="toc-diagnostics-deviance-and-prediction">Diagnostics,
+          deviance, and prediction</a></li>
+          <li><a href="#reading-a-research-paper" id="toc-reading-a-research-paper">Reading a research paper</a>
+          <ul>
+          <li><a href="#overview" id="toc-overview">Overview</a></li>
+          <li><a href="#outline-of-a-research-paper" id="toc-outline-of-a-research-paper">Outline of a research
+          paper</a></li>
+          <li><a href="#reading-a-research-paper-1" id="toc-reading-a-research-paper-1">Reading a research
+          paper</a></li>
+          <li><a href="#the-abstract-and-introduction" id="toc-the-abstract-and-introduction">The Abstract and
+          Introduction</a></li>
+          <li><a href="#study-participants" id="toc-study-participants">Study Participants</a></li>
+          <li><a href="#data-collection-and-analysis" id="toc-data-collection-and-analysis">Data Collection and
+          Analysis</a></li>
+          <li><a href="#results" id="toc-results">Results</a></li>
+          </ul></li>
           </ul>
         </nav>
         <ul class="authors">
@@ -1673,6 +1688,14 @@ margin-left: 0 !important;
 <!-- Don't indent these lines or it will mess pre blocks indentation --> 
 <p><strong>Due:</strong> Friday, September 26, 10:00pm on Canvas</p>
 <p><strong>Instructions:</strong></p>
+<p>Begin by downloading the HW 4 template from the course website:</p>
+<p><a href="https://sta214-f25.github.io/homework/hw_04_template.qmd">https://sta214-f25.github.io/homework/hw_04_template.qmd</a></p>
+<p>Save this template file to your computer, then open it in RStudio. As
+you complete the assignment, you will write down your answers to all
+questions in the file, and include all R code in code chunks.</p>
+<p>When you have completed the assignment, render your homework to HTML
+and submit on Canvas. <em>You must submit the rendered HTML on Canvas to
+receive full credit!</em></p>
 <p><strong>Code guidelines:</strong></p>
 <ul>
 <li>If a question requires code, and code is not provided, you will not
@@ -1680,8 +1703,8 @@ receive full credit</li>
 <li>You will be graded on the quality of your code. In addition to being
 correct, your code should also be easy to read</li>
 </ul>
-<div id="conceptual-questions" class="section level2">
-<h2>Conceptual questions</h2>
+<div id="diagnostics-deviance-and-prediction" class="section level2">
+<h2>Diagnostics, deviance, and prediction</h2>
 <div id="cooks-distance" class="section level3">
 <h3>Cook’s distance</h3>
 <p>Below is the output for a logistic regression model, and the Cook’s
@@ -1921,6 +1944,167 @@ that they actually have the disease? Calculate a relevant value from the
 confusion matrix.</p>
 <p>Is the doctor correct that your friend is “very likely to truly have
 the disease”?</p>
+</div>
+</div>
+</div>
+<div id="reading-a-research-paper" class="section level1">
+<h1>Reading a research paper</h1>
+<p>Statistics is an important research tool used in many fields. In this
+section of the assignment, you will read the original research article
+analyzing the dengue data which we have used in class. The purpose of
+this section is to help you learn how to read a research paper, and
+extract key details about the study and results. Later, we will try to
+replicate the authors’ results ourselves.</p>
+<div id="overview" class="section level2">
+<h2>Overview</h2>
+<p>Dengue is a mosquito-borne viral disease which affects hundreds of
+millions of people each year. Early diagnosis is crucial for patients to
+have the best prognosis, but relies on a variety of laboratory tests. To
+enhance practitioners’ ability to diagnose dengue, a 2015 paper by Tuan
+<em>et al.</em> investigated the possibility of detecting dengue using a
+variety of clinical measurements like white blood cell count and
+platelet count. This activity will help you read the paper by Tuan
+<em>et al.</em>. The paper is available at</p>
+<p><a href="https://journals.plos.org/plosntds/article?id=10.1371/journal.pntd.0003638">https://journals.plos.org/plosntds/article?id=10.1371/journal.pntd.0003638</a></p>
+</div>
+<div id="outline-of-a-research-paper" class="section level2">
+<h2>Outline of a research paper</h2>
+<p>Research papers in many fields, particularly the sciences, often
+contain the following main sections:</p>
+<ul>
+<li><strong>Abstract:</strong> A short overview of the full paper,
+giving highlights of the motivation and background, the research
+question, the data, and the results.</li>
+<li><strong>Introduction:</strong> A broad overview of the research
+question the authors want to study, motivation for studying this
+question, and the authors’ approach to answering their question. The
+introduction often starts very general, then narrows to the specific
+question addressed in this paper. More detail is provided in the
+introduction than in the abstract, and more time is spent on motivation
+and related literature.</li>
+<li><strong>Methods:</strong> The data and analysis techniques used to
+answer the research question. This typically describes the what the data
+looks like, how and where it was collected, and any statistical tools
+(e.g. visualizations, regression, hypothesis testing) that were used
+when analyzing the data.</li>
+<li><strong>Results:</strong> A summary of the analysis results, such as
+figures showing regression fits, and tables of regression coefficients
+and p-values.</li>
+<li><strong>Discussion:</strong> A discussion of the analysis results,
+in context of the original research question. In this section,
+explanations for <em>why</em> particular results were observed may be
+proposed.</li>
+<li><strong>Conclusion:</strong> A short summary of the paper and its
+key results, and their connections to broader scientific questions. The
+conclusion is often the reverse of the introduction: it starts with the
+specific question addressed by this paper, then discusses the
+implications of this research for science in general.</li>
+</ul>
+</div>
+<div id="reading-a-research-paper-1" class="section level2">
+<h2>Reading a research paper</h2>
+<p>Reading a research paper, particularly in a field in which you are
+not an expert, can be challenging. The trick is to skim the paper for
+the most relevant information, and skip over technical details that are
+not essential to understanding the key take-aways. The questions below
+will guide you to the most important sections in the paper by Tuan
+<em>et al</em>.</p>
+</div>
+<div id="the-abstract-and-introduction" class="section level2">
+<h2>The Abstract and Introduction</h2>
+<p>A good place to start is often with the Abstract and Introduction,
+which allow you get an overview of the paper, and usually don’t contain
+too many technical details. The Abstract is more succinct than the
+Introduction, but it also provides less motivation. When the
+Introduction is long, you may want to skim for key details.</p>
+<p>Read the Abstract and introduction. Then answer the following
+questions.</p>
+<div id="question-9" class="section level4 question">
+<h4>Question 9</h4>
+<p>Why is it important for the researchers to build a model to detect
+dengue in hospital patients?</p>
+</div>
+<div id="question-10" class="section level4 question">
+<h4>Question 10</h4>
+<p>What is the specific purpose of the research study?</p>
+</div>
+<p>So far, we know what question the researchers are trying to answer,
+and we know that they are going to build some kind of model to predict
+dengue. Our goal for the rest of the paper is to understand how the
+authors conducted this analysis. In particular, we want to answer the
+following questions:</p>
+<ul>
+<li>Who participated in the study?</li>
+<li>What did the researchers record about each participant?</li>
+<li>What statistical methods did the researchers use?</li>
+<li>What did the researchers conclude from their study?</li>
+</ul>
+<p>This information is provided in the Methods and Results sections of
+the paper. These sections also contain lots of other details which is
+valuable, but not crucial to understand on a first reading, so we will
+focus on the most important parts of the Methods and Results.</p>
+</div>
+<div id="study-participants" class="section level2">
+<h2>Study Participants</h2>
+<p>Read the <em>Patient Enrolment</em> subsection of the Methods, and
+then answer the following questions.</p>
+<div id="question-11" class="section level4 question">
+<h4>Question 11</h4>
+<p>How many patients participated in the study?</p>
+</div>
+<p>Potential research subjects must meet certain criteria, defined by
+the researchers, to participate in a study. <em>Inclusion</em> criteria
+define requirements for inclusion in the study (e.g., a target age range
+or social group), while <em>exclusion</em> criteria are reasons a
+subject would be asked not to participate (e.g., certain medical
+conditions).</p>
+<div id="question-12" class="section level4 question">
+<h4>Question 12</h4>
+<p>What are the inclusion/exclusion criteria for this study?</p>
+</div>
+</div>
+<div id="data-collection-and-analysis" class="section level2">
+<h2>Data Collection and Analysis</h2>
+<p>Now that we know who was studied, we want to know what data was
+collected about each participant, and how it was analyzed. Read the
+<em>Clinical and laboratory investigations on the day of enrollment</em>
+and <em>Statistical methods</em> subsections of the Methods. Then answer
+the following questions.</p>
+<div id="question-13" class="section level4 question">
+<h4>Question 13</h4>
+<p>Which variables were recorded for the patients in the study?</p>
+</div>
+<div id="question-14" class="section level4 question">
+<h4>Question 14</h4>
+<p>Which types of statistical methods were used to model the relation
+between the explanatory variables and whether the patient had dengue?
+(It is ok if you’re not familiar with all these methods!)</p>
+</div>
+<div id="question-15" class="section level4 question">
+<h4>Question 15</h4>
+<p>How did the researchers choose which variables to include in their
+logistic regression model?</p>
+</div>
+<div id="question-16" class="section level4 question">
+<h4>Question 16</h4>
+<p>Which threshold did the researchers use when converting their
+predicted probabilities into binary predictions?</p>
+</div>
+</div>
+<div id="results" class="section level2">
+<h2>Results</h2>
+<p>Finally, let’s see what the researchers concluded from their
+statistical models. Read the <em>Early Dengue Classifier</em> subsection
+of the Results, then answer the following questions.</p>
+<div id="question-17" class="section level4 question">
+<h4>Question 17</h4>
+<p>Which variables did the researchers include in their final logistic
+regression model?</p>
+</div>
+<div id="question-18" class="section level4 question">
+<h4>Question 18</h4>
+<p>What sensitivity and specificity values did the researchers observe
+using their final model?</p>
 </div>
 </div>
 </div>
