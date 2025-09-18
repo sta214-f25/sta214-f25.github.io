@@ -1,0 +1,62 @@
+---
+title: "Class activity: hypothesis testing and null distribution"
+format: html
+---
+
+**Instructions:** 
+
+* Work individually or with a neighbor to answer the following questions 
+* To get started, download the [class activity template](https://sta214-f25.github.io/class_activities/ca_12_template.qmd) file
+* When you are finished, render the file as an HTML and submit the HTML to Canvas (let me know if you encounter any problems)
+
+## Approximating the null distribution with permutations
+
+When testing the hypothesis $H_0: \beta_1 = 0$, we can use the test statistic
+
+$$z = \dfrac{\widehat{\beta}_1}{SE(\widehat{\beta}_1)}$$
+
+To calculate a p-value, we need to know the distribution of $z$ *if* $H_0$ *were true*. This is called the **null distribution**. We will approximate this null distribution by permuting the explanatory variable, and calculating the test statistic for each permutation.
+
+Here is the code we wrote in class:
+
+```{r, eval=F}
+library(tidyverse)
+grad_app <- read.csv("https://stats.idre.ucla.edu/stat/data/binary.csv")
+
+nreps <- 1000 # number of repetitions
+z_stats <- rep(NA, nreps) # place to store results
+
+for(i in 1:nreps){
+  grad_app_perm <- grad_app |>
+    mutate(gre = sample(grad_app$gre, n(), 
+                        replace = F))
+  
+  perm_mod <- glm(admit ~ gre, family = binomial, 
+                  data = grad_app_perm)
+  z_stats[i] <- summary(perm_mod)$coefficients[2,3]
+}
+```
+
+### Questions
+
+1. Run the code, and create a histogram of the $z$-statistics. Describe the shape of the distribution.
+
+The p-values reported in the coefficients table in R are calculated with a $N(0, 1)$ distribution as the null distribution. We can compare the $z$-statistics from our permutations to the $N(0, 1)$ distribution with a QQ plot:
+
+```{r, eval=F}
+qqnorm(z_stats)
+abline(a = 0, b = 1, col="red")
+```
+
+
+2. Create the QQ plot. Do the statistics appear to follow a standard normal distribution?
+
+The z-statistics we calculate divide the estimated coefficient $\widehat{\beta}_1$ by its standard error. We may wonder why we don't just use $\widehat{\beta}_1$ as the test statistic (without standardizing).
+
+3. Modify the code above so that we save the estimated slope $\widehat{\beta}_1$, instead of the z-statistic.
+
+4. What does the null distribution of the estimates $\widehat{\beta}_1$ look like?
+
+5. Why do we use the z-statistic as our test statistic?
+
+

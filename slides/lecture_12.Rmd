@@ -1,0 +1,428 @@
+---
+title: Comparing models
+output:
+  xaringan::moon_reader:
+    css: "lab-slides.css"
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+grad_app <- read.csv("https://stats.idre.ucla.edu/stat/data/binary.csv")
+
+library(knitr)
+hook_output <- knit_hooks$get("output")
+knit_hooks$set(output = function(x, options) {
+   lines <- options$output.lines
+   if (is.null(lines)) {
+     return(hook_output(x, options))  # pass to default hook
+   }
+   x <- unlist(strsplit(x, "\n"))
+   more <- "..."
+   if (length(lines)==1) {        # first n lines
+     if (length(x) > lines) {
+       # truncate the output, but add ....
+       x <- c(head(x, lines), more)
+     }
+   } else {
+     x <- c(more, x[lines], more)
+   }
+   # paste these lines together
+   x <- paste(c(x, ""), collapse = "\n")
+   hook_output(x, options)
+ })
+```
+
+### Hypothesis testing
+
+.large[
+$Y_i \sim Bernoulli(\pi_i) \hspace{0.5cm} \log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 \text{GRE}_i$
+
+We want to know if there is actually a relationship between GRE score and grad school admission.
+
+.question[
+How can I express this as null and alternative hypotheses about one or more model parameters?
+]
+]
+
+---
+
+### Steps in hypothesis testing
+
+---
+
+### Test statistic
+
+.large[
+```{r, output.lines = c(4:8)}
+m1 <- glm(admit ~ gre, family = binomial, 
+          data = grad_app)
+summary(m1)
+```
+
+.question[
+Which part of this output should I use as my test statistic for the hypothesis test?
+]
+]
+
+---
+
+### p-value
+
+.large[
+```{r, output.lines = c(4:8)}
+m1 <- glm(admit ~ gre, family = binomial, 
+          data = grad_app)
+summary(m1)
+```
+
+.question[
+Which part of this output gives me the p-value for my hypothesis test?
+]
+]
+
+---
+
+### p-value
+
+.large[
+```{r, output.lines = c(4:8)}
+m1 <- glm(admit ~ gre, family = binomial, 
+          data = grad_app)
+summary(m1)
+```
+
+.question[
+What distribution are we using to calculate that p-value?
+]
+]
+
+---
+
+### p-value
+
+.large[
+```{r, output.lines = c(4:8)}
+m1 <- glm(admit ~ gre, family = binomial, 
+          data = grad_app)
+summary(m1)
+```
+
+Our goal today: why is a N(0, 1) distribution appropriate for calculating the p-value here?
+]
+
+---
+
+### Calculating p-values
+
+.large[
+.question[
+What *is* a p-value?
+]
+]
+
+---
+
+### Null distribution
+
+.large[
+**Null distribution:** distribution of our test statistic *under* $H_0$
+
+* We need to know how our test statistic behaves if the null hypothesis is true
+* That is, how would the test statistic vary from sample to sample?
+]
+
+---
+
+### Observed relationship
+
+```{r, include=F}
+logodds_plot <- function(data, reg_formula, group,
+                         num_bins = 5){
+  
+  var_names <- all.vars(reg_formula)
+
+  if(length(var_names) != 2){
+    stop("Only one variable can appear on the x-axis")
+  }
+
+  if(!is.numeric(data[[var_names[2]]])){
+    stop("The explanatory variable must be numeric")
+  }
+  
+  if(n_distinct(data[[var_names[1]]]) != 2){
+    stop("The response variable must be binary")
+  }
+  
+  data <- data |>
+    select(all_of(var_names), {{group}}) |>
+    drop_na()
+
+  dat <- model.frame(reg_formula, data)
+  
+
+  xname <- colnames(dat)[2]
+  yname <- colnames(dat)[1]
+  colnames(dat) <- c("y", "x")
+
+  if(any(is.infinite(dat$x))){
+    stop(paste("There are non-finite values in", xname))
+  }
+
+  if(!missing(group)){
+    dat <- dat |>
+      mutate({{group}} := as.factor(data |> pull({{group}})))
+  }
+
+  dat |>
+    arrange({{group}}, x) |>
+    group_by({{group}}) |>
+    mutate(bin = rep(1:num_bins,
+                     each=ceiling(n()/num_bins))[1:n()]) |>
+    group_by(bin, {{group}}) |>
+    summarize(x = mean(x),
+                prop = (sum(y) + 0.5)/(n() + 1),
+                num_obs = n(),
+                .groups = "drop") |>
+    mutate(logodds = log(prop/(1 - prop))) |>
+    ggplot(aes(x = x,
+               y = logodds,
+               color = {{group}})) +
+    geom_point() +
+    geom_smooth(se=F, method="lm", formula = y ~ x) +
+    theme_bw() +
+    labs(x = xname,
+         y = "Empirical log odds")
+}
+```
+
+```{r, eval=F}
+logodds_plot(grad_app, admit ~ gre, num_bins = 10)
+```
+
+```{r, echo=F, fig.width=6, fig.height=4, fig.align='center'}
+logodds_plot(grad_app, admit ~ gre, num_bins = 10) +
+  theme(text = element_text(size = 20))
+```
+
+.large[
+.question[
+What would this plot look like if $H_0$ were true?
+]
+]
+
+---
+
+### Making $H_0$ true
+
+.large[
+* Currently, there may be a relationship between GRE and Admit
+* To remove this relationship: randomly shuffle the GRE values
+]
+
+---
+
+### Making $H_0$ true
+
+```{r, eval=F}
+grad_app_perm <- grad_app |>
+  mutate(gre = sample(grad_app$gre, n(), replace = F))
+
+logodds_plot(grad_app_perm, admit ~ gre, num_bins = 10)
+```
+
+```{r, echo=F, fig.width=6, fig.height=4, fig.align='center'}
+set.seed(9)
+
+grad_app_perm <- grad_app |>
+  mutate(gre = sample(grad_app$gre, n(), replace = F))
+
+logodds_plot(grad_app_perm, admit ~ gre, num_bins = 10) +
+  theme(text = element_text(size = 20))
+```
+
+---
+
+### Making $H_0$ true
+
+```{r, eval=F}
+grad_app_perm <- grad_app |>
+  mutate(gre = sample(grad_app$gre, n(), replace = F))
+
+perm_mod <- glm(admit ~ gre, family = binomial, 
+                  data = grad_app_perm)
+
+summary(perm_mod)
+```
+
+```{r, echo=F, output.lines = c(4:8)}
+set.seed(9)
+
+grad_app_perm <- grad_app |>
+  mutate(gre = sample(grad_app$gre, n(), replace = F))
+
+perm_mod <- glm(admit ~ gre, family = binomial, 
+                  data = grad_app_perm)
+
+summary(perm_mod)
+```
+
+.large[
+.question[
+What is my test statistic for the permuted data (for which $H_0$ is *true*)?
+]
+]
+
+---
+
+### Making $H_0$ true
+
+```{r, eval=F}
+grad_app_perm <- grad_app |>
+  mutate(gre = sample(grad_app$gre, n(), replace = F))
+
+perm_mod <- glm(admit ~ gre, family = binomial, 
+                  data = grad_app_perm)
+
+summary(perm_mod)
+```
+
+```{r, echo=F, output.lines = c(4:8)}
+set.seed(9)
+
+grad_app_perm <- grad_app |>
+  mutate(gre = sample(grad_app$gre, n(), replace = F))
+
+perm_mod <- glm(admit ~ gre, family = binomial, 
+                  data = grad_app_perm)
+
+summary(perm_mod)
+```
+
+.large[
+.question[
+Does this give me the *distribution* of my test statistic under $H_0$?
+]
+]
+
+---
+
+### Repeating the process
+
+.large[
+```{r}
+nreps <- 1000 # number of repetitions
+z_stats <- rep(NA, nreps) # place to store results
+
+head(z_stats)
+```
+]
+
+---
+
+### Repeating the process
+
+.large[
+```{r, eval=F}
+nreps <- 1000 # number of repetitions
+z_stats <- rep(NA, nreps) # place to store results
+
+for(i in 1:nreps){
+  # do something
+}
+```
+]
+
+---
+
+### For loop: example
+
+.large[
+```{r}
+for(i in 1:5){
+  print(i)
+}
+```
+]
+
+---
+
+### For loop: example
+
+.large[
+```{r}
+ex_results <- rep(NA, 5)
+for(i in 1:5){
+  ex_results[i] <- i*2
+}
+
+ex_results
+ex_results[1]
+ex_results[2]
+```
+]
+
+---
+
+### Repeating the process
+
+.large[
+```{r, eval=F}
+nreps <- 1000 # number of repetitions
+z_stats <- rep(NA, nreps) # place to store results
+
+for(i in 1:nreps){
+  # do something
+}
+```
+
+.question[
+What needs to happen inside our for loop?
+]
+]
+
+---
+
+### Repeating the process
+
+.large[
+```{r, eval=F}
+nreps <- 1000 # number of repetitions
+z_stats <- rep(NA, nreps) # place to store results
+
+for(i in 1:nreps){
+  grad_app_perm <- grad_app |>
+    mutate(gre = sample(grad_app$gre, n(), 
+                        replace = F))
+  
+  perm_mod <- glm(admit ~ gre, family = binomial, 
+                  data = grad_app_perm)
+  z_stats[i] <- summary(perm_mod)$coefficients[2,3]
+}
+```
+]
+
+
+---
+
+### Class activity
+
+.large[
+[https://sta214-f25.github.io/class_activities/ca_12.html](https://sta214-f25.github.io/class_activities/ca_12.html)
+]
+
+.large[
+* Work independently or with a neighbor
+* Submit HTML on Canvas when done
+]
+
+
+
+
