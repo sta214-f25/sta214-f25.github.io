@@ -12,5 +12,7 @@ September 17
   
 September 19
 : Comparing models
+  : [slides](https://sta214-f25.github.io/slides/lecture_12.pdf), [activity](https://sta214-f25.github.io/class_activities/ca_12.html)
   
 : **Homework 4 released**{: .label .label-yellow }
+  : [HW 4](https://sta214-f25.github.io/homework/hw_04.html)
