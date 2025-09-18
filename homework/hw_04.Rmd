@@ -1,0 +1,247 @@
+---
+title: "Homework 4"
+output: 
+  rmdformats::robobook:
+    css: "homework.css"
+    highlight: pygments
+link-citations: yes
+editor_options: 
+  chunk_output_type: console
+---
+
+**Due:** Friday, September 26, 10:00pm on Canvas
+
+**Instructions:** 
+
+**Code guidelines:**
+
+* If a question requires code, and code is not provided, you will not receive full credit
+* You will be graded on the quality of your code. In addition to being correct, your code should also be easy to read
+
+## Conceptual questions
+
+### Cook's distance
+
+Below is the output for a logistic regression model, and the Cook's distance plot for the fitted model.
+
+```{r, include=F}
+set.seed(42)
+
+x <- rnorm(100)
+
+# create P(Y = 1 | X) for each entry in x
+# Here log odds = -1 + 2x
+p <- exp(-1 + 2*x)/(1 + exp(-1 + 2*x))
+
+# Finally, simulate a binary response at each x
+y <- rbinom(100, 1, p)
+
+x <- c(x, 2.5, 3)
+y <- c(y, 0, 1)
+
+m1 <- glm(y ~ x, family = binomial)
+```
+
+```{r, echo=F}
+summary(m1)
+```
+
+```{r, echo=F, message=F, warning=F}
+library(tidyverse)
+library(car)
+library(mvtnorm)
+
+data.frame(x = x, y = cooks.distance(m1)) |>
+  ggplot(aes(x = x, y = y)) +
+  geom_point() +
+  theme_bw() +
+  labs(x = "x", y = "Cook's distance")
+```
+
+
+:::{.question}
+#### Question 1
+
+The largest Cook's distance is for an observation with $X = 2.5$. However, there is a point with $X = 3$ which has a smaller Cook's distance. How has this happened? In your answer, use the output provided to discuss what the observed value of $Y$ is for each of these two points.
+:::
+
+### Variance inflation factors
+
+Consider a logistic regression model with systematic component
+
+$$\log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 X_{i1} + \beta_2 X_{i2} + \cdots + \beta_k X_{ik}$$
+
+To check for multicollinearity in the explanatory variables (and assess its impact on the estimated coefficients of the model), recall that we can calculate a *variance inflation factor*. The VIF for the $j$th coefficient is defined by
+
+$$VIF_j = \dfrac{Var(\widehat{\beta}_j) \ \text{in the full model (other variables included)}}{Var(\widehat{\beta}_j) \ \text{when } X_j \text{ is the only variable in the model}}$$
+
+Suppose we have three explanatory variables, $X_1$, $X_2$, and $X_3$. We fit a logistic regression model with only $X_1$; here are the results:
+
+```{r, include=F}
+set.seed(383)
+
+n <- 1000
+rho <- 0.98
+beta <- c(0, 1, 1, 1)
+
+# Create the covariance matrix sigma
+sigma <- diag(rep(1 - rho, 3)) + matrix(rep(rho, 9), nrow=3)
+
+# Generate Xs from a multivariate normal distribution
+X <- rmvnorm(n, sigma = sigma)
+
+x1 <- X[,1]
+x2 <- X[,2]
+x3 <- X[,3]
+
+X_complete <- cbind(1, X)
+
+# generate probabilities p
+p <- exp(X_complete %*% beta)/(1 + exp(X_complete %*% beta))
+
+# generate bernoulli response y
+y <- rbinom(n, 1, p)
+```
+
+```{r}
+m1 <- glm(y ~ x1, family = binomial)
+
+summary(m1)
+```
+
+From the output, notice that $SE(\widehat{\beta}_1) \approx 0.212$.
+
+We also fit a model with all three variables, and calculate the VIFs:
+
+```{r}
+m2 <- glm(y ~ x1 + x2 + x3, family = binomial)
+vif(m2)
+```
+
+:::{.question}
+#### Question 2
+
+Using the output provided for the two models, calculate $SE(\widehat{\beta}_1)$ for the *second* model, `m2`.
+:::
+
+### Deviance
+
+Below is the output for a logistic regression model:
+
+
+```{r, include=F}
+set.seed(383)
+
+n <- 100
+rho <- 0.99
+beta <- c(0, 2, 1, 1)
+
+# Create the covariance matrix sigma
+sigma <- diag(rep(1 - rho, 3)) + matrix(rep(rho, 9), nrow=3)
+
+# Generate Xs from a multivariate normal distribution
+X <- rmvnorm(n, sigma = sigma)
+
+x1 <- X[,1]
+x2 <- X[,2]
+x3 <- X[,3]
+
+X_complete <- cbind(1, X)
+
+# generate probabilities p
+p <- exp(X_complete %*% beta)/(1 + exp(X_complete %*% beta))
+
+# generate bernoulli response y
+y <- rbinom(n, 1, p)
+```
+
+```{r}
+m1 <- glm(y ~ x1, family = binomial)
+
+summary(m1)
+```
+
+
+:::{.question}
+#### Question 3
+
+What is the log-likelihood for the fitted model?
+:::
+
+:::{.question}
+#### Question 4
+
+The estimated coefficients for the model are $\widehat{\beta}_0 = -0.4769$ and $\widehat{\beta}_1 = 3.7934$.
+
+Suppose that instead of these estimated coefficients, I decide I prefer $\widehat{\beta}_0 = -0.5$ and $\widehat{\beta}_1 = 4$ (on the same data). If I calculate the log-likelihood and deviance for the model with these different coefficients, how would they compare to the output shown above? (For each of  log-likelihood and deviance, explain whether it will increase, decrease, or stay the same).
+:::
+
+We now fit a second model, with two additional explanatory variables:
+
+```{r}
+m2 <- glm(y ~ x1 + x2 + x3, family = binomial)
+summary(m2)
+vif(m2)
+```
+
+Comparing the two models (`m1` and `m2` in the displayed output), we notice that while the deviance decreases very slightly, the AIC has *increased* in model 2. 
+
+:::{.question}
+#### Question 5
+
+Explain what is causing the AIC to increase when we add additional variables to the model. Your answer should use information provided by the displayed VIFs.
+:::
+
+
+### Prediction
+
+Your friend has built a logistic regression model to diagnose a rare disease, using a sample of 10000 patients from providers across NC. To assess their model's predictive ability, they create a confusion matrix:
+
+| | Disease negative | Disease positive|
+| --- | --- | --- |
+|Prediction negative | 9501 | 489 |
+| Prediction positive | 6 | 4 |
+
+They calculate the overall accuracy of their predictions, and are ecstatic to obtain an accuracy of 95%!
+
+:::{.question}
+#### Question 6
+
+Should your friend be happy with their model's predictive performance? Explain why or why not. Your answer should include a discussion of other metrics for assessing predictive ability (such as sensitivity and specificity).
+:::
+
+
+### More prediction
+
+A different friend of yours is feeling ill, and goes to their doctor. Their doctor diagnoses them with a disease called the *Red Death* (what a horrifying name!). Understandably upset, your friend asks about the reliability of the diagnostic test.
+
+In response, their doctor provides a confusion matrix from a recent study on the Red Death:
+
+| | Disease negative | Disease positive|
+| --- | --- | --- |
+|Test negative | 8003 | 10 |
+| Test positive | 312 | 95 |
+
+The doctor claims that, *if a patient is positive for the disease*, there is a 90.5% chance that they will test positive. Therefore, the doctor argues that your friend is very likely to truly have the disease.
+
+:::{.question}
+#### Question 7
+
+Using the confusion matrix, explain how the doctor got the 90.5% probability they reported.
+:::
+
+:::{.question}
+#### Question 8
+
+*Given that your friend tested positive*, how likely is it that they actually have the disease? Calculate a relevant value from the confusion matrix. 
+
+Is the doctor correct that your friend is "very likely to truly have the disease"?
+:::
+
+
+
+
+
+
+
+
