@@ -1,0 +1,161 @@
+---
+title: "Class activity: hypothesis testing and null distribution"
+format: html
+---
+
+**Instructions:** 
+
+* Work individually or with a neighbor to answer the following questions 
+* To get started, download the [class activity template](https://sta214-f25.github.io/class_activities/ca_13_template.qmd) file
+* When you are finished, render the file as an HTML and submit the HTML to Canvas (let me know if you encounter any problems)
+
+**Note:** Pick up where you left off in the last class activity. You do not need to re-do work from last time!
+
+## Approximating the null distribution with permutations
+
+When testing the hypothesis $H_0: \beta_1 = 0$, we can use the test statistic
+
+$$z = \dfrac{\widehat{\beta}_1}{SE(\widehat{\beta}_1)}$$
+
+To calculate a p-value, we need to know the distribution of $z$ *if* $H_0$ *were true*. This is called the **null distribution**. We will approximate this null distribution by permuting the explanatory variable, and calculating the test statistic for each permutation.
+
+Here is the code we wrote in class:
+
+```{r, eval=F}
+library(tidyverse)
+grad_app <- read.csv("https://stats.idre.ucla.edu/stat/data/binary.csv")
+
+nreps <- 1000 # number of repetitions
+z_stats <- rep(NA, nreps) # place to store results
+
+for(i in 1:nreps){
+  grad_app_perm <- grad_app |>
+    mutate(gre = sample(grad_app$gre, n(), 
+                        replace = F))
+  
+  perm_mod <- glm(admit ~ gre, family = binomial, 
+                  data = grad_app_perm)
+  z_stats[i] <- summary(perm_mod)$coefficients[2,3]
+}
+```
+
+### Questions
+
+1. Run the code, and create a histogram of the $z$-statistics. Describe the shape of the distribution.
+
+The p-values reported in the coefficients table in R are calculated with a $N(0, 1)$ distribution as the null distribution. We can compare the $z$-statistics from our permutations to the $N(0, 1)$ distribution with a QQ plot:
+
+```{r, eval=F}
+qqnorm(z_stats)
+abline(a = 0, b = 1, col="red")
+```
+
+
+2. Create the QQ plot. Do the statistics appear to follow a standard normal distribution?
+
+The z-statistics we calculate divide the estimated coefficient $\widehat{\beta}_1$ by its standard error. We may wonder why we don't just use $\widehat{\beta}_1$ as the test statistic (without standardizing).
+
+3. Modify the code above so that we save the estimated slope $\widehat{\beta}_1$, instead of the z-statistic.
+
+4. What does the null distribution of the estimates $\widehat{\beta}_1$ look like?
+
+5. Why do we use the z-statistic as our test statistic?
+
+
+## Another approach: change in deviance
+
+One way of testing the hypotheses $H_0: \beta_1 = 0$ vs. $H_A: \beta_1 \neq 0$ is to compare nested models.
+
+**Reduced model:** If $H_0$ were true, then the model for the grad acceptance data above would be
+
+$$\log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0$$
+This is called the *reduced model*.
+
+**Full model:** If $H_0$ is not correct, then the model for the grad acceptance data would be
+
+$$\log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 GRE_i$$
+
+Just like an $F$-test in linear regression compares the SSE of full and reduced models, in a GLM we can compare the *deviance* between full and reduced models.
+
+### Drop-in-deviance statistic
+
+In particular, our test statistic is the change in deviance:
+
+$$G = \text{deviance}_{\text{reduced}} \ - \ \text{deviance}_{\text{full}}$$
+
+6. Fit the full model on the original `grad_app` data (*not* the permuted data), and report the deviance. (Note: you can extract the deviance of a model with `$deviance`. For example, if my fitted model was called `m1`, I would use `m1$deviance`)
+
+7. Now fit the reduced model on the original data, and report the deviance. Also calculate the drop in deviance $G$.
+
+### Null distribution
+
+To calculate a p-value for our observed test statistic, we need to know how "unusual" $G$ would be, if $H_0$ were true. That is, we need to know the *null distribution* again.
+
+For a $z$-statistic, the null distribution was a $N(0, 1)$. However, the change in deviance is a different statistic, and has a different distribution.
+
+8. Modifying the code above, use a for loop to calculate the drop-in-deviance $G$ between the reduced and full models for `nreps = 1000` permutations.
+
+9. Create a histogram of the 1000 $G$ statistics from question 8, and calculate their mean and variance. What does the distribution look like? Does a normal distribution seem appropriate?
+
+10. Explain why the drop-in-deviance is *always* non-negative.
+
+### $\chi^2$ distributions
+
+It turns out that the null distribution of $G$ is a $\chi^2$ (read *chi-squared*) distribution. The $\chi^2$ distribution is really a family of distributions, parameterized by their *degrees of freedom* (similar to how a normal distribution is parameterized by its mean and variance, while a $t$-distribution has degrees of freedom, and an $F$ distribution has numerator and denominator degrees of freedom).
+
+A $\chi^2_k$ distribution (a chi-squared distribution with $k$ degrees of freedom) has mean $k$ and variance $2k$. Here is a plot from [Wikipedia](https://en.wikipedia.org/wiki/Chi-squared_distribution) showing the shape of $\chi^2_k$ distributions for a few different values of $k$.
+
+![](https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Chi-square_pdf.svg/1920px-Chi-square_pdf.svg.png)
+
+11. Based on your answer to question 11, which degrees of freedom matches the null distribution for the drop-in-deviance statistic $G$ you simulated above?
+
+
+## Testing more parameters
+
+Now suppose that we fit a model with multiple explanatory variables:
+
+$$\log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 GRE_i + \beta_2 GPA_i$$
+
+We wish to test the hypotheses
+
+$$H_0: \beta_1 = \beta_2 = 0 \hspace{1cm} H_A: \text{at least one of } \beta_1, \beta_2 \neq 0$$
+
+**Full model:** $\log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 GRE_i + \beta_2 GPA_i$
+
+**Reduced model:** $\log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0$
+
+### Change in deviance
+
+12. Fit the full and reduced models on the *original* `grad_app` data, and report the change in deviance.
+
+### Null distribution
+
+Now we need to explore the null distribution of $G$ when testing *two* parameters.
+
+To break the relationship between the response (Admit) and the explanatory variables (GRE and GPA), this time we'll permute the Admit values:
+
+```{r, eval=F}
+grad_app_perm <- grad_app |>
+    mutate(admit = sample(grad_app$admit, n(), 
+                        replace = F))
+  
+perm_full <- glm(admit ~ gre + gpa, family = binomial, 
+                data = grad_app_perm)
+
+perm_reduced <- glm(admit ~ 1, family = binomial, 
+                data = grad_app_perm)
+```
+
+13. Modifying your for loop from above, calculate the change in deviance for `nreps=1000` permutations.
+
+14. Create a histogram of the 1000 $G$ statistics from question 13, and calculate their mean and variance. What does the distribution look like?
+
+15. Which $\chi^2_k$ distribution should we use for the null distribution now? (i.e., what should be the degrees of freedom $k$?) How does the degrees of freedom related to the null hypothesis $H_0$?
+
+
+
+
+
+
+
+
