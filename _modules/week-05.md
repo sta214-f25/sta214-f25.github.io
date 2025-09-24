@@ -11,6 +11,7 @@ September 22
 
 September 24
 : Hypothesis testing and confidence intervals
+  : [slides](https://sta214-f25.github.io/slides/lecture_14.pdf), [activity 1](https://sta214-f25.github.io/class_activities/ca_14_handout.pdf), [activity 2](https://sta214-f25.github.io/class_activities/ca_14_handout_2.pdf)
   
 September 26
 : Hypothesis testing and confidence intervals

@@ -1,0 +1,55 @@
+---
+title: "Activity"
+format: pdf
+editor: source
+---
+
+\vspace{-2.5cm}
+
+**Group members:**
+
+## Grap applications data
+
+Suppose we are interesting in testing whether there is a relationship between college GPA and acceptance to a graduate program. We fit the regression model
+
+$$Admit_i \sim Bernoulli(\pi_i)$$
+
+$$\log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 GPA_i$$
+
+and we wish to test the hypotheses $H_0: \beta_1 = 0$ vs. $H_A: \beta_1 \neq 0$. We will use the drop-in-deviance statistic
+
+$$G = \text{deviance}_{\text{reduced}} - \text{deviance}_{\text{full}}$$
+
+Here is model output for the full and reduced models, and a histogram approximating the null distribution for the drop-in-deviance statistic $G$:
+
+```{r}
+grad_app <- read.csv("https://stats.idre.ucla.edu/stat/data/binary.csv")
+
+# full model
+glm(admit ~ gpa, family = binomial, data = grad_app)
+# reduced model
+glm(admit ~ 1, family = binomial, data = grad_app)
+```
+
+```{r, echo=F}
+hist(rchisq(1000, df=1), xlab="Drop-in-deviance (G)", 
+     main = "Approximate null distribution")
+```
+
+
+1. What do you notice about the "Null Deviance" for the two models? How does it compare to the "Residual Deviance"?
+
+\hspace{3cm}
+
+2. Calculate the drop-in-deviance statistic for the hypotheses above.
+
+\hspace{3cm}
+
+3. Based on the observed drop-in-deviance and the null distribution, do you think that the null hypothesis is true?
+
+
+
+
+
+
+

@@ -1,0 +1,40 @@
+---
+title: "Activity"
+format: pdf
+editor: source
+---
+
+\vspace{-2.5cm}
+
+**Group members:**
+
+## Grap applications data
+
+We are now interested in testing whether there is a relationship between the *rank* of a student's undergraduate institution (1 = most selective, 4 = least selective) and their acceptance to a graduate program, after accounting for GRE score and undergraduate GPA.
+
+We fit the regression model
+
+$$Admit_i \sim Bernoulli(\pi_i)$$
+
+$$\log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 GPA_i + \beta_2 GRE_i + \beta_3 Rank2_i + \beta_4 Rank3_i + \beta_5 Rank4_i$$
+
+### Questions
+
+1. Write down the null and alternative hypotheses corresponding to the research question.
+
+\vspace{3cm}
+
+2. Write down the reduced model.
+
+\vspace{3cm}
+
+3. Below is output for the fitted models. Calculate an appropriate test statistic to test the hypotheses in question 1. What will be the degrees of freedom for the $\chi^2$ distribution under $H_0$?
+
+\vspace{3cm}
+
+```{r, echo=F}
+grad_app <- read.csv("https://stats.idre.ucla.edu/stat/data/binary.csv")
+glm(admit ~ gpa + gre + factor(rank), family = binomial, data = grad_app)
+glm(admit ~ gpa + gre, family = binomial, data = grad_app)
+```
+
