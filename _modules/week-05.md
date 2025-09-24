@@ -4,7 +4,7 @@ title: Inference
 
 September 22
 : Hypothesis testing with logistic regression
-  : [activity](https://sta214-f25.github.io/class_activities/ca_13.html)
+  : [activity](https://sta214-f25.github.io/class_activities/ca_13.html), [activity solutions](https://sta214-f25.github.io/class_activities/ca_13_solutions.html)
   
 : Reading for Wednesday's class
   : [Beyond MLR 6.5.4 - 6.5.5](https://bookdown.org/roback/bookdown-BeyondMLR/ch-logreg.html#sec-logisticInf)
