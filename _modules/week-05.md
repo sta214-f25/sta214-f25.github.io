@@ -15,5 +15,7 @@ September 24
   
 September 26
 : Hypothesis testing and confidence intervals
+  : [slides](https://sta214-f25.github.io/slides/lecture_15.pdf), [activity 1](https://sta214-f25.github.io/class_activities/ca_15.html), [activity 2](https://sta214-f25.github.io/class_activities/ca_15_handout.pdf)
   
 : **Homework 5 released**{: .label .label-yellow }
+  : [HW 5](https://sta214-f25.github.io/homework/hw_05.html)

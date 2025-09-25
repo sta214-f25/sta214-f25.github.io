@@ -12,6 +12,19 @@ editor_options:
   chunk_output_type: console
 ---
 
+### Agenda
+
+.large[
+* For homework submissions:
+    * Make sure to submit rendered HTML
+    * If writing math in Quarto (e.g. regression models, maximum likelihood problems, etc.), make sure the equations display correctly
+* Discuss feedback survey
+* Recap activity from end of last class
+* More inference!
+]
+
+---
+
 ### Last time: Activity
 
 $$Admit_i \sim Bernoulli(\pi_i)$$
@@ -314,7 +327,7 @@ Another bootstrap sample:
 * For each bootstrap sample, calculate $\widehat{\beta}_1$
 * Examine the distribution of estimated slopes
 
-(https://sta214-f25.github.io/class_activities/ca_15.html)[https://sta214-f25.github.io/class_activities/ca_15.html]
+[https://sta214-f25.github.io/class_activities/ca_15.html](https://sta214-f25.github.io/class_activities/ca_15.html)
 ]
 
 ---

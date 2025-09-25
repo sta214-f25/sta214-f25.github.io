@@ -19,10 +19,12 @@ Begin by downloading the HW 5 template from the course website:
 
 Save this template file to your computer, then open it in RStudio. As you complete the assignment, you will write down your answers to all questions in the file, and include all R code in code chunks.
 
-When you have completed the assignment, render your homework to HTML and submit on Canvas. *You must submit the rendered HTML on Canvas to receive full credit!*
+When you have completed the assignment, render your homework to HTML and submit on Canvas. 
 
-**Code guidelines:**
+**Guidelines:**
 
+* *You must submit the rendered HTML on Canvas to receive full credit!*
+* The course codebook has examples of writing math in Quarto and R Markdown documents. If your rendered math does not display correctly, or is hard to read, you will not receive full credit
 * If a question requires code, and code is not provided, you will not receive full credit
 * You will be graded on the quality of your code. In addition to being correct, your code should also be easy to read
 
