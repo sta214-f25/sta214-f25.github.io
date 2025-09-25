@@ -1,0 +1,78 @@
+---
+title: "Class activity: bootstrap sampling"
+format: html
+---
+
+**Instructions:** 
+
+* Work individually or with a neighbor to answer the following questions 
+* To get started, download the [class activity template](https://sta214-f25.github.io/class_activities/ca_15_template.qmd) file
+* When you are finished, render the file as an HTML and submit the HTML to Canvas (let me know if you encounter any problems)
+
+## Bootstrap sampling
+
+A **bootstrap sample** is a sample of rows from the original data, *with replacement*. Bootstrap sampling can be used to explore the sampling distribution and variability of a statistic. The idea is that variability in resampling from the *observed* data should reflect variability in resampling from the *population*.
+
+### Grad app data
+
+Suppose we are working with the grad app data, and the model
+
+$$Admit_i \sim Bernoulli(\pi_i)$$
+
+$$\log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 GRE_i$$
+
+We fit the model in R, and we are interested in estimating $\beta_1$:
+
+```
+             Estimate Std. Error z value Pr(>|z|)    
+(Intercept) -2.901344   0.606038  -4.787 1.69e-06
+gre          0.003582   0.000986   3.633  0.00028
+```
+
+Now we would like to explore how $\widehat{\beta}_1$ varies from sample to sample.
+
+The code below creates a bootstrap sample of the data, and re-fits the logistic regression model on the bootstrap sample:
+
+```{r, eval=F}
+library(tidyverse)
+
+# bootstrap sample
+grad_boot <- grad_app |>
+  slice_sample(n = nrow(grad_app), replace=T)
+
+# re-fit model
+m_boot <- glm(admit ~ gre, family = binomial, data = grad_boot)
+
+# get estimated slope
+coef(m_boot)[2]
+```
+
+1. Run the code; how does the estimate of $\beta_1$ from the bootstrap sample compare to the estimate from the original data?
+
+<br/>
+
+Now let's repeat the process many times, using a `for` loop! Here is some starter code:
+
+```{r, eval=F}
+nsim <- 1000
+boot_ests <- rep(NA, nsim) # vector to store slope estimates
+
+for(i in 1:nsim){
+  # take a bootstrap sample
+  # fit the model
+  # store the estimated slope (fill in the ...)
+  boot_ests[i] <- ...
+}
+```
+
+2. Fill in the code to estimate $\beta_1$ in 1000 bootstrap samples.
+
+3. Calculate the mean of the bootstrap estimates. How does the mean compare to $\widehat{\beta}_1$ from the original data?
+
+4. Calculate the standard deviation of the bootstrap estimates. How does the standard deviation compare to the reported standard error $SE(\widehat{\beta}_1)$ from the logistic regression output on the original data?
+
+5. Make a histogram of the bootstrap estimates, and describe the distribution. Based on this bootstrap distribution, provide a "reasonable range" of values for 
+$\beta_1$.
+
+
+

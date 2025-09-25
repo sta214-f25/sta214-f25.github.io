@@ -1,0 +1,376 @@
+---
+title: "Homework 5"
+output: 
+  rmdformats::robobook:
+    css: "homework.css"
+    highlight: pygments
+link-citations: yes
+editor_options: 
+  chunk_output_type: console
+---
+
+**Due:** Friday, October 3, 11:59pm on Canvas
+
+**Instructions:** 
+
+Begin by downloading the HW 5 template from the course website:
+
+[https://sta214-f25.github.io/homework/hw_05_template.qmd](https://sta214-f25.github.io/homework/hw_05_template.qmd)
+
+Save this template file to your computer, then open it in RStudio. As you complete the assignment, you will write down your answers to all questions in the file, and include all R code in code chunks.
+
+When you have completed the assignment, render your homework to HTML and submit on Canvas. *You must submit the rendered HTML on Canvas to receive full credit!*
+
+**Code guidelines:**
+
+* If a question requires code, and code is not provided, you will not receive full credit
+* You will be graded on the quality of your code. In addition to being correct, your code should also be easy to read
+
+
+## Exploring null distributions with randomization
+
+In this part of the homework assignment, you will use randomization to explore the null distribution of a test statistic. So far, we have examined null distributions for the Wald and drop-in-deviance tests. Here, we will examine a new test, comparing two categorical variables.
+
+This part of the assignment does not directly involve logistic regression models, but is designed to give you practice with the use of simulation to explore null distributions and hypothesis tests.
+
+### Contingency tables
+
+Suppose we want to examine the relationship between passenger class and survival in the `titanic` data. One way to do this is to make a contingency table examining the outcome for passengers in each class:
+
+```{r}
+titanic <- read.csv("https://sta214-f25.github.io/homework/Titanic.csv")
+
+table("Surival" = titanic$Survived, 
+      "Class" = titanic$Pclass)
+```
+
+It looks like there may be a relationship between these two variables. Formally, we would want to test the hypotheses
+
+$$H_0: \text{there is no relationship between passenger class and survival}$$
+$$H_A: \text{there is a relationship between passenger class and survival}$$
+
+### Expectation under the null hypothesis
+
+As always in hypothesis testing, **suppose that the null hypothesis is true**. That is, suppose there is no relationship here. What would we expect our contingency table to look like?
+
+Let's start in the first entry: 80 passengers in first class did not survive, or equivalently 80/891 = 0.09. *If* the variables were independent, how many first class passengers would be expected to perish?
+
+The probability of being in first class is $(80+136)/891 = 0.242$. The probability of dying is $(80 + 97 + 372)/891 = 0.616$. If the events are independent, then the probability of being in first class *and* dying is 
+
+$$P(\text{first class and death}) = 0.242 \times0.616 = 0.149$$
+and the expected *number* of dead first class passengers is
+
+$$0.149 \times 891 = 133$$
+
+
+:::{.question}
+#### Question 1
+
+Repeat this process to calculate the expected number of deaths for the remainder of the cells in the table. Show your work.
+:::
+
+To verify your answers in question 1, we can get the expected counts in R:
+
+```{r}
+expected_counts <- chisq.test(table("Surival" = titanic$Survived, 
+                                    "Class" = titanic$Pclass))$expected
+```
+
+### Calculating a test statistic
+
+
+Now we need to compare the *observed* values in the data to the values *expected* under the null hypothesis. That is, are the observed values close to what should happen under $H_0$?
+
+For this hypothesis test, we will use the test statistic
+
+$$X^2 = \sum \limits_i \sum \limits_j \dfrac{(O_{ij} - E_{ij})^2}{E_{ij}}$$
+
+where $O_{ij}$ is the observed count in row $i$, column $j$ of the contingency table, and $E_{ij}$ is the corresponding expected count. For example, for the passenger class and survival table above, $O_{11} = 80$, $O_{12} = 97$, etc. and $E_{11} = 133.09$, $E_{12} = 113.37$, etc. 
+
+The notation here just means "add everything up".
+
+:::{.question}
+#### Question 2
+
+The code below will calculate the $X^2$ test statistic described above. Run the code and report the statistic.
+
+```{r, eval=F}
+obs_counts <- table("Surival" = titanic$Survived, 
+                    "Class" = titanic$Pclass)
+sum((obs_counts - expected_counts)^2 / expected_counts)
+```
+
+:::
+
+
+### Null distribution
+
+Next, we need to know whether our observed statistic $X^2$ is unusual under the null hypothesis. So, we need to know how the distribution of $X^2$ behaves if $H_0$ is true. Recall that the sampling distribution of a test statistic under $H_0$ is called the *null distribution*.
+
+As we did in our logistic regression model, we will randomly shuffle (permute) one of the variables, to *force* the null hypothesis to be true. Here is code to create a contingency table with the shuffled data:
+
+```{r, eval=F}
+table(sample(titanic$Survived, nrow(titanic), replace=F), 
+      titanic$Pclass)
+```
+
+:::{.question}
+#### Question 3
+
+Use the code to create a contingency table with the shuffled data. Then calculate the $X^2$ statistic with this new contingency table.
+
+Note that you do not need to re-calculate the table of estimated counts -- the estimated counts stay the same, only the observed counts change with the shuffled data.
+
+:::
+
+:::{.question}
+#### Question 4
+
+Use a `for` loop to repeat the process of shuffling the data, creating a contingency table, and calculating the $X^2$ statistic. Here is some starter code for you to fill in:
+
+```{r, eval=F}
+nsim <- 1000 # number of repetitions
+x2_stats <- rep(NA, nsim)
+
+for(i in 1:nsim){
+  # shuffle data and calculate the new X^2 statistic
+  
+  # store the results
+  x2_stats[i] <- ... # (fill in the ...)
+}
+```
+
+:::
+
+:::{.question}
+#### Question 5
+
+Create a histogram of the simulated $X^2$ statistics from question 4, and describe the shape of the distribution. This approximates the null distribution of $X^2$.
+
+Also calculate the mean and variance of the simulated statistics from question 4.
+
+:::
+
+
+### $\chi^2$ distribution
+
+It turns out that under $H_0$, $X^2 \sim \chi^2_k$, where $k = (r-1)(c-1)$, with $r$ the number of rows and $c$ the number of columns in the contingency table.
+
+
+:::{.question}
+#### Question 6
+
+Calculate the degrees of freedom for the hypothesis test with the titanic data.
+
+Recall that a $\chi^2_k$ distribution has mean $k$ and variance $2k$. Verify that your results from question 5 match the degrees of freedom you report here.
+
+:::
+
+
+### Calculating a p-value
+
+We can use our $\chi^2$ distribution to calculate a p-value for the observed test statistic on the original data (from question 2). The `pchisq` function in R calculates tail probabilities for a $\chi^2$ distribution.
+
+
+:::{.question}
+#### Question 7
+
+Fill in the code to calculate the p-value for the hypothesis test with the titanic data:
+
+```{r, eval=F}
+pchisq(..., df = ..., lower.tail = FALSE)
+```
+
+
+Report your results, and make a conclusion in the context of the original research question -- do you think there is a relationship between passenger class and survival?
+
+:::
+
+## Logistic regression and comparing deviances
+
+### Data and research question
+
+Your friend is interested in factors that influence whether a house sells for more or less than its asking price. They collect data on 200 different houses which were sold in the last year, and record several variables:
+
+* `OverAsking`: whether the house sold for more than the asking price (1) or not (0)
+* `Area`: the interior space of the house, in hundreds of square feet
+* `Location`: whether the house is in an urban, rural, or suburban location
+* `Age`: the age of the house (in years)
+
+Your friend wants to know whether the location of the house is related to whether it sells for over asking price, after accounting for its area and age.
+
+
+:::{.question}
+#### Question 8
+
+Write down the full population model which your friend can use to investigate their research question.
+
+:::
+
+:::{.question}
+#### Question 9
+
+Write down null and alternative hypotheses, in terms of one or more model parameters for the model in question 8, that match your friend's question.
+
+:::
+
+:::{.question}
+#### Question 10
+
+Write down the *reduced* model.
+
+:::
+
+### Model output
+
+```{r, include=F}
+n <- 200
+area <- rnorm(n, mean=20, sd = 4)
+location <- sample(c("urban", "rural", "suburban"), n, replace=T)
+age <- rnorm(n, mean=50, sd=10)
+p <- exp(-3 + 0.1*area + 0.02*age)/(1 + exp(-3 + 0.1*area + 0.02*age))
+over_asking <- rbinom(n, 1, p)
+
+house_data <- data.frame(Area = area, Location = location,
+                         Age = age, OverAsking = over_asking)
+
+m1 <- glm(OverAsking ~ Area + Age + Location,  
+          data = house_data, family = binomial)
+m2 <- glm(OverAsking ~ Area + Age,  
+          data = house_data, family = binomial)
+m3 <- glm(OverAsking ~ Location,  
+          data = house_data, family = binomial)
+```
+
+Below is *partial* output for 3 different models fit in R:
+
+**Model 1:**
+
+```
+glm(formula = OverAsking ~ Area + Age + Location, family = binomial, 
+    data = house_data)
+
+Coefficients:
+                 Estimate Std. Error 
+(Intercept)      -3.96452    1.08977  
+Area              0.12716    0.03716  
+Age               0.02980    0.01531  
+Locationsuburban  0.28347    0.37079  
+Locationurban     0.28812    0.36186  
+
+    Null deviance: 274.37  on 199  degrees of freedom
+Residual deviance: 255.63  on 195  degrees of freedom
+```
+
+<br/>
+
+**Model 2:**
+
+```
+glm(formula = OverAsking ~ Area + Age, family = binomial, data = house_data)
+
+Coefficients:
+            Estimate Std. Error 
+(Intercept) -3.71925    1.04660  
+Area         0.12800    0.03709   
+Age          0.02830    0.01513  
+
+    Null deviance: 274.37  on 199  degrees of freedom
+Residual deviance: 256.45  on 197  degrees of freedom
+```
+
+<br/>
+
+**Model 3:**
+
+```
+glm(formula = OverAsking ~ Location, family = binomial, data = house_data)
+
+Coefficients:
+                 Estimate Std. Error 
+(Intercept)       0.08701    0.24100   
+Locationsuburban  0.20067    0.35056 
+Locationurban     0.26966    0.34467  
+
+    Null deviance: 274.37  on 199  degrees of freedom
+Residual deviance: 273.71  on 197  degrees of freedom
+```
+
+:::{.question}
+#### Question 11
+
+Calculate the AIC for each of the three models.
+
+:::
+
+:::{.question}
+#### Question 12
+
+Explain why the *null* deviance is the same for all three models.
+
+:::
+
+:::{.question}
+#### Question 13
+
+Calculate the drop-in-deviance statistic $G$ for the hypotheses in question 9. (Note: you might not need to use all of the models shown here)
+
+What will be the degrees of freedom for the $\chi^2$ distribution under $H_0$?
+
+:::
+
+:::{.question}
+#### Question 14
+
+Calculate a p-value for your hypothesis test, using the appropriate $\chi^2$ distribution from question 13. Report your results, and draw a conclusion about the original research question.
+
+:::
+
+
+## Wald test
+
+Using the same house price data as above, you now want to ask a different question: after accounting for age and location, is there a *positive* relationship between a house's area and the probability it sells for more than asking price?
+
+:::{.question}
+#### Question 15
+
+Write down null and alternative hypotheses, in terms of one or more model parameters for the model in question 8, to address this new question.
+
+:::
+
+:::{.question}
+#### Question 16
+
+Calculate a $z$-statistic for the hypotheses in question 15, using information from the model output above. 
+
+:::
+
+Finally, we want to calculate a p-value for the $z$-statistic. Under $H_0$, the test statistics follow a $N(0, 1)$ distribution, which means we can calculate a p-value using the `pnorm` function in R.
+
+To use the `pnorm` function, we specify the statistic, and whether we want to look in the left or right tail. For example, $P(Z > 0.5)$ we would do
+
+```{r}
+pnorm(0.5, lower.tail = FALSE)
+```
+
+while for $P(Z < -2)$ we would do
+
+```{r}
+pnorm(-2, lower.tail = TRUE)
+```
+
+
+:::{.question}
+#### Question 17
+
+Calculate a p-value for your hypothesis test, using the test statistic from question 16.
+
+:::
+
+
+
+
+
+
+
+
