@@ -1,0 +1,39 @@
+---
+title: "Activity"
+format: pdf
+editor: source
+---
+
+\vspace{-2.5cm}
+
+**Group members:**
+
+## Dengue data
+
+Here we will return to the dengue data from class. Our model is
+
+$$Dengue_i \sim Bernoulli(\pi_i)$$
+$$\log \left( \dfrac{\pi_i}{1 - \pi_i} \right) = \beta_0 + \beta_1 WBC_i$$
+
+Here is the output for the fitted model from R:
+
+```
+Coefficients:
+            Estimate Std. Error z value Pr(>|z|)    
+(Intercept)  1.73743    0.08499   20.44   <2e-16 ***
+WBC         -0.36085    0.01243  -29.03   <2e-16 ***
+```
+
+1. Calculate a 99% confidence interval for the change in the log odds of dengue associated with a one-unit increase in WBC.
+
+\vspace{1.5cm}
+
+2. How could we calculate a 99% confidence interval for the change in the *odds* of dengue associated with a one-unit increase in WBC?
+
+\vspace{1.5cm}
+
+3. Your friend, seeing your confidence interval from question 2, states that there is a 1% chance that the true change in odds associated with a one-unit increase in WBC is less than 0.675 or greater than 0.720. Is your friend correct?
+
+
+
+

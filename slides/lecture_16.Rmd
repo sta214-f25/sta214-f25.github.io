@@ -1,0 +1,284 @@
+---
+title: Inference and effect size
+output:
+  xaringan::moon_reader:
+    css: "lab-slides.css"
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+editor_options: 
+  chunk_output_type: console
+---
+
+### Activity
+
+.large[
+Work on the activity (handout), then we will discuss as a class.
+]
+
+---
+
+### Activity
+
+.large[
+```
+Coefficients:
+            Estimate Std. Error z value Pr(>|z|)    
+(Intercept)  1.73743    0.08499   20.44   <2e-16 ***
+WBC         -0.36085    0.01243  -29.03   <2e-16 ***
+```
+
+.question[
+Calculate a 99% confidence interval for the change in the log odds of dengue associated with a one-unit increase in WBC.
+]
+]
+
+---
+
+### Activity
+
+.large[
+```
+Coefficients:
+            Estimate Std. Error z value Pr(>|z|)    
+(Intercept)  1.73743    0.08499   20.44   <2e-16 ***
+WBC         -0.36085    0.01243  -29.03   <2e-16 ***
+```
+
+.question[
+How could we calculate a 99% confidence interval for the change in the *odds* of dengue associated with a one-unit increase in WBC?
+]
+]
+
+---
+
+### Activity
+
+
+.large[
+```
+Coefficients:
+            Estimate Std. Error z value Pr(>|z|)    
+(Intercept)  1.73743    0.08499   20.44   <2e-16 ***
+WBC         -0.36085    0.01243  -29.03   <2e-16 ***
+```
+
+99% confidence interval in terms of odds: (0.675, 0.720)
+
+.question[
+How do I interpret this confidence interval?
+]
+]
+
+---
+
+
+### Activity
+
+.large[
+```
+Coefficients:
+            Estimate Std. Error z value Pr(>|z|)    
+(Intercept)  1.73743    0.08499   20.44   <2e-16 ***
+WBC         -0.36085    0.01243  -29.03   <2e-16 ***
+```
+
+99% confidence interval in terms of odds: (0.675, 0.720)
+
+.question[
+Your friend, seeing your confidence interval from question 2, states that there is a 1% chance that the true change in odds associated with a one-unit increase in WBC is less than 0.675 or greater than 0.720. Is your friend correct?
+]
+]
+
+---
+
+### Types of inference questions
+
+.large[
+* Is there a relationship between these variables?
+    * Hypothesis testing
+* What is the size of relationship between these variables?
+    * Confidence intervals
+    
+Today: thinking about effect size
+]
+
+---
+
+### Thinking about effect size
+
+.large[
+```
+              Estimate Std. Error z value Pr(>|z|)    
+(Intercept)  1.2525593  0.1548038   8.091  5.9e-16 ***
+Age          0.1383186  0.0099763  13.865  < 2e-16 ***
+WBC         -0.2523294  0.0135371 -18.640  < 2e-16 ***
+PLT         -0.0060276  0.0006113  -9.860  < 2e-16 ***
+```
+
+.question[
+Your friend claims that the coefficient on platelet count (PLT) is very close to 0, so platelet count is not a meaningful variable to include in the model. Is your friend correct?
+]
+]
+
+---
+
+### Thinking about effect size
+
+```{r, echo=F, message=F, warning=F, fig.align='center', fig.width=7, fig.height=5}
+library(tidyverse)
+dengue <- read.csv("https://sta279-s22.github.io/labs/dengue.csv")
+
+dengue |>
+  ggplot(aes(x = PLT)) +
+  geom_histogram(fill = "transparent", color="black") +
+  theme_classic() +
+  theme(text = element_text(size = 20))
+```
+
+.large[
+* The coefficient on PLT (-0.006) is interpret in terms of a one-unit increase
+* The scale of PLT ranges from 0 to 800 -- a one-unit increase is very small!
+]
+
+---
+
+### Thinking about effect size
+
+```{r, echo=F, message=F, warning=F, fig.align='center', fig.width=7, fig.height=5}
+library(tidyverse)
+dengue <- read.csv("https://sta279-s22.github.io/labs/dengue.csv")
+
+dengue |>
+  ggplot(aes(x = PLT)) +
+  geom_histogram(fill = "transparent", color="black") +
+  theme_classic() +
+  theme(text = element_text(size = 20))
+```
+
+.large[
+.question[
+If a one-*unit* increase has different meaning across different variables, how else could we think about the effect size of a variable?
+]
+]
+
+---
+
+### Effects in terms of standard deviations
+
+.large[
+```
+              Estimate Std. Error z value Pr(>|z|)    
+(Intercept)  1.2525593  0.1548038   8.091  5.9e-16 ***
+Age          0.1383186  0.0099763  13.865  < 2e-16 ***
+WBC         -0.2523294  0.0135371 -18.640  < 2e-16 ***
+PLT         -0.0060276  0.0006113  -9.860  < 2e-16 ***
+```
+
+The *standard deviation* of PLT in the data is 80.02.
+
+.question[
+What is the change in log-odds associated with a one *standard deviation* in PLT, holding the other variables constant?
+]
+
+]
+
+---
+
+### Effects in terms of standard deviations
+
+.large[
+```
+              Estimate Std. Error z value Pr(>|z|)    
+(Intercept)  1.2525593  0.1548038   8.091  5.9e-16 ***
+Age          0.1383186  0.0099763  13.865  < 2e-16 ***
+WBC         -0.2523294  0.0135371 -18.640  < 2e-16 ***
+PLT         -0.0060276  0.0006113  -9.860  < 2e-16 ***
+```
+
+The *standard deviation* of PLT in the data is 80.02.
+
+Holding Age and WBC constant, a one *standard deviation* increase in PLT is associated with:
+
+* A decrease of -0.482 in the log-odds of dengue
+* A change in the *odds* by a factor of $e^{-0.482} = 0.617$ (i.e., a decrease of almost 40%)!
+]
+
+---
+
+### Effects in terms of standard deviations
+
+.large[
+```
+              Estimate Std. Error z value Pr(>|z|)    
+(Intercept)  1.2525593  0.1548038   8.091  5.9e-16 ***
+Age          0.1383186  0.0099763  13.865  < 2e-16 ***
+WBC         -0.2523294  0.0135371 -18.640  < 2e-16 ***
+PLT         -0.0060276  0.0006113  -9.860  < 2e-16 ***
+```
+
+The *standard deviation* of PLT in the data is 80.02.
+
+The estimated probability of dengue at the mean values of Age, WBC, and PLT is about 0.2. If we fix Age and WBC:
+
+* Probability when PLT = mean + 1 sd is 0.135
+* Probability when PLT = mean - 1 sd is 0.292
+]
+
+
+---
+
+### Activity
+
+.large[
+Work on the activity (handout), then we will discuss as a class.
+]
+
+---
+
+### Activity
+
+.large[
+```
+             Estimate Std. Error z value Pr(>|z|)    
+(Intercept) -2.507329   0.311939  -8.038 9.14e-16 ***
+loss        -0.846499   0.238335  -3.552 0.000383 ***
+smoke100    -0.137151   0.035816  -3.829 0.000128 ***
+hlthplan     0.613613   0.051233  11.977  < 2e-16 ***
+age         -0.012148   0.001043 -11.652  < 2e-16 ***
+height       0.056845   0.004520  12.577  < 2e-16 ***
+```
+
+The standard deviation of the `loss` variable is 0.074.
+
+.question[
+How do the odds of exercise change with a one standard deviation increase in loss, holding the other variables constant?
+]
+]
+
+---
+
+### Activity
+
+.large[
+```
+             Estimate Std. Error z value Pr(>|z|)    
+(Intercept) -2.507329   0.311939  -8.038 9.14e-16 ***
+loss        -0.846499   0.238335  -3.552 0.000383 ***
+...          ...        ...        ...    ...
+```
+
+The standard deviation of the `loss` variable is 0.074.
+
+.question[
+Want to test whether a one-standard deviation increase in `loss` is associated with a decrease in the odds of at least 5% (holding other variables constant).
+]
+]
+
+
+
+
+
+

@@ -1,0 +1,51 @@
+---
+title: "Activity"
+format: pdf
+editor: source
+---
+
+\vspace{-2.5cm}
+
+**Group members:**
+
+# BRFSS data: weight loss and exercise
+
+The Behavioral Risk Factor Surveillance System (BRFSS) is an annual telephone survey of 350,000 people in the United States. As its name implies, the BRFSS is designed to identify risk factors in the adult population and report emerging health trends. For example, respondents are asked about their diet and weekly physical activity, their HIV/AIDS status, possible tobacco use, and even their level of healthcare coverage.
+
+We will focus on a random sample of 20,000 people from the BRFSS survey. This sample includes information on the following variables:
+
+* `exerany`: indicates whether the respondent exercised in the past month (1) or did not (0).
+* `loss`: the proportion of body weight which the respondent wants to lose
+* `smoke100`: indicates whether the respondent had smoked at least 100 cigarettes in their lifetime
+* `hltplan`: indicates whether the respondent had some form of health coverage (1) or did not (0).
+* `age`: in years
+* `height`: in inches
+
+## Model
+
+A collaborator fits the following regression model with `exerany` as the response:
+
+```
+Coefficients:
+             Estimate Std. Error z value Pr(>|z|)    
+(Intercept) -2.507329   0.311939  -8.038 9.14e-16 ***
+loss        -0.846499   0.238335  -3.552 0.000383 ***
+smoke100    -0.137151   0.035816  -3.829 0.000128 ***
+hlthplan     0.613613   0.051233  11.977  < 2e-16 ***
+age         -0.012148   0.001043 -11.652  < 2e-16 ***
+height       0.056845   0.004520  12.577  < 2e-16 ***
+```
+
+The standard deviation of the `loss` variable is 0.074.
+
+1. How do the odds of exercise change with a one standard deviation increase in loss, holding the other variables constant?
+
+\vspace{3cm}
+
+2. Your collaborators tell you that for the effect of desired weight loss to be clinically meaningful, they would need a one-standard deviation increase in `loss` to be associated with a decrease in the odds of at least 5% (holding other variables constant). Carry out a hypothesis test to address this research question.
+
+
+
+
+
+
