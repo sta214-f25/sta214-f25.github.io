@@ -1,0 +1,60 @@
+---
+title: "Activity"
+format: pdf
+editor: source
+---
+
+\vspace{-2.5cm}
+
+**Group members:**
+
+## Grad applications data
+
+Using the grad applications data, you fit a model with GRE score, GPA, and school Rank (1 = most prestigious, 4 = least prestigious) as the explanatory variables. Here is the regression output:
+
+```
+Coefficients:
+               Estimate Std. Error z value Pr(>|z|)    
+(Intercept)   -3.989979   1.139951  -3.500 0.000465 ***
+gre            0.002264   0.001094   2.070 0.038465 *  
+gpa            0.804038   0.331819   2.423 0.015388 *  
+factor(rank)2 -0.675443   0.316490  -2.134 0.032829 *  
+factor(rank)3 -1.340204   0.345306  -3.881 0.000104 ***
+factor(rank)4 -1.551464   0.417832  -3.713 0.000205 ***
+```
+
+Your friend attends a school of Rank 3, and has an undergraduate GPA of 3.95. They took the GRE over the summer and received an average score (590), but they are wondering whether they should retake the GRE before applying to graduate school.
+
+### Questions
+
+1. Given your friend's GPA, school, and current GRE score, what is your estimated probability that they will be accepted to graduate school?
+
+\vspace{4cm}
+
+2. The standard deviation of GRE scores is 115.5 points. If your friend re-took the GRE and increased their score by one standard deviation, what would be the estimated change in their *odds* of being accepted?
+
+\vspace{3cm}
+
+3. If your friend re-took the GRE and increased their score by one standard deviation, what would be their new estimated *probability* of getting accepted?
+
+\vspace{3cm}
+
+4. Taking the GRE again is expensive, and studying for the GRE enough to substantially increase the score is very time consuming. So, your friend is reluctant to retake the exam unless they believe that their odds of acceptance will increase by at least 25%.
+    * Calculate a 95% confidence interval for the change in *odds* of acceptance associated with a *one-unit* increase in GRE score, holding GPA and school rank fixed
+    * Now calculate a 95% confidence interval for the change in *odds* of acceptance associated with a one *standard deviation* increase in GRE score, holding GPA and school rank fixed
+    * Would you recommend that your friend re-takes the exam?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
