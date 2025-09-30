@@ -117,7 +117,25 @@ hist(test_stats, xlab = "Test statistic",
 ```
 
 
+## Maximum likelihood practice question
 
+This question is separate from the earthquake data discussed above.
+
+Suppose we have a variable $Y$ which can take three possible outcomes: $Y = -1, 0$, or 1. We also know that:
+
+* $P(Y_i = -1) = \pi$
+* $P(Y_i = 0) = 5\pi$
+* $P(Y_i = 1) = 1 - 6\pi$
+
+where the parameter $\pi$ is unknown. We observe data
+
+$$1, 1, 0, 0, 1, 0, 1, -1, -1, -1$$
+
+and we want to estimate $\pi$ from the data.
+
+15. Write down the likelihood function $L(\pi)$ for the observed data.
+
+16. Compute the maximum likelihood estimate $\widehat{\pi}$ from the observed data.
 
 
 
