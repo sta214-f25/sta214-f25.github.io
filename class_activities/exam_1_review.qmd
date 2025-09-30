@@ -1,0 +1,126 @@
+---
+title: "Exam 1 review questions"
+format: html
+---
+
+
+
+## Data
+
+Our data today come from the 2015 Gorkha earthquake in Nepal. After the earthquake, a large scale survey was conducted to determine the amount of damage the earthquake caused for homes, businesses and other structures. This is one of the largest post-disaster surveys in the world, and today we will be using it to determine what characteristics were associated building damage.
+
+The data contains information on 10000 buildings, with the following variables:
+
+* `age`: the age of the building (in years)
+* `area_percentage`: normalized area of the building footprint
+* `height_percentage`: normalized height of the building footprint
+* `land_surface_condition`: a categorical variable recording the surface condition of the land around the building. There are three different levels: n, o, and t. (The researchers who collected the data anonymized the level names to protect inhabitants’ privacy).
+* `foundation_type`: type of foundation used while building. Possible values: h, i, r, u, w. (The researchers who collected the data anonymized the level names to protect inhabitants’ privacy)
+* `roof_type`: type of roof used while building. Possible values: n, q, x. (The researchers who collected the data anonymized the level names to protect inhabitants’ privacy)
+* `count_families`: number of families that live in the building
+* `has_secondary_use`: whether the building was used for any secondary purpose (0 = no, 1 = yes)
+* `Damage`: whether the building sustained any damage (1) or not (0)
+
+### Choosing and interpreting a model
+
+1. A collaborator is interested in modeling the probability that a building sustained any damage, based on building age and surface condition. Write down a population regression model that would allow them to explore this research question.
+
+2. You fit the model for your collaborator in R, producing the following output (**model 1**). Interpret each of the coefficients in the fitted model in terms of the *odds* of damage.
+
+**Model 1:**
+
+```
+                         Estimate Std. Error 
+(Intercept)              1.420845   0.105823  
+age                      0.065166   0.003191  
+land_surface_conditiono -0.230243   0.205150  
+land_surface_conditiont -0.442394   0.105703
+
+    Null deviance: 7250.4  on 9999  degrees of freedom
+Residual deviance: 6600.8  on 9996  degrees of freedom
+```
+
+3. Describe a plot you could use to assess the *shape* assumption for this model. Make it clear in your description which variables or quantities would be plotted on the graph, and how you would use the plot to assess the shape assumption.
+
+4. For the type of plot described in question 3, sketch a hypothetical example plot which suggests that a transformation is needed for an explanatory variable.
+
+<br/>
+
+(For the remainder of the questions, you may assume that the shape assumption is satisfied for the earthquake data).
+
+<br/>
+
+### Predictions
+
+5. Calculate the estimated probability of damage for a 50 year old building with surface condition = t.
+
+6. Using **model 1**, the predicted probability of damage for a specific building is 0.80. For this building, which observed outcome would result in a higher Cook's distance: Damage = 0, or Damage = 1?
+
+7. Below is a confusion matrix for the predictions from the model, created using a threshold of 0.85. Calculate accuracy, sensitivity, specificity, and positive predictive value. How well does the model seem to be predicting?
+
+```
+                True Damage
+Predicted Damage    0    1
+               0  755 2682
+               1  423 6140
+```
+
+8. Explain how sensitivity and specificity would change if we *decreased* the threshold used to make the confusion matrix.
+
+### Inference
+
+9. Calculate and interpret a 95% confidence interval for the change in odds of damage associated with a one standard deviation increase in building age, holding surface condition fixed. The standard deviation of building age in the data is 19.64 years, and the critical value for a 95% confidence interval is $z^* = 1.96$.
+
+10. Your collaborator now wants to know whether there is a relationship between surface condition and building damage, after accounting for building age. Write down null and alternative hypotheses, in terms of one or more model parameters, that allow you to address this question. 
+
+<br/>
+
+To help you test the hypotheses in question 10, below is the output for two other regression models on the same data. You may or may not need to use all of the output provided.
+
+**Model 2:**
+
+```
+                        Estimate Std. Error 
+(Intercept)              2.36548    0.09793  
+land_surface_conditiono -0.34877    0.20053  
+land_surface_conditiont -0.40014    0.10344 
+
+    Null deviance: 7250.4  on 9999  degrees of freedom
+Residual deviance: 7234.1  on 9997  degrees of freedom
+```
+
+**Model 3:**
+
+```
+            Estimate Std. Error
+(Intercept) 1.039066   0.047770   
+age         0.065061   0.003191 
+
+    Null deviance: 7250.4  on 9999  degrees of freedom
+Residual deviance: 6620.7  on 9998  degrees of freedom
+```
+
+<br/>
+
+11. Calculate the AIC and the log-likelihood for **model 2**.
+
+12. Define the null deviance, and explain why the null deviance is the same for all three models.
+
+13. Calculate a test statistic that allows you to address the hypotheses in question 10. What will be the distribution of the test statistic? If the distribution depends on certain parameters (e.g., a mean and variance, or degrees of freedom) make sure to specify these in your answer.
+
+14. Below is an approximate null distribution for the test statistic. Based on this null distribution, would the test statistic you calculated in question 13 be unusual under the null hypothesis? Explain your reasoning.
+
+```{r, echo=F}
+test_stats <- rchisq(1000, 2)
+hist(test_stats, xlab = "Test statistic", 
+     main = "Approximate null distribution")
+```
+
+
+
+
+
+
+
+
+
