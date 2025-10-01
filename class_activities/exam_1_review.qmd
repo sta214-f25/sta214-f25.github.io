@@ -3,7 +3,11 @@ title: "Exam 1 review questions"
 format: html
 ---
 
+Below are questions to help you study for Exam 1. These are some examples of the kinds of questions I might ask.
 
+* This is not a practice exam.
+* The questions cover most, but not all, possible material for the exam.
+* The distribution of questions here is not necessarily reflective of the distribution of questions on the actual exam.
 
 ## Data
 
