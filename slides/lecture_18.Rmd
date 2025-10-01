@@ -1,0 +1,281 @@
+---
+title: Inference and linear combinations
+output:
+  xaringan::moon_reader:
+    css: "lab-slides.css"
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+editor_options: 
+  chunk_output_type: console
+---
+
+### Last time: Activity
+
+.large[
+```
+Coefficients:
+               Estimate Std. Error z value Pr(>|z|)    
+(Intercept)   -3.989979   1.139951  -3.500 0.000465 ***
+gre            0.002264   0.001094   2.070 0.038465 *  
+gpa            0.804038   0.331819   2.423 0.015388 *  
+factor(rank)2 -0.675443   0.316490  -2.134 0.032829 *  
+factor(rank)3 -1.340204   0.345306  -3.881 0.000104 ***
+factor(rank)4 -1.551464   0.417832  -3.713 0.000205 ***
+```
+
+.question[
+Given your friend's GPA (3.95), school (rank 3), and current GRE score (590), what is your estimated probability that they will be accepted to graduate school?
+]
+]
+
+---
+
+### Activity
+
+.large[
+```
+Coefficients:
+               Estimate Std. Error z value Pr(>|z|)    
+(Intercept)   -3.989979   1.139951  -3.500 0.000465 ***
+gre            0.002264   0.001094   2.070 0.038465 *  
+gpa            0.804038   0.331819   2.423 0.015388 *  
+factor(rank)2 -0.675443   0.316490  -2.134 0.032829 *  
+factor(rank)3 -1.340204   0.345306  -3.881 0.000104 ***
+factor(rank)4 -1.551464   0.417832  -3.713 0.000205 ***
+```
+
+.question[
+The standard deviation of GRE scores is 115.5 points. If your friend re-took the GRE and increased their score by one standard deviation, what would be the estimated change in their *odds* of being accepted?
+]
+]
+
+---
+
+### Activity
+
+.large[
+```
+Coefficients:
+               Estimate Std. Error z value Pr(>|z|)    
+(Intercept)   -3.989979   1.139951  -3.500 0.000465 ***
+gre            0.002264   0.001094   2.070 0.038465 *  
+gpa            0.804038   0.331819   2.423 0.015388 *  
+factor(rank)2 -0.675443   0.316490  -2.134 0.032829 *  
+factor(rank)3 -1.340204   0.345306  -3.881 0.000104 ***
+factor(rank)4 -1.551464   0.417832  -3.713 0.000205 ***
+```
+
+.question[
+If your friend re-took the GRE and increased their score by one standard deviation, what would be their new estimated *probability* of getting accepted?
+]
+]
+
+---
+
+### Activity
+
+.large[
+```
+Coefficients:
+               Estimate Std. Error z value Pr(>|z|)    
+(Intercept)   -3.989979   1.139951  -3.500 0.000465 ***
+gre            0.002264   0.001094   2.070 0.038465 *  
+gpa            0.804038   0.331819   2.423 0.015388 *  
+factor(rank)2 -0.675443   0.316490  -2.134 0.032829 *  
+factor(rank)3 -1.340204   0.345306  -3.881 0.000104 ***
+factor(rank)4 -1.551464   0.417832  -3.713 0.000205 ***
+```
+
+.question[
+Calculate a 95% confidence interval for the change in *odds* of acceptance associated with a *one-unit* increase in GRE score, holding GPA and school rank fixed
+]
+]
+
+---
+
+### Activity
+
+.large[
+```
+Coefficients:
+               Estimate Std. Error z value Pr(>|z|)    
+(Intercept)   -3.989979   1.139951  -3.500 0.000465 ***
+gre            0.002264   0.001094   2.070 0.038465 *  
+gpa            0.804038   0.331819   2.423 0.015388 *  
+factor(rank)2 -0.675443   0.316490  -2.134 0.032829 *  
+factor(rank)3 -1.340204   0.345306  -3.881 0.000104 ***
+factor(rank)4 -1.551464   0.417832  -3.713 0.000205 ***
+```
+
+.question[
+Now calculate a 95% confidence interval for the change in *odds* of acceptance associated with a one *standard deviation* increase in GRE score, holding GPA and school rank fixed
+]
+]
+
+---
+
+### Activity
+
+.large[
+95% confidence interval for change in *odds* of acceptance associated with a one *standard deviation* increase in GRE score, holding GPA and school rank fixed:
+
+$$(1.014, 1.66)$$
+
+Your friend is reluctant to retake the exam unless they believe that their odds of acceptance will increase by at least 25%.
+
+.question[
+Would you recommend that your friend re-takes the exam?
+]
+]
+
+---
+
+### A new question
+
+.large[
+So far:
+
+* Inference for the *change* in log-odds ($\beta_1$) or odds ($e^{\beta_1}$) for a one-unit increase in $X$
+* Inference for change in the log-odds and odds for a one *standard deviation* increase in $X$
+
+New question:
+
+.question[
+Can we do inference about a *probability*? E.g., can we construct a confidence interval for the true probability of admission, given values of the explanatory variables?
+]
+]
+
+---
+
+### Example
+
+.large[
+For simplicity, suppose we just look at GRE score for now:
+
+```
+             Estimate Std. Error z value Pr(>|z|)    
+(Intercept) -2.901344   0.606038  -4.787 1.69e-06 ***
+gre          0.003582   0.000986   3.633  0.00028 ***
+```
+
+For a student with a GRE of 590, the *estimated* probability of admission is $\widehat{\pi}_i = 0.313$.
+
+.question[
+We want to construct a confidence interval for the *true* probability of admission, $\pi_i$, for this student.
+]
+]
+
+---
+
+### Example
+
+.large[
+For simplicity, suppose we just look at GRE score for now:
+
+```
+             Estimate Std. Error z value Pr(>|z|)    
+(Intercept) -2.901344   0.606038  -4.787 1.69e-06 ***
+gre          0.003582   0.000986   3.633  0.00028 ***
+```
+
+For a student with a GRE of 590, the *estimated* probability of admission is $\widehat{\pi}_i = 0.313$.
+
+.question[
+We want to construct a confidence interval for the *true* probability of admission, $\pi_i$, for this student.
+]
+
+* create a confidence interval for the true *log odds* of admission for this student
+* transform the interval into probabilities
+]
+
+---
+
+### Confidence interval for the log odds
+
+.large[
+For a student with a GRE of 590, the *estimated* log odds is:
+
+$$\widehat{\text{log odds}} = \widehat{\beta}_0 + \widehat{\beta}_1 (590)$$
+
+A confidence interval for the *true* log odds is:
+
+$$\widehat{\text{log odds}} \pm z^* SE(\widehat{\text{log odds}})$$
+]
+
+
+---
+
+### Variance of a sum of random variables
+
+.large[
+**Fact:** For two variables $U$, $V$ and constants $a, b$:
+
+$$Var(aU + bV) = a^2 Var(U) + b^2 Var(V) + 2ab Cov(U, V)$$
+
+where $Cov(U, V) = \text{Correlation}(U, V) \cdot SD(U) \cdot SD(V)$
+]
+
+---
+
+### Finding the variance and covariance
+
+.large[
+In R, `vcov` can be used to extract variances and covariances for estimated coefficients:
+
+```{r, include=F}
+library(tidyverse)
+grad_app <- read.csv("https://stats.idre.ucla.edu/stat/data/binary.csv")
+```
+
+
+```{r}
+m1 <- glm(admit ~ gre, family = binomial, 
+          data = grad_app)
+vcov(m1)
+```
+
+]
+
+---
+
+### Confidence interval for the log odds
+
+.large[
+For a student with GRE 590, $SE(\widehat{\text{log odds}}) = 0.11$
+
+95% confidence interval for log odds:
+
+$$\widehat{\text{log odds}} \pm 1.96 \ SE(\widehat{\text{log odds}})$$
+]
+
+---
+
+### Confidence interval for the probability
+
+.large[
+95% confidence interval for the log odds, for a student with GRE 590:
+
+$$(-1.004, -0.572)$$
+
+.question[
+How would I turn this into a 95% confidence interval for the true *probability* of admission to graduate school?
+]
+]
+
+---
+
+### Class activity
+
+.large[
+Work on the class activity (handout).
+]
+
+
+
+
+
+
+

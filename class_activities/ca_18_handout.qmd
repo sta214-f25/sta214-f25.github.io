@@ -1,0 +1,64 @@
+---
+title: "Activity"
+format: pdf
+editor: source
+---
+
+\vspace{-2.5cm}
+
+**Group members:**
+
+## Grad applications data
+
+Using the grad applications data, you fit a model with GPA as the explanatory variables. Here is the regression output:
+
+```
+            Estimate Std. Error z value Pr(>|z|)    
+(Intercept)  -4.3576     1.0353  -4.209 2.57e-05 ***
+gpa           1.0511     0.2989   3.517 0.000437 ***
+```
+
+And here is the variance-covariance matrix for the fitted model:
+
+```
+            (Intercept)        gpa
+(Intercept)   1.0718814 -0.3076994
+gpa          -0.3076994  0.0893229
+```
+
+### Questions
+
+1. Calculate the estimated log odds of admission for a student with GPA 3.8.
+
+\vspace{3cm}
+
+**Fact:** For two variables $U$, $V$ and constants $a, b$:
+
+$$Var(aU + bV) = a^2 Var(U) + b^2 Var(V) + 2ab Cov(U, V)$$
+
+For a student with GPA 3.8, the estimated log odds is 
+
+$$\widehat{\text{log odds}} = \widehat{\beta}_0 + \widehat{\beta}_1 (3.8)$$
+
+2. Using the fact above, and the variance-covariance matrix from the R output, calculate $Var(\widehat{\text{log odds}})$ when GPA = 3.8.
+
+\vspace{3cm}
+
+3. From your answer in question 2, calculate $SE(\widehat{\text{log odds}})$.
+
+\vspace{3cm}
+
+A 95% CI for the *true* log odds of admission for students with GPA 3.8 is 
+
+$$\widehat{\text{log odds}} \pm 1.96 SE(\widehat{\text{log odds}})$$
+
+4. Using your answers to questions 1 and 3, calculate a 95% CI for the true log odds of admission for students with GPA 3.8.
+
+\vspace{3cm}
+
+5. Finally, transform your confidence interval from question 4 into a 95% CI for the true *probability* of admission for students with GPA 3.8.
+
+
+
+
+
