@@ -14,4 +14,5 @@ October 1
   : [review](https://sta214-f25.github.io/class_activities/exam_1_review.html)
   
 October 3
-: Low event rates
+: Inference for linear combinations
+  : [slides](https://sta214-f25.github.io/slides/lecture_18.pdf), [activity](https://sta214-f25.github.io/class_activities/ca_18_handout.pdf)
