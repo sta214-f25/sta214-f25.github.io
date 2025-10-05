@@ -15,4 +15,4 @@ October 1
   
 October 3
 : Inference for linear combinations
-  : [slides](https://sta214-f25.github.io/slides/lecture_18.pdf), [activity](https://sta214-f25.github.io/class_activities/ca_18_handout.pdf)
+  : [slides](https://sta214-f25.github.io/slides/lecture_18.pdf), [activity](https://sta214-f25.github.io/class_activities/ca_18_handout.pdf), [activity solutions](https://sta214-f25.github.io/class_activities/ca_18_handout_solutions.pdf)
