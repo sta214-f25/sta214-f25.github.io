@@ -6,7 +6,7 @@ format: html
 **Instructions:** 
 
 * Work individually or with a neighbor to answer the following questions 
-* To get started, download the [class activity template](https://sta214-f25.github.io/class_activities/ca_15_template.qmd) file
+* To get started, download the [class activity template](https://sta214-f25.github.io/class_activities/ca_19_template.qmd) file
 * When you are finished, render the file as an HTML and submit the HTML to Canvas (let me know if you encounter any problems)
 
 # Motivation
