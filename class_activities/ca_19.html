@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.42">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Class activity: grad admissions analysis</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="ca_19_files/libs/clipboard/clipboard.min.js"></script>
+<script src="ca_19_files/libs/quarto-html/quarto.js"></script>
+<script src="ca_19_files/libs/quarto-html/popper.min.js"></script>
+<script src="ca_19_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="ca_19_files/libs/quarto-html/anchor.min.js"></script>
+<link href="ca_19_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="ca_19_files/libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="ca_19_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="ca_19_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="ca_19_files/libs/bootstrap/bootstrap-c0367b04c37547644fece4185067e4a7.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Class activity: grad admissions analysis</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><strong>Instructions:</strong></p>
+<ul>
+<li>Work individually or with a neighbor to answer the following questions</li>
+<li>To get started, download the <a href="https://sta214-f25.github.io/class_activities/ca_15_template.qmd">class activity template</a> file</li>
+<li>When you are finished, render the file as an HTML and submit the HTML to Canvas (let me know if you encounter any problems)</li>
+</ul>
+<section id="motivation" class="level1">
+<h1>Motivation</h1>
+<p>At this point in the course, you have learned a lot about logistic regression. You know how to work with log odds, odds, and probabilities; you know how to make and assess predictions; you know how to interpret coefficients; you know how to assess model assumptions and make adjustments; and you know how to do a variety of statistical inference for your fitted model.</p>
+<p>With the advent of generative AI in the last few years, however, we may wonder how much of this knowledge could be outsourced to an AI tool. What role would a statistician still play in that analysis?</p>
+<p>To explore this question, let’s return to the grad admissions data we have used regularly in class, because we are all very familiar with this dataset. Playing the role of someone fairly inexperienced with statistics, I asked a generative AI tool the following question:</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Prompt
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>I have data on grad admissions from the following url: “https://stats.idre.ucla.edu/stat/data/binary.csv”. Columns include whether a student was admitted to graduate school, their GPA, their GRE score, and the rank of their undergraduate institution (1 = most prestigious, 4 = least prestigious). I have a friend with a GPA of 3.95, at a school of rank 3, and a GRE score of 590. My friend wants to know if he should retake the GRE to get a better score. What do you think?</p>
+</div>
+</div>
+<p>Some important notes:</p>
+<ul>
+<li>This prompt is somewhat open-ended. Could we get better results by scaffolding the prompt, providing more explicit instructions, or by engaging in an extended dialogue? Yes, absolutely. But <strong>all of these require some statistical knowledge</strong>. My goal here is to play the role of someone with little statistical knowledge.</li>
+<li>Generative AI tools are constantly improving. Will the available tools get better at answering questions like this over time? Almost certainly.</li>
+</ul>
+<p><br></p>
+<p>I actually asked the AI tool this prompt <em>twice</em>, in independent chat sessions, to see how the answers would differ. Below are the two AI responses, and below that are some questions for you to think about. Each response contains a sort of overall “executive summary”, and then a more detailed discussion.</p>
+<p><br></p>
+</section>
+<section id="response-1" class="level1">
+<h1>Response 1</h1>
+<div>
+
+</div>
+<div class="quarto-layout-panel" data-layout-ncol="3">
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell" style="flex-basis: 33.3%;justify-content: center;">
+<p><img src="ai_grad_analysis_1_1.png" class="img-fluid" width="300"></p>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 33.3%;justify-content: center;">
+<p><img src="ai_grad_analysis_1_2.png" class="img-fluid" width="300"></p>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 33.3%;justify-content: center;">
+<p><img src="ai_grad_analysis_1_3.png" class="img-fluid" width="300"></p>
+</div>
+</div>
+</div>
+<p>Based on my analysis of the graduate admissions data, <strong>I recommend that your friend retake the GRE.</strong> Here’s why:</p>
+<p><strong>Key Findings:</strong></p>
+<ol type="1">
+<li><p><strong>Current admission probability:</strong> With a GPA of 3.95, rank 3 school, and GRE of 590, your friend has approximately 32-35% chance of admission</p></li>
+<li><p><strong>Below average:</strong> The GRE score of 590 is significantly below the average for admitted students from rank 3 schools (approximately 630)</p></li>
+<li><p><strong>Strong improvement potential:</strong></p>
+<ul>
+<li>Increasing to 650 would raise probability to ~43% (+8-10 points)</li>
+<li>Increasing to 700 would raise probability to ~56% (+21-24 points)</li>
+<li>Increasing to 750 would raise probability to ~69% (+34-37 points)</li>
+</ul></li>
+<li><p><strong>The GPA is excellent</strong> (3.95) and won’t change, so the GRE is the only lever your friend can pull to improve their profile</p></li>
+</ol>
+<p><strong>Bottom Line:</strong> Your friend’s outstanding GPA is being held back by a below-average GRE score. Since the GPA is already nearly perfect, improving the GRE is the most effective way to boost admission chances. Even a moderate improvement to 650-700 could make a substantial difference in outcomes.</p>
+<section id="the-model" class="level3">
+<h3 class="anchored" data-anchor-id="the-model">The Model</h3>
+<p>Logistic regression predicts the probability of admission using this formula:</p>
+<p><span class="math inline">\(P(admit) = 1 / (1 + e^{-z})\)</span></p>
+<p>where <span class="math inline">\(z = \beta_0 + \beta_1(GRE) + \beta_2(GPA) + \beta_3(Rank)\)</span>.</p>
+<p>The <span class="math inline">\(\beta\)</span> coefficients (weights) are learned from the historical data by finding values that best predict the actual admission outcomes in the dataset.</p>
+</section>
+<section id="training-process" class="level3">
+<h3 class="anchored" data-anchor-id="training-process">Training Process</h3>
+<p>The model used gradient descent to learn the optimal weights by:</p>
+<ul>
+<li>Starting with random weights</li>
+<li>Making predictions on the training data</li>
+<li>Calculating how wrong the predictions were</li>
+<li>Adjusting weights to reduce the error</li>
+<li>Repeating 5,000 times until the weights converged</li>
+</ul>
+</section>
+<section id="your-friends-calculation" class="level3">
+<h3 class="anchored" data-anchor-id="your-friends-calculation">Your Friend’s Calculation</h3>
+<p>For your friend (GRE=590, GPA=3.95, Rank=3), the model plugs these values into the trained formula to calculate the probability.</p>
+<p>The specific weights my model learned were approximately:</p>
+<ul>
+<li>Intercept (<span class="math inline">\(\beta_0\)</span>): around -3.5</li>
+<li>GRE coefficient (<span class="math inline">\(\beta_1\)</span>): around +0.002 (positive impact)</li>
+<li>GPA coefficient (<span class="math inline">\(\beta_2\)</span>): around +0.8 (strong positive impact)</li>
+<li>Rank coefficient (<span class="math inline">\(\beta_3\)</span>): around -0.5 (negative impact - higher rank = less prestigious)</li>
+</ul>
+<p>These weights tell us that GPA has a strong positive effect, GRE has a moderate positive effect, and school rank has a negative effect on admission chances.</p>
+<p><br></p>
+<p><br></p>
+</section>
+</section>
+<section id="response-2" class="level1">
+<h1>Response 2</h1>
+<div>
+
+</div>
+<div class="quarto-layout-panel" data-layout-ncol="2">
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="ai_grad_analysis_2_1.png" class="img-fluid" width="300"></p>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="ai_grad_analysis_2_2.png" class="img-fluid" width="300"></p>
+</div>
+</div>
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell" style="flex-basis: 42.9%;justify-content: center;">
+<p><img src="ai_grad_analysis_2_3.png" class="img-fluid" width="300"></p>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 57.1%;justify-content: center;">
+<p><img src="ai_grad_analysis_2_4.png" class="img-fluid" width="400"></p>
+</div>
+</div>
+</div>
+<p>Based on my analysis of the graduate admissions data, <strong>I think your friend should seriously consider retaking the GRE.</strong> Here’s why:</p>
+<p><strong>The Numbers Tell a Clear Story:</strong></p>
+<p>Among students from Rank 3 schools with high GPAs (3.8+) like your friend:</p>
+<ul>
+<li>Those who were <strong>admitted</strong> had an average GRE score of <strong>654</strong></li>
+<li>Those who were <strong>rejected</strong> had an average GRE score of <strong>611</strong></li>
+<li>Your friend’s score of <strong>590 falls below both averages</strong></li>
+</ul>
+<p><strong>Admission Rates by GRE Range:</strong></p>
+<ul>
+<li>Students scoring <strong>below 600:</strong> Much lower admission rates</li>
+<li>Students scoring <strong>600-699:</strong> Significantly higher admission rates</li>
+<li>Students scoring <strong>700+:</strong> Even better odds</li>
+</ul>
+<p><strong>The Good News:</strong></p>
+<p>Your friend has an excellent GPA of 3.95, which is a major strength. This strong academic record suggests they have the capability to improve their GRE score with focused preparation. Even boosting the score to the mid-600s would likely make a meaningful difference in their admission chances.</p>
+<p><strong>Bottom Line:</strong></p>
+<p>With such a strong GPA, your friend has already demonstrated academic excellence. A GRE score in the 590 range doesn’t reflect that same level of achievement and may be holding back an otherwise competitive application. Retaking the GRE and aiming for at least 650+ would better align with the profile of admitted students and significantly strengthen their candidacy.</p>
+<p><br></p>
+<p><br></p>
+</section>
+<section id="questions" class="level1">
+<h1>Questions</h1>
+<ol type="1">
+<li><p>Read through both responses, and think about the general techniques the AI chose to use. What is similar to the methods we have learned in class? What is different?</p></li>
+<li><p>As you read the responses, you will (hopefully) notice that there are some discrepancies in the numbers reported. Check the AI’s calculations, and try to identify as many errors as possible (there are quite a few!). As in previous activities, you can work with the grad admissions data yourself in R to check the results:</p></li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>grad_app <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"https://stats.idre.ucla.edu/stat/data/binary.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ol start="3" type="1">
+<li><p>What is <em>missing</em> from the AI’s report? Are there steps that you would include in your analysis, but which are missing here?</p></li>
+<li><p>At this point, many researchers have investigated the way that AI tends to write. One characteristic of AI writing is the use of adjectives that are both vague and strong. For example, in Response 2: “Much lower admission rates”, “Significantly higher admission rates”, “Even better odds”. Examine instances of these descriptions in the AI responses. Are such strong statements actually warranted by the data? How would you word things differently?</p></li>
+<li><p>The previous questions invite you to take a sceptical view of what AI is delivering in response to this prompt. But not everything about the responses is bad. What are some aspects of the response that you think were good/helpful?</p></li>
+</ol>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
