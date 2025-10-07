@@ -11,7 +11,7 @@ October 1
   : [slides](https://sta214-f25.github.io/slides/lecture_17.pdf), [activity](https://sta214-f25.github.io/class_activities/ca_17_handout.pdf)
   
 : Exam 1 review questions
-  : [review](https://sta214-f25.github.io/class_activities/exam_1_review.html)
+  : [review](https://sta214-f25.github.io/class_activities/exam_1_review.html), [review solutions](https://sta214-f25.github.io/class_activities/exam_1_review_solutions.html)
   
 October 3
 : Inference for linear combinations
