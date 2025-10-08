@@ -8,6 +8,7 @@ October 6
 
 October 8
 : Exam 1 review
+  : [review notes](https://sta214-f25.github.io/slides/lecture_19.pdf)
   
 October 8
 : Exam 1
