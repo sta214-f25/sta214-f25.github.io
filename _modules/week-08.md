@@ -14,3 +14,4 @@ October 15
   
 October 17
 : Poisson regression
+  : [slides](https://sta214-f25.github.io/slides/lecture_21.pdf), [activity](https://sta214-f25.github.io/class_activities/ca_21.html)

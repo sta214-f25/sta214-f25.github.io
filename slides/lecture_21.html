@@ -224,6 +224,26 @@ How likely is a residual deviance of 621.24 if our model is correct?
 ### Goodness of fit
 
 .large[
+Residual deviance = 621.24, df = 75
+]
+
+&lt;img src="lecture_21_files/figure-html/unnamed-chunk-14-1.png" style="display: block; margin: auto;" /&gt;
+
+
+``` r
+pchisq(621.24, df=75, lower.tail=F)
+```
+
+```
+## [1] 5.844298e-87
+```
+
+
+---
+
+### Goodness of fit
+
+.large[
 **Goodness of fit test:** If the model is a good fit for the data, then the residual deviance follows a `\(\chi^2\)` distribution with the same degrees of freedom as the residual deviance
 
 Residual deviance = 621.24, df = 75

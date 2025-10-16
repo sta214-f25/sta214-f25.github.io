@@ -293,6 +293,29 @@ How likely is a residual deviance of 621.24 if our model is correct?
 ### Goodness of fit
 
 .large[
+Residual deviance = 621.24, df = 75
+]
+
+```{r, echo=F, warning=F, fig.align='center', fig.width=7, fig.height=5}
+x <- qchisq(ppoints(1000), 75)
+y <- dchisq(x, 75)
+data.frame(x, y) |>
+  ggplot(aes(x = x, y = y)) +
+  geom_line() +
+  theme_bw() +
+  labs(y = "density", title = "Chi-squared distribution with 75 df")
+```
+
+```{r}
+pchisq(621.24, df=75, lower.tail=F)
+```
+
+
+---
+
+### Goodness of fit
+
+.large[
 **Goodness of fit test:** If the model is a good fit for the data, then the residual deviance follows a $\chi^2$ distribution with the same degrees of freedom as the residual deviance
 
 Residual deviance = 621.24, df = 75
