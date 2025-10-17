@@ -1,0 +1,181 @@
+---
+title: "Project Part 2"
+output: 
+  rmdformats::robobook:
+    css: "homework.css"
+    highlight: pygments
+link-citations: yes
+---
+
+**Due dates:** Monday, October 27 at 11:59pm on Canvas.
+
+**Submission:** A template file is provided, with a rough outline: [project_1_2_template.qmd](https://sta214-f25.github.io/projects/project_1_2_template.qmd)
+
+Once you have completed the report, submit *both* your 
+rendered HTML file and the Quarto file to Canvas.
+
+# Overview
+
+This semester, you will complete a project in which you use logistic regression to investigate a research question of your choosing. You will then write a report that communicates the results of your analysis and draws a conclusion about your research question, and finally present your work to me. 
+
+This project will be broken into several different parts; I will provide feedback on each part.
+
+In this first part, you identified a research question and dataset to explore that research question, and performed EDA. In the second part of the project, you will fit a model, perform model diagnostics, and use your model to address the research question.
+
+
+# Your task in Part II
+
+For the second part of the project, you will fit a model, perform model diagnostics, and use the model to address your research question. You will submit two documents on Canvas for part 2:
+
+* Your written report (.html file): 
+  * This is the knitted write up that will explain your work, and address your research question
+  * There should be **no code** showing. This
+includes warnings and other stray code output – hide it all.
+  * You will be graded on writing as well as your statistical analysis.
+* Your Quarto (.qmd) file, with all the code you used for your analysis
+  * The goal is that a person who reads your report, and wants to
+replicate your results, could look at your .qmd file and completely reproduce the results and figures in the rendered report.
+
+
+Your written report for part 2 will contain three sections: EDA with empirical logit plots, model fitting and diagnostics, and inference. Each section should be written in paragraph form, and make sure to always discuss any figures in your report.
+
+There is no minimum or maximum length required. However, your analysis should be thorough, with your report addressing the research question, and containing all the elements described below.
+
+### Exploratory data analysis: empirical logit plots
+
+Use empirical logit plots to examine the relationship between quantitative explanatory variables and your response variable of interest. 
+
+* You should show empirical logit plots for at least **2** quantitative explanatory variables. 
+* Discuss each plot, and whether the shape assumption appears reasonable for that variable or if a transformation is needed. 
+* If a transformation is needed, show an empirical logit plot for the transformed variable which demonstrates an improvement in the shape assumption
+
+### Modeling and diagnostics
+
+Using the explanatory variables needed to address your research question, build a model to address the research question.
+
+* Use any transformations you deemed necessary from your empirical logit plots
+* Present a table of coefficients for your fitted model
+
+Then, perform model diagnostics with your fitted model:
+
+* Create quantile residual plots to assess the shape assumption
+* Check for collinearity and influential points
+* If any assumptions are still violated, modify your model and report the final model
+
+Finally, interpret any relevant fitted coefficients in context of the research question. It may help to consider discussing coefficients in terms of a one standard deviation increase in the explanatory variable, rather than a one-unit increase.
+
+### Inference
+
+Perform a hypothesis test that allows you to address your research question. When testing hypotheses, make sure to:
+
+* State the hypotheses in terms of one or more model parameters
+* Calculate a test statistic and p-value
+* Use the p-value to make a conclusion about the research question
+
+# Appearance and style
+
+### Writing
+
+The report should be written like an article or research paper: in full sentences and paragraphs, with headings for each section. You should not write your report with question numbers or as a list of bullet points. Scientific articles are generally written in third person, though "we" can also be acceptable ("we can see from Figure 2.1 ...") in some disciplines.
+
+### Code
+
+As with previous assignments, you will write the document in Quarto. However, in full reports, the only output that should be visible from code chunks are figures and tables. If a code chunk does not produce a figure or table, you can hide it from the knitted document with `include=F`:
+
+````
+```{r, include=F}`r ''`
+
+```
+````
+
+If a code chunk produces a figure or table, only the figure or table should be visible in the knitted document. You can hide the chunk but display the output with `echo=F, message=F, warning=F`:
+
+````
+```{r, echo=F, message=F, warning=F}`r ''`
+
+```
+````
+
+### Figures
+
+Figures should have labeled axes, and should be clear and easy to read. Figures should also be captioned and numbered; to caption a figure, use `fig.cap = "..."` in the chunk options. For example (scroll to the right on the code to see it all),
+
+````
+```{r, echo=F, message=F, warning=F, fig.cap="Figure 2.1: Bill depth vs. bill length for penguins near Palmer Station, Antarctica."}`r ''`
+penguins |>
+  ggplot(aes(x = bill_length_mm, 
+             y = bill_depth_mm)) +
+  geom_point() +
+  labs(x = "Bill length (mm)",
+       y = "Bill depth (mm)") +
+  theme_bw()
+```
+````
+
+is displayed as
+
+```{r include=F}
+library(tidyverse)
+library(palmerpenguins)
+```
+
+```{r, echo=F, message=F, warning=F, fig.cap="Figure 1: Bill depth vs. bill length for penguins near Palmer Station, Antarctica."}
+penguins |>
+  ggplot(aes(x = bill_length_mm, 
+             y = bill_depth_mm)) +
+  geom_point() +
+  labs(x = "Bill length (mm)",
+       y = "Bill depth (mm)") +
+  theme_bw()
+```
+
+Captions should provide enough information to understand what is being plotted, but interpretation can be left to the main text. Refer to figures by their number in the text. Make sure that any figures you include are discussed in the text.
+
+### Tables
+
+Tables should be nicely formatted, and have a number and caption. This can be done with the `kable` function in the `knitr` package.
+
+For example,
+
+````
+```{r, echo=F, message=F}`r''`
+table(penguins$island, penguins$species) |>
+  knitr::kable(caption = "Table 3.2: Penguins by island and species")
+```
+````
+
+is displayed as
+
+```{r, echo=F, message=F}
+table(penguins$island, penguins$species) |>
+  knitr::kable(caption = "Table 3.2: Penguins by island and species")
+```
+
+### Writing math in Quarto or R Markdown
+
+If you want to write mathematical notation, we need to tell Markdown, “Hey, we’re going to make a math symbol!” To do that, you use dollar signs. For instance, to make $\widehat{\beta}_1$, you simply put `$\widehathat{\beta}_1$` into the white space (not a chunk) in youQuarto.
+
+Here are some examples of writing math, which you can adapt:
+
+| Math | Code |
+| --- | --- |
+| $Y_i \sim Bernoulli(\pi_i)$ | `$Y_i \sim Bernoulli(\pi_i)$` |
+| $\log \left( \dfrac{\pi_i}{1 - \pi_i} \right)$ | `$\log \left( \dfrac{\pi_i}{1 - \pi_i} \right)$` |
+| $\widehat{\pi}_i$ | `$\widehat{\pi}_i$` |
+
+# Checklist
+
+* Change name in Quarto YAML
+* Three sections: Empirical logit plots, Modeling and diagnostics, Inference
+* Writing:
+  * Each section written as a paragraph, with full sentences
+  * No bullet points or lists
+* Code:
+  * Code is included in the Quarto document, but *not* displayed in the rendered HTML
+  * The only R output shown in the report is figures and tables
+* Figures:
+  * Include meaningful caption and axis labels (see above for details on including a caption)
+  * Each figure included in the report is discussed in your writing, and referred to by its figure number
+* Submission:
+  * Submit *both* the rendered HMTL and the .qmd file to Canvas
+  * Deadline is Monday, October 27 at 11:59pm

@@ -1,0 +1,23 @@
+---
+---
+---
+title: "Project Part 2"
+author: "Your Name"
+format: 
+  html:
+    embed-resources: true
+editor: source
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+```
+
+## Empirical logit plots
+
+## Modeling and diagnostics
+
+## Inference
+
+
+

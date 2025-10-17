@@ -17,3 +17,4 @@ October 17
   : [slides](https://sta214-f25.github.io/slides/lecture_21.pdf), [activity](https://sta214-f25.github.io/class_activities/ca_21.html)
   
 : **Project Part 2 released**{: .label .label-yellow }
+  : [Part 2](https://sta214-f25.github.io/projects/project_1_2.html)
