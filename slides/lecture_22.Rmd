@@ -1,0 +1,339 @@
+---
+title: Poisson Regression 
+output:
+  xaringan::moon_reader:
+    css: "lab-slides.css"
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+editor_options: 
+  chunk_output_type: console
+---
+
+
+```{r setup, include=F}
+library(tidyverse)
+library(statmod)
+library(topmodels)
+library(gridExtra)
+crimes <- read_csv("c_data.csv")
+```
+
+### Last time: Another dataset
+
+.large[
+A concerned parent asks us to investigate crime rates on college campuses. We have access to data on 81 different colleges and universities in the US, including the following variables:
+
+* `type`: college (C) or university (U)
+* `nv`: the number of crimes for that institution in the given year
+* `enroll1000`: the number of enrolled students, in thousands
+* `region`: region of the US C = Central, MW = Midwest, NE = Northeast, SE = Southeast, SW = Southwest, and W = West)
+]
+
+---
+
+### Last time
+
+.large[
+We want to know whether there are regional differences in the number of crimes on college campuses.
+
+$$Crimes_i \sim Poisson(\lambda_i)$$
+
+$$\log(\lambda_i) = \beta_0 + \beta_1 MW_i + \beta_2 NE_i + \beta_3 SE_i + \beta_4 SW_i + \beta_5 W_i$$
+]
+
+---
+
+### Last time: Rootogram
+
+```{r, fig.width=7, fig.height=5, fig.align='center'}
+m1 <- glm(nv ~ region, data = crimes, family = poisson)
+rootogram(m1, style="standing")
+```
+
+---
+
+### Goodness of fit
+
+.large[
+Another way to assess whether our model is reasonable is with a *goodness of fit* test.
+
+**Goodness of fit test:** If the model is a good fit for the data, then the residual deviance follows a $\chi^2$ distribution with the same degrees of freedom as the residual deviance
+
+```{r echo=F, message=F, output.lines = 19:20}
+library(knitr)
+hook_output <- knit_hooks$get("output")
+knit_hooks$set(output = function(x, options) {
+   lines <- options$output.lines
+   if (is.null(lines)) {
+     return(hook_output(x, options))  # pass to default hook
+   }
+   x <- unlist(strsplit(x, "\n"))
+   more <- "..."
+   if (length(lines)==1) {        # first n lines
+     if (length(x) > lines) {
+       # truncate the output, but add ....
+       x <- c(head(x, lines), more)
+     }
+   } else {
+     x <- c(more, x[lines], more)
+   }
+   # paste these lines together
+   x <- paste(c(x, ""), collapse = "\n")
+   hook_output(x, options)
+ })
+
+m1 <- glm(nv ~ region, data = crimes, family = poisson)
+summary(m1)
+```
+
+Residual deviance = 621.24, df = 75
+
+.question[
+How likely is a residual deviance of 621.24 if our model is correct?
+]
+]
+
+---
+
+### Goodness of fit
+
+.large[
+Residual deviance = 621.24, df = 75
+]
+
+```{r, echo=F, warning=F, fig.align='center', fig.width=7, fig.height=5}
+x <- qchisq(ppoints(1000), 75)
+y <- dchisq(x, 75)
+data.frame(x, y) |>
+  ggplot(aes(x = x, y = y)) +
+  geom_line() +
+  theme_bw() +
+  labs(y = "density", title = "Chi-squared distribution with 75 df")
+```
+
+```{r}
+pchisq(621.24, df=75, lower.tail=F)
+```
+
+
+---
+
+### Goodness of fit
+
+.large[
+**Goodness of fit test:** If the model is a good fit for the data, then the residual deviance follows a $\chi^2$ distribution with the same degrees of freedom as the residual deviance
+
+Residual deviance = 621.24, df = 75
+
+```{r}
+pchisq(621.24, df=75, lower.tail=F)
+```
+
+So our model might not be a very good fit to the data.
+]
+
+---
+
+### Potential issues with our model
+
+.large[
+* The Poisson distribution might not be a good choice
+* There may be additional factors related to the number of crimes which we are not including in the model
+]
+
+---
+
+### Offsets
+
+.large[
+We will account for school size by including an **offset** in the model:
+
+$$\log(\lambda_i) = \beta_0 + \beta_1 MW_i + \beta_2 NE_i + \beta_3 SE_i + \beta_4 SW_i + \beta_5 W_i \\ + \log(Enrollment_i)$$
+]
+
+---
+
+### Motivation for offsets
+
+.large[
+We can rewrite our regression model with the offset:
+
+$$\log(\lambda_i) = \beta_0 + \beta_1 MW_i + \beta_2 NE_i + \beta_3 SE_i + \beta_4 SW_i + \beta_5 W_i \\ + \log(Enrollment_i)$$
+]
+
+---
+
+### Fitting a model with an offset
+
+.large[
+```{r, output.lines = 10:16}
+m2 <- glm(nv ~ region, offset = log(enroll1000),
+          data = crimes, family = poisson)
+summary(m2)
+```
+
+* The offset doesn't show up in the output (because we're not estimating a coefficient for it)
+]
+
+---
+
+### Fitting a model with an offset
+
+.large[
+$$\log(\widehat{\lambda}_i) = -1.30 + 0.10 MW_i + 0.76 NE_i + \\ 0.87 SE_i + 0.51 SW_i + 0.21 W_i \\  + \log(Enrollment_i)$$
+
+.question[
+How would I interpret the intercept -1.30?
+]
+]
+
+---
+
+### When to use offsets
+
+.large[
+Offsets are useful in Poisson regression when our counts come from groups of very different sizes (e.g., different numbers of students on a college campus). The offset lets us interpret model coefficients in terms of rates instead of raw counts.
+
+.question[
+With your neighbor, brainstorm some other data scenarios where our response is a count variable, and an offset would be useful. What would our offset be?
+]
+]
+
+---
+
+### Inference
+
+.large[
+$$\log(\lambda_i) = \beta_0 + \beta_1 MW_i + \beta_2 NE_i + \beta_3 SE_i + \beta_4 SW_i + \beta_5 W_i \\ + \log(Enrollment_i)$$
+
+Our concerned parent wants to know whether the crime rate on campuses is different in different regions. 
+
+.question[
+What hypotheses would we test to answer this question?
+]
+]
+
+---
+
+### Drop-in-deviance test
+
+.large[
+Full model:
+
+$$\log(\lambda_i) = \beta_0 + \beta_1 MW_i + \beta_2 NE_i + \beta_3 SE_i + \beta_4 SW_i + \beta_5 W_i \\ + \log(Enrollment_i)$$
+
+Reduced model:
+
+$$\log(\lambda_i) = \beta_0 + \log(Enrollment_i)$$
+]
+
+---
+
+### Drop-in-deviance test
+
+.large[
+```{r, output.lines = 18:21}
+m2 <- glm(nv ~ region, offset = log(enroll1000),
+          data = crimes, family = poisson)
+summary(m2)
+```
+
+.question[
+What is my test statistic?
+]
+]
+
+---
+
+### Drop-in-deviance test
+
+.large[
+```{r, output.lines = 18:21}
+m2 <- glm(nv ~ region, offset = log(enroll1000),
+          data = crimes, family = poisson)
+summary(m2)
+```
+
+$G = 491 - 433.14 = 57.86$
+
+```{r}
+pchisq(57.86, df=5, lower.tail=F)
+```
+]
+
+---
+
+### Inference
+
+.large[
+$$\log(\lambda_i) = \beta_0 + \beta_1 MW_i + \beta_2 NE_i + \beta_3 SE_i + \beta_4 SW_i + \beta_5 W_i \\ + \log(Enrollment_i)$$
+
+Now our concerned parent wants to know about the difference between Western and Central schools. They would like a "reasonable range" of values for the difference between the regions.
+
+.question[
+How would we construct a "reasonable range" of values for this difference?
+]
+]
+
+---
+
+### Confidence intervals
+
+.large[
+$$\log(\lambda_i) = \beta_0 + \beta_1 MW_i + \beta_2 NE_i + \beta_3 SE_i + \beta_4 SW_i + \beta_5 W_i \\ + \log(Enrollment_i)$$
+
+```{r, echo=F, output.lines = 7:13}
+summary(m2)
+```
+
+95% confidence interval for $\beta_5$:
+]
+
+---
+
+### Class activity
+
+.large[
+Work on the class activity (handout).
+]
+
+---
+
+### Class activity
+
+.large[
+```
+             Estimate Std. Error z value Pr(>|z|)    
+(Intercept)  0.304617   0.102981   2.958   0.0031 ** 
+femWomen    -0.224594   0.054613  -4.112 3.92e-05 ***
+marMarried   0.155243   0.061374   2.529   0.0114 *  
+kid5        -0.184883   0.040127  -4.607 4.08e-06 ***
+phd          0.012823   0.026397   0.486   0.6271    
+ment         0.025543   0.002006  12.733  < 2e-16 ***
+```
+
+.question[
+We are interested in the relationship between prestige and the number of articles published, after accounting for other factors. What confidence interval should we make?
+]
+]
+
+---
+
+### Class activity
+
+.large[
+
+$$Articles_i \sim Poisson(\lambda_i)$$
+$$\log(\lambda_i) = \beta_0 + \beta_1 Female_i + \beta_2 Married_i + \beta_3 Kids_i + \\  \beta_4 Prestige_i + \beta_5 Mentor_i$$
+
+.question[
+Do I need an offset for this model?
+]
+
+]
+
+
+
