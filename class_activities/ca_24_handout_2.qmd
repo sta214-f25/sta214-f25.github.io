@@ -1,0 +1,82 @@
+---
+title: "Activity"
+format: pdf
+editor: source
+---
+
+\vspace{-2.5cm}
+
+**Group members:**
+
+\vspace{-0.5cm}
+
+# Working with count data
+
+The data in this class activity comes from a study on residents of Framingham, MA, which was conducted to research variables related to heart health. We will work with a subset of the data, containing
+
+* `cigsPerDay`: The number of cigarettes smoked per day during the study period.
+* `education`: 1 = High School, 2 = Some College, 3 = College Degree, 4 = Advanced Degree.
+* `male`: 1 = Male, 0 = Female.
+* `age`: The age of the individual in years.
+* `diabetes`: 1 if the individual has diabetes, 0 otherwise.
+* `BMI`: the individual's body mass index (BMI)
+* `currentSmoker`: 1 if the individual currently smokes, 0 otherwise
+
+Below is output of a quasi-Poisson model using this data. Use this output to answer the following questions.
+
+```{r, eval=F}
+smokers <- heart_data |>
+  filter(currentSmoker == 1)
+
+m2 <- glm(cigsPerDay ~ male + age + education + diabetes + BMI,
+          data = smokers, family = quasipoisson)
+summary(m2)
+```
+
+```
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  2.837192   0.115099  24.650  < 2e-16 ***
+male         0.456170   0.026095  17.481  < 2e-16 ***
+age         -0.006806   0.001595  -4.267 2.07e-05 ***
+education2   0.016463   0.029675   0.555    0.579    
+education3   0.016427   0.037706   0.436    0.663    
+education4  -0.015033   0.040477  -0.371    0.710    
+diabetes    -0.025398   0.092606  -0.274    0.784    
+BMI          0.005001   0.003304   1.513    0.130  
+
+(Dispersion parameter for quasipoisson family taken to be 5.519388)
+```
+
+```{r, eval=F}
+vcov(m2)
+```
+
+```
+              (Intercept)          male           age    education2
+(Intercept)  1.324781e-02 -7.543261e-05 -1.209099e-04 -1.108129e-03
+male        -7.543261e-05  6.809567e-04 -1.457262e-06  6.767626e-05
+age         -1.209099e-04 -1.457262e-06  2.543831e-06  1.004946e-05
+education2  -1.108129e-03  6.767626e-05  1.004946e-05  8.806037e-04
+education3  -9.653811e-04  1.224285e-04  6.075923e-06  4.199471e-04
+education4  -9.018688e-04 -2.755796e-05  6.764320e-06  4.043217e-04
+diabetes     7.665450e-04  4.907976e-05 -9.513520e-06 -1.651884e-05
+BMI         -2.656023e-04 -1.295274e-05 -1.397067e-07  7.396988e-06
+               education3    education4      diabetes           BMI
+(Intercept) -9.653811e-04 -9.018688e-04  7.665450e-04 -2.656023e-04
+male         1.224285e-04 -2.755796e-05  4.907976e-05 -1.295274e-05
+age          6.075923e-06  6.764320e-06 -9.513520e-06 -1.397067e-07
+education2   4.199471e-04  4.043217e-04 -1.651884e-05  7.396988e-06
+education3   1.421765e-03  3.929524e-04 -1.153424e-05  7.973004e-06
+education4   3.929524e-04  1.638377e-03 -1.992754e-05  8.305380e-06
+diabetes    -1.153424e-05 -1.992754e-05  8.575954e-03 -1.940554e-05
+BMI          7.973004e-06  8.305380e-06 -1.940554e-05  1.091919e-05
+```
+
+
+
+
+## Questions
+
+1. Is there a difference in the average number of cigarettes smoked between smokers with some college education and smokers with a college degree, after accounting for sex, age, diabetes, and BMI?
+
+

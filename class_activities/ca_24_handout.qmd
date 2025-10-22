@@ -1,0 +1,78 @@
+---
+title: "Activity"
+format: pdf
+editor: source
+---
+
+\vspace{-2.5cm}
+
+**Group members:**
+
+\vspace{-0.5cm}
+
+# Working with count data
+
+The data in this class activity comes from a study on residents of Framingham, MA, which was conducted to research variables related to heart health. We will work with a subset of the data, containing
+
+* `cigsPerDay`: The number of cigarettes smoked per day during the study period.
+* `education`: 1 = High School, 2 = Some College, 3 = College Degree, 4 = Advanced Degree.
+* `male`: 1 = Male, 0 = Female.
+* `age`: The age of the individual in years.
+* `diabetes`: 1 if the individual has diabetes, 0 otherwise.
+* `BMI`: the individual's body mass index (BMI)
+* `currentSmoker`: 1 if the individual currently smokes, 0 otherwise
+
+While the data were originally collected to study heart health, in this activity we will try to model the number of cigarettes smoked. Since not all participants are smokers, we will restrict our analysis only to the current smokers in the data.
+
+Below is (partial) output of Poisson and quasi-Poisson regression models using this data. Use this output to answer the following questions.
+
+## Output
+
+**Model 1:** (Poisson)
+
+```{r, eval=F}
+smokers <- heart_data |>
+  filter(currentSmoker == 1)
+
+m1 <- glm(cigsPerDay ~ male + age + education + diabetes + BMI,
+          data = smokers, family = poisson)
+```
+
+
+```
+Coefficients:
+              Estimate Std. Error z value Pr(>|z|)    
+(Intercept)  2.8371917  0.0489922  57.911  < 2e-16 ***
+male         0.4561700  0.0111074  41.069  < 2e-16 ***
+age         -0.0068063  0.0006789 -10.026  < 2e-16 ***
+education2   0.0164626  0.0126312   1.303 0.192462    
+education3   0.0164274  0.0160498   1.024 0.306057    
+education4  -0.0150328  0.0172291  -0.873 0.382921    
+diabetes    -0.0253978  0.0394181  -0.644 0.519368    
+BMI          0.0050011  0.0014065   3.556 0.000377 ***
+
+(Dispersion parameter for poisson family taken to be 1)
+Residual deviance: 11540  on 2004  degrees of freedom
+```
+
+
+**Model 2:** (quasi-Poisson)
+
+```{r, eval=F}
+m2 <- glm(cigsPerDay ~ male + age + education + diabetes + BMI,
+          data = smokers, family = quasipoisson)
+```
+
+```
+(Dispersion parameter for quasipoisson family taken to be 5.519388)
+```
+
+## Questions
+
+1. Which model do you think would be more appropriate for this data? Explain your reasoning.
+
+\vspace{3cm}
+
+2. Is there a difference in the average number of cigarettes smoked between smokers with some college education and smokers with no college education, after accounting for sex, age, diabetes, and BMI?
+
+

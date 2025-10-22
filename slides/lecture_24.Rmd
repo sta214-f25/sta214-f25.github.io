@@ -1,0 +1,211 @@
+---
+title: Quasi-Poisson models 
+output:
+  xaringan::moon_reader:
+    css: "lab-slides.css"
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=F}
+library(tidyverse)
+heart_data <- read.csv("~/Documents/Teaching/applied_glms/sta214-f25.github.io/class_activities/framingham.csv")
+
+heart_data <- heart_data %>%
+  drop_na(male, age, education, diabetes, cigsPerDay, BMI) %>%
+  mutate(education = as.factor(education))
+
+smokers <- heart_data %>%
+  filter(currentSmoker == 1)
+```
+
+
+### Last time: quasi-Poisson models
+
+.large[
+**Poisson:**
+
+* Mean = $\lambda_i$
+* Variance = $\lambda_i$
+
+**quasi-Poisson:**
+
+* Mean = $\lambda_i$
+* Variance = $\phi \lambda_i$
+* Variance is a linear function of the mean
+]
+
+---
+
+### Last time: quasi-Poisson models
+
+.pull-left[
+.large[
+**Poisson:** 
+
+* $\dfrac{\widehat{\beta}_j - \beta_j}{SE(\widehat{\beta}_j)} \sim N(0, 1)$
+* Use $N(0, 1)$ for hypothesis testing and confidence intervals for one parameter
+* Comparing nested models (drop-in-deviance): $\chi^2$ test
+]
+]
+
+.pull-right[
+.large[
+**quasi-Poisson:**
+
+* $SE(\widehat{\beta}_j)_{QP} = \sqrt{\widehat{\phi}} \times SE(\widehat{\beta}_j)_{Poisson}$
+* $\dfrac{\widehat{\beta}_j - \beta_j}{SE(\widehat{\beta}_j)_{QP}} \sim t_{n-p}$
+* Use $t_{n-p}$ for hypothesis testing and confidence intervals for one parameter
+* Comparing nested models: $F$ test
+]
+]
+
+---
+
+### Class activity
+
+.large[
+Work on the class activity (handout).
+]
+
+---
+
+### Class activity
+
+.large[
+.question[
+Which model do you think is more appropriate for the data?
+]
+]
+
+---
+
+### Class activity
+
+.large[
+Is there a difference in the average number of cigarettes smoked between smokers with some college education and smokers with no college education, after accounting for sex, age, diabetes, and BMI?
+
+Model 1:
+
+```
+              Estimate Std. Error z value Pr(>|z|)    
+...
+education2   0.0164626  0.0126312   1.303 0.192462   
+...
+```
+
+Model 2:
+
+```
+(Dispersion parameter for quasipoisson family taken 
+   to be 5.519388)
+```
+]
+
+---
+
+### Nested tests with quasi-Poisson models
+
+```{r, eval=F}
+m2 <- glm(cigsPerDay ~ male + age + education + diabetes + BMI,
+          data = smokers, family = quasipoisson)
+summary(m2)
+```
+
+```
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  2.837192   0.115099  24.650  < 2e-16 ***
+male         0.456170   0.026095  17.481  < 2e-16 ***
+age         -0.006806   0.001595  -4.267 2.07e-05 ***
+education2   0.016463   0.029675   0.555    0.579    
+education3   0.016427   0.037706   0.436    0.663    
+education4  -0.015033   0.040477  -0.371    0.710    
+diabetes    -0.025398   0.092606  -0.274    0.784    
+BMI          0.005001   0.003304   1.513    0.130 
+```
+
+.large[
+**Research question:** Is there a relationship between education level and the number of cigarettes smoked per day, after accounting for sex, age, diabetes, and BMI?
+]
+
+---
+
+### Nested tests with quasi-Poisson models
+
+.large[
+**Research question:** Is there a relationship between education level and the number of cigarettes smoked per day, after accounting for sex, age, diabetes, and BMI?
+
+* In Poisson regression, we would use a likelihood ratio test
+* However, the quasi-Poisson model includes the estimated dispersion, $\widehat{\phi}$. We need to use an **F-test** instead
+]
+
+---
+
+### Nested tests with quasi-Poisson models
+
+```{r}
+m1 <- glm(cigsPerDay ~ male + age + education + 
+            diabetes + BMI,
+          data = smokers, family = quasipoisson)
+m2 <- glm(cigsPerDay ~ male + age + diabetes + BMI,
+          data = smokers, family = quasipoisson)
+
+m1$deviance
+m2$deviance
+m1$df.residual
+m2$df.residual
+```
+
+
+---
+
+### Nested tests with quasi-Poisson models
+
+.large[
+```{r}
+m1$deviance
+m2$deviance
+
+pf(0.258, 3, 2004, lower.tail=F)
+```
+]
+
+---
+
+### Limitations of quasi-Poisson models
+
+.large[
+**Important:** quasi-Poisson models do *not* describe a full distribution for the response (there is no "quasi-Poisson" distribution). They describe *only* the mean and variance of the response.
+
+As a result, one cannot calculate probabilities for a quasi-Poisson:
+
+```{r, eval=F}
+m2 <- glm(cigsPerDay ~ male + age + diabetes + BMI,
+          data = smokers, family = quasipoisson)
+rootogram(m2)
+```
+
+```
+Error in prodist.glm(object) : 
+family is not associated with a full probability distribution
+```
+
+]
+
+---
+
+### Class activity
+
+.large[
+Work on the class activity (handout).
+]
+
+
+
+
+

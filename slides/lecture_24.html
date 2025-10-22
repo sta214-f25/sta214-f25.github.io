@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Quasi-Poisson models</title>
+    <meta charset="utf-8" />
+    <script src="libs/header-attrs-2.29/header-attrs.js"></script>
+    <link rel="stylesheet" href="lab-slides.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# Quasi-Poisson models
+]
+
+---
+
+
+
+
+
+### Last time: quasi-Poisson models
+
+.large[
+**Poisson:**
+
+* Mean = `\(\lambda_i\)`
+* Variance = `\(\lambda_i\)`
+
+**quasi-Poisson:**
+
+* Mean = `\(\lambda_i\)`
+* Variance = `\(\phi \lambda_i\)`
+* Variance is a linear function of the mean
+]
+
+---
+
+### Last time: quasi-Poisson models
+
+.pull-left[
+.large[
+**Poisson:** 
+
+* `\(\dfrac{\widehat{\beta}_j - \beta_j}{SE(\widehat{\beta}_j)} \sim N(0, 1)\)`
+* Use `\(N(0, 1)\)` for hypothesis testing and confidence intervals for one parameter
+* Comparing nested models (drop-in-deviance): `\(\chi^2\)` test
+]
+]
+
+.pull-right[
+.large[
+**quasi-Poisson:**
+
+* `\(SE(\widehat{\beta}_j)_{QP} = \sqrt{\widehat{\phi}} \times SE(\widehat{\beta}_j)_{Poisson}\)`
+* `\(\dfrac{\widehat{\beta}_j - \beta_j}{SE(\widehat{\beta}_j)_{QP}} \sim t_{n-p}\)`
+* Use `\(t_{n-p}\)` for hypothesis testing and confidence intervals for one parameter
+* Comparing nested models: `\(F\)` test
+]
+]
+
+---
+
+### Class activity
+
+.large[
+Work on the class activity (handout).
+]
+
+---
+
+### Class activity
+
+.large[
+.question[
+Which model do you think is more appropriate for the data?
+]
+]
+
+---
+
+### Class activity
+
+.large[
+Is there a difference in the average number of cigarettes smoked between smokers with some college education and smokers with no college education, after accounting for sex, age, diabetes, and BMI?
+
+Model 1:
+
+```
+              Estimate Std. Error z value Pr(&gt;|z|)    
+...
+education2   0.0164626  0.0126312   1.303 0.192462   
+...
+```
+
+Model 2:
+
+```
+(Dispersion parameter for quasipoisson family taken 
+   to be 5.519388)
+```
+]
+
+---
+
+### Nested tests with quasi-Poisson models
+
+
+``` r
+m2 &lt;- glm(cigsPerDay ~ male + age + education + diabetes + BMI,
+          data = smokers, family = quasipoisson)
+summary(m2)
+```
+
+```
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)  2.837192   0.115099  24.650  &lt; 2e-16 ***
+male         0.456170   0.026095  17.481  &lt; 2e-16 ***
+age         -0.006806   0.001595  -4.267 2.07e-05 ***
+education2   0.016463   0.029675   0.555    0.579    
+education3   0.016427   0.037706   0.436    0.663    
+education4  -0.015033   0.040477  -0.371    0.710    
+diabetes    -0.025398   0.092606  -0.274    0.784    
+BMI          0.005001   0.003304   1.513    0.130 
+```
+
+.large[
+**Research question:** Is there a relationship between education level and the number of cigarettes smoked per day, after accounting for sex, age, diabetes, and BMI?
+]
+
+---
+
+### Nested tests with quasi-Poisson models
+
+.large[
+**Research question:** Is there a relationship between education level and the number of cigarettes smoked per day, after accounting for sex, age, diabetes, and BMI?
+
+* In Poisson regression, we would use a likelihood ratio test
+* However, the quasi-Poisson model includes the estimated dispersion, `\(\widehat{\phi}\)`. We need to use an **F-test** instead
+]
+
+---
+
+### Nested tests with quasi-Poisson models
+
+
+``` r
+m1 &lt;- glm(cigsPerDay ~ male + age + education + 
+            diabetes + BMI,
+          data = smokers, family = quasipoisson)
+m2 &lt;- glm(cigsPerDay ~ male + age + diabetes + BMI,
+          data = smokers, family = quasipoisson)
+
+m1$deviance
+```
+
+```
+## [1] 11539.56
+```
+
+``` r
+m2$deviance
+```
+
+```
+## [1] 11543.84
+```
+
+``` r
+m1$df.residual
+```
+
+```
+## [1] 2004
+```
+
+``` r
+m2$df.residual
+```
+
+```
+## [1] 2007
+```
+
+
+---
+
+### Nested tests with quasi-Poisson models
+
+.large[
+
+``` r
+m1$deviance
+```
+
+```
+## [1] 11539.56
+```
+
+``` r
+m2$deviance
+```
+
+```
+## [1] 11543.84
+```
+
+``` r
+pf(0.258, 3, 2004, lower.tail=F)
+```
+
+```
+## [1] 0.8556648
+```
+]
+
+---
+
+### Limitations of quasi-Poisson models
+
+.large[
+**Important:** quasi-Poisson models do *not* describe a full distribution for the response (there is no "quasi-Poisson" distribution). They describe *only* the mean and variance of the response.
+
+As a result, one cannot calculate probabilities for a quasi-Poisson:
+
+
+``` r
+m2 &lt;- glm(cigsPerDay ~ male + age + diabetes + BMI,
+          data = smokers, family = quasipoisson)
+rootogram(m2)
+```
+
+```
+Error in prodist.glm(object) : 
+family is not associated with a full probability distribution
+```
+
+]
+
+---
+
+### Class activity
+
+.large[
+Work on the class activity (handout).
+]
+
+
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+  "highlightStyle": "github",
+  "highlightLines": true,
+  "countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
