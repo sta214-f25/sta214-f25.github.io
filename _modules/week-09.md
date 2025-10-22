@@ -10,7 +10,8 @@ October 20
   : [Beyond MLR 4.4 - 4.7, 4.9.1, 4.9.2](https://bookdown.org/roback/bookdown-BeyondMLR/ch-poissonreg.html#cs-philippines)
 
 October 22
-: Overdispersion and inference
+: Quasi-Poisson models
+  : [slides](https://sta214-f25.github.io/slides/lecture_23.pdf), [warmup](https://sta214-f25.github.io/class_activities/ca_23_handout.pdf), [activity](https://sta214-f25.github.io/class_activities/ca_23.html)
     
 October 24
 : Quasi-Poisson models

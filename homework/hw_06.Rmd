@@ -1,0 +1,70 @@
+---
+title: "Homework 5"
+output: 
+  rmdformats::robobook:
+    css: "homework.css"
+    highlight: pygments
+link-citations: yes
+editor_options: 
+  chunk_output_type: console
+---
+
+**Due:** Friday, October 3, 11:59pm on Canvas
+
+**Instructions:** 
+
+Begin by downloading the HW 5 template from the course website:
+
+[https://sta214-f25.github.io/homework/hw_05_template.qmd](https://sta214-f25.github.io/homework/hw_05_template.qmd)
+
+Save this template file to your computer, then open it in RStudio. As you complete the assignment, you will write down your answers to all questions in the file, and include all R code in code chunks.
+
+When you have completed the assignment, render your homework to HTML and submit on Canvas. 
+
+**Guidelines:**
+
+* *You must submit the rendered HTML on Canvas to receive full credit!*
+* The course codebook has examples of writing math in Quarto and R Markdown documents. If your rendered math does not display correctly, or is hard to read, you will not receive full credit
+* If a question requires code, and code is not provided, you will not receive full credit
+* You will be graded on the quality of your code. In addition to being correct, your code should also be easy to read
+
+
+# Using diagnostic plots
+
+```{r}
+library(statmod)
+library(tidyverse)
+library(topmodels)
+
+n <- 1000
+x <- rnorm(n, sd = 0.5)
+y <- rnbinom(n, size=0.2, mu=exp(x))
+
+m1 <- glm(y ~ x, family = poisson)
+
+data.frame(x = x, resids = qresid(m1)) |>
+  ggplot(aes(x = x, y = resids)) +
+  geom_point() +
+  geom_smooth() +
+  theme_bw() +
+  labs(x = "X", y = "Quantile residuals") 
+
+rootogram(m1, style="standing")
+```
+
+
+
+:::{.question}
+#### Question 17
+
+Calculate a p-value for your hypothesis test, using the test statistic from question 16.
+
+:::
+
+
+
+
+
+
+
+
