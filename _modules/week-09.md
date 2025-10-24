@@ -15,6 +15,7 @@ October 22
     
 October 24
 : Quasi-Poisson models
+  : [slides](https://sta214-f25.github.io/slides/lecture_24.pdf), [activity 1](https://sta214-f25.github.io/class_activities/ca_24_handout.pdf), [activity 2](https://sta214-f25.github.io/class_activities/ca_24_handout_2.pdf)
 
 : Reading for Monday's class
   : [Beyond MLR 4.9.3](https://bookdown.org/roback/bookdown-BeyondMLR/ch-poissonreg.html#negative-binomial-modeling)
