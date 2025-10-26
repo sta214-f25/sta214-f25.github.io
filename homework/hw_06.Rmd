@@ -1,5 +1,5 @@
 ---
-title: "Homework 5"
+title: "Homework 6"
 output: 
   rmdformats::robobook:
     css: "homework.css"
@@ -9,13 +9,13 @@ editor_options:
   chunk_output_type: console
 ---
 
-**Due:** Friday, October 3, 11:59pm on Canvas
+**Due:** Monday, November 3, 11:59pm on Canvas
 
 **Instructions:** 
 
-Begin by downloading the HW 5 template from the course website:
+Begin by downloading the HW 6 template from the course website:
 
-[https://sta214-f25.github.io/homework/hw_05_template.qmd](https://sta214-f25.github.io/homework/hw_05_template.qmd)
+[https://sta214-f25.github.io/homework/hw_06_template.qmd](https://sta214-f25.github.io/homework/hw_06_template.qmd)
 
 Save this template file to your computer, then open it in RStudio. As you complete the assignment, you will write down your answers to all questions in the file, and include all R code in code chunks.
 
@@ -31,14 +31,30 @@ When you have completed the assignment, render your homework to HTML and submit 
 
 # Using diagnostic plots
 
-```{r}
+Suppose we observe data $(X_1, Y_1),...,(X_n, Y_n)$, and fit the Poisson regression model
+
+$$Y_i \sim Poisson(\lambda_i)$$
+
+$$\log(\lambda_i) = \beta_0 + \beta_1 X_i$$
+
+To check our model fit, we create the diagnostic plots shown below:
+
+```{r, echo=F, message=F, warning=F}
 library(statmod)
 library(tidyverse)
 library(topmodels)
 
+set.seed(4)
+
+rqpois <- function(n, mean, dispersion){
+  return(rnbinom(n, mu = mean, size = mean/(dispersion - 1)))
+}
+
+
 n <- 1000
 x <- rnorm(n, sd = 0.5)
-y <- rnbinom(n, size=0.2, mu=exp(x))
+#y <- rnbinom(n, size=0.2, mu=exp(1.5*x))
+y <- rqpois(1000, mean = exp(x), dispersion = 4)
 
 m1 <- glm(y ~ x, family = poisson)
 
@@ -55,16 +71,165 @@ rootogram(m1, style="standing")
 
 
 :::{.question}
-#### Question 17
+#### Question 1
 
-Calculate a p-value for your hypothesis test, using the test statistic from question 16.
+Do the Poisson regression assumptions appear to be satisfied? 
+
+* Explain your reasoning -- how are you using the plots to check the assumptions?
+* If the assumptions are not satisfied:
+  * Which particular assumptions are violated?
+  * How would you modify the model?
+
+:::
+
+# Diagnostic plots, part II
+
+Below are two rootograms from two different models. For both models, the shape assumption is satisfied, but the distribution assumption is not. One model suffers from *overdispersion* in the response (the variance is bigger than the model expects), while the other model suffers from *underdispersion* in the response (the variance is smaller than the model expects).
+
+```{r, echo=F}
+n <- 1000
+x <- rnorm(n, sd = 0.5)
+y <- rbinom(n, size=8, prob=0.5)
+
+m1 <- glm(y ~ x, family = poisson)
+
+rootogram(m1, style="standing")
+```
+
+```{r, echo=F}
+n <- 1000
+x <- rnorm(n, sd = 0.5)
+y <- rqpois(1000, mean = exp(x), dispersion = 3)
+m1 <- glm(y ~ x, family = poisson)
+
+rootogram(m1, style="standing")
+```
+
+:::{.question}
+#### Question 2
+
+Which rootogram shows evidence of overdispersion, and which shows evidence of underdispersion? Explain your reasoning, and which features of the rootograms you are using to make your decision.
 
 :::
 
 
+# Offsets
+
+Below are three descriptions of scenarios in which we may wish to use Poisson regression (or a variant) to model a count variable:
+
+1. Our response of interest is the number of patients with a particular disease. Data is collected from all cities in the US; for our purposes, a city has a population of at least 50000 people. Each row in the data corresponds to a city, and we are interested in modeling the number of patients with this disease, using variables such as the location of the city and its average temperature.
+2. Our response of interest is the number of students in a class at Wake Forest. Each observation represents one class at Wake Forest, taught in the Fall 2025 semester. We record the number of students in the class, and we are interested in modeling the number of students using variables such as the level of the course (100, 200, etc.), the department, and whether it fulfills any divisional or 21CS requirements.
+3. Our response of interest is the number of fish caught by visitors to a national park. Visitors can obtain a permit and fish in the park for between 1 and 7 days. Each observation represents the number of fish caught by a different visitor, and we are interested in modeling the number of fish using variables such as the age of the visitor and whether they were accompanied by any young children.
+
+:::{.question}
+#### Question 3
+
+In which of these scenarios would we wish to include an offset term in our Poisson regression model? Explain your reasoning. If you believe an offset term is necessary, describe what the offset would be -- it may or may not be one of the explanatory variables mentioned in the scenario descriptions.
+
+:::
 
 
+# Estimates and confidence intervals
+
+On October 22, you worked on a [class activity](https://sta214-f25.github.io/class_activities/ca_23.html) in which you investigated the effects of overdispersion on the coverage of confidence intervals. You saw in that activity that, as the degree of overdispersion increases, the coverage of our confidence intervals decreases.
+
+Why does this occur? There are several possibilities:
+
+* The center of the confidence interval is in the wrong place, but the width of the interval is ok
+* The center of the confidence interval is in the right place, but the width of the interval is too small
+* The center of the confidence interval is in the wrong place, *and* the width of the interval is too small
+
+We already know that the width of the interval is too small -- this is why expanding the width with the quasi-Poisson model helps. The question is then whether the center of the confidence interval is in the right place or not.
+
+Our confidence interval for $\beta_j$ is centered around $\widehat{\beta}_j$. So our question is whether $\widehat{\beta}_j$ is close, on average, to $\beta_j$. To formalize this question, let's introduce a couple pieces of notation:
+
+* **Expectation:** The *expected value*, or *mean*, of $\widehat{\beta}_j$ is denoted by $\mathbb{E}[\widehat{\beta}_j]$. This is the average value of $\widehat{\beta}_j$ over many, many samples from the population
+* **Bias:** The *bias* of $\widehat{\beta}_j$ is the difference between its expectation and the true $\beta_j$:
+
+$$Bias(\widehat{\beta}_j) = \mathbb{E}[\widehat{\beta}_j] - \beta_j$$
+
+Ideally, we want estimators with **small bias** (i.e., we want to be right on average!).
+
+**Conducting a simulation:** We will explore whether the amount of overdispersion in our data effects the *bias* of our regression coefficient estimates from Poisson regression (we already know overdispersion impacts the variance). 
+
+* Borrowing code from the class activity, simulate data from a model in which the Poisson regression assumptions are correct, and calculate $\widehat{\beta}_1$ for each simulation. Repeat the simulations many times and average your $\widehat{\beta}_1$ estimates to approximate $\mathbb{E}[\widehat{\beta}_1]$ and $Bias(\widehat{\beta}_1)$
+* Now modify your code, so that the distribution assumption is incorrect, and there is overdispersion in the data. Use the `rnbinom` function we used in class, and change the `size` parameter to vary the amount of overdispersion. For each `size` parameter you choose, approximate $Bias(\widehat{\beta}_1)$ for the Poisson regression model
+* Finally, make and interpret a plot of $Bias(\widehat{\beta}_1)$ against the amount of overdispersion in the data
 
 
+:::{.question}
+#### Question 4
 
+Conduct and discuss the simulation described above. What is causing the decrease in coverage of confidence intervals for the Poisson model when there is overdispersion in the data?
+
+:::
+
+
+# Understanding the estimated dispersion parameter
+
+The dispersion parameter $\phi$ tells us about the relationship between the mean and variance of the response variable. For a Poisson regression model, we assume that $\phi = 1$. However, real data often shows evidence of overdispersion, in which case we wish to estimate $\phi$.
+
+In class, the estimator discussed is
+
+$$\widehat{\phi} = \dfrac{\sum \limits_{i=1}^n e_{(P)i}^2}{n-p}$$
+
+Why does this estimate $\phi$? Because
+
+$$\sum \limits_{i=1}^n e_{(P)i}^2 \approx \phi \chi^2_{n-p}$$
+
+That is, the approximate distribution of the numerator is $\phi$ times a chi-squared distribution with $n - p$ degrees of freedom. We know that the mean of a $\chi^2_{n-p}$ distribution is $n-p$, so on average $\widehat{\phi} \approx \phi$. In particular, if our Poisson distribution assumption is correct and $\phi = 1$, then $\widehat{\phi} \approx 1$ as well.
+
+In this portion of the homework, you will use simulation to verify that $\sum \limits_{i=1}^n e_{(P)i}^2 \approx \phi \chi^2_{n-p}$. (The mathematical explanation is a bit beyond the scope of the course, but I am happy to chat more about the math in office hours if you are interested!)
+
+The code below simulates 100 observations from a Poisson regression model in which all assumptions are satisfied, and then calculates the numerator for $\widehat{\phi}$:
+
+```{r, eval=F}
+n <- 100
+beta0 <- 0
+beta1 <- 1
+
+x <- rnorm(n, sd = 0.5)
+y <- rpois(n, lambda = exp(beta0 + beta1*x))
+
+m1 <- glm(y ~ x, family = poisson)
+sum(residuals(m1, "pearson")^2)
+```
+
+:::{.question}
+#### Question 5
+
+Repeat the simulation `nsim = 1000` times, and store the resulting sums of squared residuals. Compare the distribution of the calculated numerators to a $\chi^2_{98}$ distribution:
+
+* Calculate the mean and variance of the 1000 calculated numerators, and compare to the mean and variance of a $\chi^2_{98}$
+* Create a density histogram of the 1000 calculated numerators, and overlay the density function of a $\chi^2_{98}$
+
+:::
+
+
+```{r, echo=F, eval=F}
+nsim <- 1000
+n <- 100
+beta0 <- 0
+beta1 <- 1
+
+sum_sq <- rep(NA, nsim)
+
+for(i in 1:nsim){
+  x <- rnorm(n, sd = 0.5)
+  y <- rpois(n, lambda = exp(beta0 + beta1*x))
+
+  m1 <- glm(y ~ x, family = poisson)
+
+  sum_sq[i] <- sum(residuals(m1, "pearson")^2)
+}
+
+data.frame(sum_sq = sum_sq) |>
+  ggplot(aes(x = sum_sq)) +
+  geom_histogram(aes(y = after_stat(density))) +
+  stat_function(fun = dchisq, args = list(df=98)) +
+  theme_bw()
+
+mean(sum_sq)
+var(sum_sq)
+```
 

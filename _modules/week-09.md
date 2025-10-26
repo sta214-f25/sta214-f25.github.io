@@ -21,3 +21,4 @@ October 24
   : [Beyond MLR 4.9.3](https://bookdown.org/roback/bookdown-BeyondMLR/ch-poissonreg.html#negative-binomial-modeling)
   
 : **HW 6 released**{: .label .label-yellow }
+  : [HW 6](https://sta214-f25.github.io/homework/hw_06.html)
