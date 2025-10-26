@@ -1,0 +1,41 @@
+---
+title: "Class activity: Negative Binomial models"
+format: html
+---
+
+**Instructions:** 
+
+* Work individually or with a neighbor to answer the following questions 
+* To get started, download the [class activity template](https://sta214-f25.github.io/class_activities/ca_25_template.qmd) file
+* When you are finished, render the file as an HTML and submit the HTML to Canvas (let me know if you encounter any problems)
+
+# Negative binomial modeling
+
+We are interested in analyzing the number of articles published by biochemistry PhD students. The data contains the following variables:
+
+* `art`: articles published in last three years of Ph.D.
+* `fem`: gender (recorded as men or women)
+* `mar`: marital status (recorded as married or single)
+* `kid5`: number of children under age six
+* `phd`: prestige of Ph.D. program
+* `ment`: articles published by their mentor in last three years
+
+The data can be loaded in R with the following:
+
+```{r}
+library(MASS)
+library(foreign)
+
+articles <- read.dta("http://www.stata-press.com/data/lf2/couart2.dta")
+```
+
+## Questions
+
+1. Fit a negative binomial regression model to predict the number of articles published, using the other variables in the data as the explanatory variables.
+
+2. Using your fitted model, is there a relationship between the prestige of the PhD program and the number of articles published, after accounting for the other variables? For practice, do this two ways: with a $z$-test, and with a likelihood ratio test.
+
+
+
+
+

@@ -1,0 +1,325 @@
+---
+title: Negative binomial regression
+output:
+  xaringan::moon_reader:
+    css: "lab-slides.css"
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+editor_options: 
+  chunk_output_type: console
+---
+
+### Last time: class activity
+
+```
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  2.837192   0.115099  24.650  < 2e-16 ***
+male         0.456170   0.026095  17.481  < 2e-16 ***
+age         -0.006806   0.001595  -4.267 2.07e-05 ***
+education2   0.016463   0.029675   0.555    0.579    
+education3   0.016427   0.037706   0.436    0.663    
+education4  -0.015033   0.040477  -0.371    0.710    
+diabetes    -0.025398   0.092606  -0.274    0.784    
+BMI          0.005001   0.003304   1.513    0.130  
+```
+
+.large[
+.question[
+Is there a difference in the average number of cigarettes smoked between smokers with some college education and smokers with a college degree, after accounting for sex, age, diabetes, and BMI?
+]
+]
+
+---
+
+### Last time: class activity
+
+.large[
+$$Var(aU + bV) = a^2 Var(U) + b^2 Var(V) + 2ab Cov(U, V)$$
+]
+
+---
+
+### Last time: class activity
+
+```{r}
+se <- sqrt(1.421765e-03 + 8.806037e-04 - 2*4.199471e-04) # 0.0382
+t_stat <- (0.016427 - 0.016463)/se  # -0.001
+
+2*pt(abs(t_stat), 2004, lower.tail=F)
+```
+
+---
+
+### Comparing Poisson and quasi-Poisson
+
+.large[
+**Poisson:**
+
+* Mean = $\lambda_i$
+* Variance = $\lambda_i$
+
+**quasi-Poisson:**
+
+* Mean = $\lambda_i$
+* Variance = $\phi \lambda_i$
+* Variance is a linear function of the mean
+
+.question[
+What if we want variance to depend on the mean in a different way?
+]
+]
+
+---
+
+### Introducing the negative binomial
+
+.large[
+If $Y_i \sim NB(\theta, p)$, then $Y_i$ takes values $y = 0, 1, 2, 3, ...$ with probabilities
+
+$$P(Y_i = y) = \dfrac{(y + \theta - 1)!}{y!(\theta - 1)!} (1 - p)^\theta p^y$$
+
+* $\theta > 0$, $\ \ \ p \in [0, 1]$
+* Mean = $\dfrac{p \theta}{1 - p} = \mu$
+* Variance = $\dfrac{p \theta}{(1 - p)^2} = \mu + \dfrac{\mu^2}{\theta}$
+* Variance is a *quadratic* function of the mean
+]
+
+---
+
+### Mean and variance for a negative binomial variable
+
+.large[
+If $Y_i \sim NB(\theta, p)$, then
+
+* Mean = $\dfrac{p \theta}{1 - p} = \mu$
+* Variance = $\dfrac{p \theta}{(1 - p)^2} = \mu + \dfrac{\mu^2}{\theta}$
+
+.question[
+How is $\theta$ related to overdispersion?
+]
+]
+
+---
+
+### Negative binomial regression
+
+.large[
+$$Y_i \sim NB(\theta, \ p_i)$$
+
+$$\log(\mu_i) = \beta_0 + \beta_1 X_i$$
+
+* $\mu_i = \dfrac{p_i \theta}{1 - p_i}$
+* Note that $\theta$ is the same for all $i$
+* Note that just like in Poisson regression, we model the average count
+  * Interpretation of $\beta$s is the same as in Poisson regression
+]
+
+---
+
+### Comparing Poisson, quasi-Poisson, negative binomial
+
+.large[
+**Poisson:**
+
+* Mean = $\lambda_i$
+* Variance = $\lambda_i$
+
+**quasi-Poisson:**
+
+* Mean = $\lambda_i$
+* Variance = $\phi \lambda_i$
+
+**negative binomial:**
+
+* Mean = $\mu_i$
+* Variance = $\mu_i + \dfrac{\mu_i^2}{\theta}$
+]
+
+---
+
+### In R
+
+.large[
+```{r, include=F}
+library(foreign)
+library(MASS)
+library(tidyverse)
+
+heart_data <- read.csv("~/Documents/Teaching/applied_glms/sta214-f25.github.io/class_activities/framingham.csv")
+
+heart_data <- heart_data |>
+  drop_na(male, age, education, diabetes, cigsPerDay, BMI) |>
+  mutate(education = as.factor(education))
+
+smokers <- heart_data |>
+  filter(currentSmoker == 1)
+
+m3 <- glm.nb(cigsPerDay ~ male + age + education + 
+            diabetes + BMI, data = smokers)
+```
+
+
+```{r eval=F}
+library(MASS)
+m3 <- glm.nb(cigsPerDay ~ male + age + education + 
+            diabetes + BMI, data = smokers)
+```
+
+```
+             Estimate Std. Error z value Pr(>|z|)    
+(Intercept)  2.877771   0.123477  23.306  < 2e-16 ***
+male         0.459148   0.027641  16.611  < 2e-16 ***
+age         -0.007010   0.001731  -4.050 5.12e-05 ***
+education2   0.024518   0.032534   0.754    0.451    
+education3   0.009252   0.040802   0.227    0.821    
+education4  -0.027732   0.044825  -0.619    0.536    
+diabetes    -0.010124   0.099126  -0.102    0.919    
+BMI          0.003693   0.003573   1.033    0.301    
+
+(Dispersion parameter for Negative Binomial(3.2981) family taken to be 1)
+```
+
+$\widehat{\theta} = 3.30$
+]
+
+---
+
+### In R
+
+.large[
+```
+             Estimate Std. Error z value Pr(>|z|)    
+(Intercept)  2.877771   0.123477  23.306  < 2e-16 ***
+male         0.459148   0.027641  16.611  < 2e-16 ***
+age         -0.007010   0.001731  -4.050 5.12e-05 ***
+education2   0.024518   0.032534   0.754    0.451    
+education3   0.009252   0.040802   0.227    0.821    
+education4  -0.027732   0.044825  -0.619    0.536    
+diabetes    -0.010124   0.099126  -0.102    0.919    
+BMI          0.003693   0.003573   1.033    0.301    
+```
+
+.question[
+How do I interpret the estimated coefficient -0.007?
+]
+]
+
+---
+
+### Hypothesis testing
+
+```
+             Estimate Std. Error z value Pr(>|z|)    
+(Intercept)  2.877771   0.123477  23.306  < 2e-16 ***
+male         0.459148   0.027641  16.611  < 2e-16 ***
+age         -0.007010   0.001731  -4.050 5.12e-05 ***
+education2   0.024518   0.032534   0.754    0.451    
+education3   0.009252   0.040802   0.227    0.821    
+education4  -0.027732   0.044825  -0.619    0.536    
+diabetes    -0.010124   0.099126  -0.102    0.919    
+BMI          0.003693   0.003573   1.033    0.301  
+```
+
+.large[
+**Research question:** Is there a relationship between education level and the number of cigarettes smoked per day, after accounting for sex, age, diabetes, and BMI?
+]
+
+---
+
+### Likelihood ratio test
+
+.large[
+```{r}
+m3 <- glm.nb(cigsPerDay ~ male + age + education + 
+               diabetes + BMI, data = smokers)
+m4 <- glm.nb(cigsPerDay ~ male + age +
+               diabetes + BMI, data = smokers)
+m3$twologlik - m4$twologlik
+pchisq(1.423, df=3, lower.tail=F)
+```
+]
+
+
+---
+
+### quasi-Poisson vs. negative binomial
+
+.large[
+
+.pull-left[
+**quasi-Poisson:**
+
+* linear relationship between mean and variance
+* easy to interpret $\widehat{\phi}$
+* same as Poisson regression when $\phi = 1$
+* simple adjustment to estimated standard errors
+* estimated coefficients same as in Poisson regression
+]
+
+.pull-right[
+**negative binomial:**
+
+* quadratic relationship between mean and variance
+* we get to use a likelihood, rather than a quasi-likelihood
+* Same as Poisson regression when $\theta$ is very large and $p$ is very small
+]
+]
+
+---
+
+### Class activity
+
+.large[
+Work on the class activity. Submit the rendered HTML on Canvas at the end of class.
+]
+
+---
+
+### Class activity
+
+.large[
+```{r, eval=F}
+m_art <- glm.nb(art ~ ., data = articles)
+```
+
+```
+             Estimate Std. Error z value Pr(>|z|)    
+(Intercept)  0.256144   0.137348   1.865 0.062191 .  
+femWomen    -0.216418   0.072636  -2.979 0.002887 ** 
+marMarried   0.150489   0.082097   1.833 0.066791 .  
+kid5        -0.176415   0.052813  -3.340 0.000837 ***
+phd          0.015271   0.035873   0.426 0.670326    
+ment         0.029082   0.003214   9.048  < 2e-16 ***
+```
+]
+
+---
+
+### Class activity
+
+.large[
+```{r, include=F}
+library(MASS)
+library(foreign)
+
+articles <- read.dta("http://www.stata-press.com/data/lf2/couart2.dta")
+```
+
+```{r}
+m_art <- glm.nb(art ~ ., data = articles)
+m_art_reduced <- glm.nb(art ~ fem + mar + 
+                          kid5 + ment,
+                        data = articles)
+m_art$twologlik - m_art_reduced$twologlik
+pchisq(0.180, df=1, lower.tail=F)
+```
+
+
+]
+
+
+
+
