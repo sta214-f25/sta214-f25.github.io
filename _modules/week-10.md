@@ -8,6 +8,7 @@ October 27
 
 October 29
 : Zero-inflated Poisson models
+  : [slides](https://sta214-f25.github.io/slides/lecture_26.pdf), [activity](https://sta214-f25.github.io/class_activities/ca_26_handout.pdf)
     
 October 31
 : Zero-inflated Poisson models
