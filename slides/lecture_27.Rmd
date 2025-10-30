@@ -1,0 +1,313 @@
+---
+title: Zero inflated models
+output:
+  xaringan::moon_reader:
+    css: "lab-slides.css"
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+editor_options: 
+  chunk_output_type: console
+---
+
+### Data: College drinking
+
+.large[
+Survey data from 77 college students on a dry campus (i.e., alcohol is prohibited) in the US. Survey asks students "How many alcoholic drinks did you consume last weekend?"
+
+* `drinks`: the number of drinks the student reports consuming
+* `sex`: an indicator for whether the student identifies as male
+* `OffCampus`: an indicator for whether the student lives off campus
+* `FirstYear`: an indicator for whether the student is a first-year student
+
+.question[
+Our goal: model the number of drinks students report consuming.
+]
+]
+
+---
+
+### Class activity: The fitted model
+
+.large[
+$$P(Y_i = y) = \begin{cases} e^{-\lambda_i}(1 - \alpha_i) + \alpha_i & y = 0 \\ \dfrac{e^{-\lambda_i} \lambda_i^y}{y!}(1 - \alpha_i) & y > 0 \end{cases}$$
+
+$\log \left( \dfrac{\widehat{\alpha}_i}{1 - \widehat{\alpha}_i} \right) = -0.60 + 1.14 FirstYear_i$
+
+$\log(\widehat{\lambda}_i) = 0.75 + 0.42 \ OffCampus_i + 1.02 \ Male_i$
+
+.question[
+
+What is the estimated probability that a first year student never drinks?
+
+]
+]
+
+---
+
+### The fitted model
+
+.large[
+$$P(Y_i = y) = \begin{cases} e^{-\lambda_i}(1 - \alpha_i) + \alpha_i & y = 0 \\ \dfrac{e^{-\lambda_i} \lambda_i^y}{y!}(1 - \alpha_i) & y > 0 \end{cases}$$
+
+$\log \left( \dfrac{\widehat{\alpha}_i}{1 - \widehat{\alpha}_i} \right) = -0.60 + 1.14 FirstYear_i$
+
+$\log(\widehat{\lambda}_i) = 0.75 + 0.42 \ OffCampus_i + 1.02 \ Male_i$
+
+.question[
+
+What is the estimated average number of drinks for a male student who lives off campus and sometimes drinks?
+
+]
+]
+
+---
+
+### The fitted model
+
+.large[
+$$P(Y_i = y) = \begin{cases} e^{-\lambda_i}(1 - \alpha_i) + \alpha_i & y = 0 \\ \dfrac{e^{-\lambda_i} \lambda_i^y}{y!}(1 - \alpha_i) & y > 0 \end{cases}$$
+
+$\log \left( \dfrac{\widehat{\alpha}_i}{1 - \widehat{\alpha}_i} \right) = -0.60 + 1.14 FirstYear_i$
+
+$\log(\widehat{\lambda}_i) = 0.75 + 0.42 \ OffCampus_i + 1.02 \ Male_i$
+
+.question[
+
+What is the estimated probability that a male first year student who lives off campus had at least one drink last weekend?
+
+]
+]
+
+---
+
+```{r include=F}
+library(tidyverse)
+library(knitr)
+library(pscl)
+```
+
+
+### Data: Framingham heart study
+
+.large[
+Data collected on residents of Framingham, MA over a long period of time, to study variables related to heart health. We will work with a subset of the data, containing
+
+* `cigsPerDay`: The number of cigarettes smoked per day during the study period.
+* `education`: 1 = High School, 2 = Some College, 3 = College Degree, 4 = Advanced Degree.
+* `male`: 1 = Male, 0 = Female.
+* `age`: The age of the individual in years.
+* `diabetes`: 1 if the individual has diabetes, 0 otherwise.
+
+.question[
+Why might we see zero inflation in the number of cigarettes smoked per day?
+]
+
+]
+
+---
+
+### EDA: number of cigarettes smoked
+
+```{r, echo=F, warning=F, message=F, fig.align='center', fig.height=5, fig.width=7}
+heart_data <- read.csv("~/Documents/Teaching/applied_glms/sta214-f25.github.io/class_activities/framingham.csv")
+
+heart_data <- heart_data %>%
+  drop_na(male, age, education, diabetes, cigsPerDay) %>%
+  mutate(education = as.factor(education))
+
+heart_data %>%
+  ggplot(aes(x = cigsPerDay)) +
+  geom_histogram(bins = 20) +
+  theme_bw() +
+  labs(x = "Number of cigarettes smoked per day") +
+  theme(text = element_text(size = 20))
+```
+
+---
+
+### Class activity
+
+.large[
+Work on the class activity (handout).
+]
+
+---
+
+### Class activity
+
+$$P(Y_i = y) = \begin{cases} e^{-\lambda_i}(1 - \alpha_i) + \alpha_i & y = 0 \\ \dfrac{e^{-\lambda_i} \lambda_i^y}{y!}(1 - \alpha_i) & y > 0 \end{cases}$$
+
+$$\log \left( \dfrac{\widehat{\alpha}_i}{1 - \widehat{\alpha}_i} \right) = -2.51 + 0.051 Age_i$$
+
+$$\log(\widehat{\lambda}_i) = 3.21 -0.044 EducationSome_i -0.082 EducationCollege_i - \\ 0.0062 EducationAdv_i - 0.024 Diabetes_i - 0.0056 Age_i$$
+
+.large[
+.question[
+How do we interpret the coefficient -0.024 in the fitted model?
+]
+]
+
+
+---
+
+### Class activity
+
+
+$$\log \left( \dfrac{\widehat{\alpha}_i}{1 - \widehat{\alpha}_i} \right) = -2.51 + 0.051 Age_i$$
+
+$$\log(\widehat{\lambda}_i) = 3.21 -0.044 EducationSome_i -0.082 EducationCollege_i - \\ 0.0062 EducationAdv_i - 0.024 Diabetes_i - 0.0056 Age_i$$
+
+.large[
+.question[
+What is the expected number of cigarettes smoked per day, for a 50 year old smoker with diabetes and some college education?
+]
+]
+
+---
+
+### Making predictions
+
+
+$$\log \left( \dfrac{\widehat{\alpha}_i}{1 - \widehat{\alpha}_i} \right) = -2.51 + 0.051 Age_i$$
+
+$$\log(\widehat{\lambda}_i) = 3.21 -0.044 EducationSome_i -0.082 EducationCollege_i - \\ 0.0062 EducationAdv_i - 0.024 Diabetes_i - 0.0056 Age_i$$
+
+.large[
+.question[
+What if I want the expected number of cigarettes smoked per day for a 50 year old with diabetes and some college education, but *without* knowing whether they are a smoker?
+]
+]
+
+---
+
+### A new question
+
+$$P(Y_i = y) = \begin{cases} e^{-\lambda_i}(1 - \alpha_i) + \alpha_i & y = 0 \\ \dfrac{e^{-\lambda_i} \lambda_i^y}{y!}(1 - \alpha_i) & y > 0 \end{cases}$$
+
+$$\log \left( \dfrac{\alpha_i}{1 - \alpha_i} \right) = \gamma_0 + \gamma_1 Age_i$$
+
+$$\log(\lambda_i) = \beta_0 + \beta_1 EducationSome_i + \beta_2 EducationCollege_i + \\ \beta_3 EducationAdv_i + \beta_4 Diabetes_i + \beta_5 Age_i$$
+.large[
+.question[
+New research question: for smokers, does the number of cigarettes smoked per day depend on age?
+
+How would we answer this research question?
+]
+]
+
+---
+
+### Fitting the model in R
+
+.large[
+```{r, eval=F}
+m2 <- zeroinfl(cigsPerDay ~ education + 
+                 diabetes + age | age, 
+               data = heart_data)
+summary(m2)
+```
+]
+
+```
+Count model coefficients (poisson with log link):
+              Estimate Std. Error z value Pr(>|z|)    
+(Intercept)  3.2063376  0.0342290  93.673  < 2e-16 ***
+education2  -0.0441182  0.0124809  -3.535 0.000408 ***
+education3  -0.0820372  0.0158604  -5.172 2.31e-07 ***
+education4  -0.0062453  0.0171640  -0.364 0.715964    
+diabetes    -0.0241459  0.0386337  -0.625 0.531974    
+age         -0.0056182  0.0006738  -8.338  < 2e-16 ***
+
+Zero-inflation model coefficients (binomial with logit link):
+             Estimate Std. Error z value Pr(>|z|)    
+(Intercept) -2.506681   0.191483  -13.09   <2e-16 ***
+age          0.051329   0.003821   13.43   <2e-16 ***
+```
+
+---
+
+### z-test
+
+.large[
+```{r, eval=F}
+m2 <- zeroinfl(cigsPerDay ~ education + 
+                 diabetes + age | age, 
+               data = heart_data)
+summary(m2)
+```
+]
+
+```
+Count model coefficients (poisson with log link):
+              Estimate Std. Error z value Pr(>|z|)    
+(Intercept)  3.2063376  0.0342290  93.673  < 2e-16 ***
+education2  -0.0441182  0.0124809  -3.535 0.000408 ***
+education3  -0.0820372  0.0158604  -5.172 2.31e-07 ***
+education4  -0.0062453  0.0171640  -0.364 0.715964    
+diabetes    -0.0241459  0.0386337  -0.625 0.531974    
+age         -0.0056182  0.0006738  -8.338  < 2e-16 ***
+```
+---
+
+### Likelihood ratio test
+
+```{r, include=F}
+m2 <- zeroinfl(cigsPerDay ~ education + 
+                 diabetes + age | age, 
+               data = heart_data)
+summary(m2)
+```
+
+---
+
+### Likelihood ratio test
+
+.large[
+
+```{r}
+m2 <- zeroinfl(cigsPerDay ~ education + 
+                 diabetes + age | age, 
+               data = heart_data)
+m2$loglik
+```
+
+```{r}
+m1 <- zeroinfl(cigsPerDay ~ education + 
+                 diabetes | age, 
+               data = heart_data)
+m1$loglik
+```
+]
+
+---
+
+### Likelihood ratio test
+
+.large[
+
+```{r}
+m1 <- zeroinfl(cigsPerDay ~ education + 
+                 diabetes | age, 
+               data = heart_data)
+
+m2 <- zeroinfl(cigsPerDay ~ education + 
+                 diabetes + age | age, 
+               data = heart_data)
+
+2*(m2$loglik - m1$loglik)
+pchisq(69.976, df=1, lower.tail=F)
+```
+]
+
+---
+
+### Class activity
+
+.large[
+Work on the class activity. At the end of class, render your work as an HTML and submit on Canvas.
+]
+
+

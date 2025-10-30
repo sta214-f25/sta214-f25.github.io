@@ -1,0 +1,66 @@
+---
+title: "Activity"
+format: pdf
+editor: source
+---
+
+\vspace{-2.5cm}
+
+**Group members:**
+
+\vspace{-0.5cm}
+
+# Zero-Inflated Poisson (ZIP) models
+
+In this class activity, we work with the Framingham heart study data. This data includes the following variables (among others):
+
+* `cigsPerDay`: The number of cigarettes smoked per day during the study period.
+* `education`: 1 = High School, 2 = Some College, 3 = College Degree, 4 = Advanced Degree.
+* `male`: 1 = Male, 0 = Female.
+* `age`: The age of the individual in years.
+* `diabetes`: 1 if the individual has diabetes, 0 otherwise.
+
+We are interested in modeling the number of cigarettes smoked per day (`cigsPerDay`).
+
+## The model
+
+Researchers suspect that whether or not someone smokes depends on their age, and that if they do smoke, the number of cigarettes smoked is related to their age, education level, and whether they have diabetes. The researchers therefore fit the following ZIP model:
+
+$$P(Y_i = y) = \begin{cases} e^{-\lambda_i}(1 - \alpha_i) + \alpha_i & y = 0 \\ \dfrac{e^{-\lambda_i} \lambda_i^y}{y!}(1 - \alpha_i) & y > 0 \end{cases}$$
+
+$\log \left( \dfrac{\alpha_i}{1 - \alpha_i} \right) = \gamma_0 + \gamma_1 Age_i$
+
+\begin{align*}
+\log(\lambda_i) &= \beta_0 + \beta_1 EducationSome_i + \beta_2 EducationCollege_i + \beta_3 EducationAdv_i + \\ & \hspace{1cm} \beta_4 Diabetes_i + \beta_5 Age_i
+\end{align*}
+
+The R output below shows their fitted model.
+
+```
+Count model coefficients (poisson with log link):
+              Estimate Std. Error z value Pr(>|z|)    
+(Intercept)  3.2063376  0.0342290  93.673  < 2e-16 ***
+education2  -0.0441182  0.0124809  -3.535 0.000408 ***
+education3  -0.0820372  0.0158604  -5.172 2.31e-07 ***
+education4  -0.0062453  0.0171640  -0.364 0.715964    
+diabetes    -0.0241459  0.0386337  -0.625 0.531974    
+age         -0.0056182  0.0006738  -8.338  < 2e-16 ***
+
+Zero-inflation model coefficients (binomial with logit link):
+             Estimate Std. Error z value Pr(>|z|)    
+(Intercept) -2.506681   0.191483  -13.09   <2e-16 ***
+age          0.051329   0.003821   13.43   <2e-16 ***
+```
+
+## Questions
+
+1. Interpret the coefficient -0.024 in the fitted model.
+
+\vspace{3cm}
+
+2. What is the expected number of cigarettes smoked per day, for a 50 year old smoker with diabetes and some college education?
+
+\vspace{3cm}
+
+3. What if I want the expected number of cigarettes smoked per day for a 50 year old with diabetes and some college education, but *without* knowing whether they are a smoker?
+
