@@ -1,5 +1,5 @@
 ---
-title: "Class activity: Negative Binomial models"
+title: "Class activity"
 format: html
 ---
 
