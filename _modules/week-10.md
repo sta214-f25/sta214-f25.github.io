@@ -12,5 +12,6 @@ October 29
     
 October 31
 : Zero-inflated Poisson models
+  : [slides](https://sta214-f25.github.io/slides/lecture_27.pdf), [activity](https://sta214-f25.github.io/class_activities/ca_27_handout.pdf)
   
 : **HW 7 released**{: .label .label-yellow }

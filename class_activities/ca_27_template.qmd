@@ -1,0 +1,17 @@
+---
+---
+---
+title: "Class activity"
+format: 
+  html:
+    embed-resources: true
+editor: source
+author: "Group members: "
+---
+
+1. 
+
+```{r}
+
+```
+
