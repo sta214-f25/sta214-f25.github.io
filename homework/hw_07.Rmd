@@ -1,0 +1,218 @@
+---
+title: "Homework 7"
+output: 
+  rmdformats::robobook:
+    css: "homework.css"
+    highlight: pygments
+link-citations: yes
+editor_options: 
+  chunk_output_type: console
+---
+
+**Due:** Monday, November 10, 11:59pm on Canvas
+
+**Instructions:** 
+
+Begin by downloading the HW 7 template from the course website:
+
+[https://sta214-f25.github.io/homework/hw_07_template.qmd](https://sta214-f25.github.io/homework/hw_07_template.qmd)
+
+Save this template file to your computer, then open it in RStudio. As you complete the assignment, you will write down your answers to all questions in the file, and include all R code in code chunks.
+
+When you have completed the assignment, render your homework to HTML and submit on Canvas. 
+
+**Guidelines:**
+
+* *You must submit the rendered HTML on Canvas to receive full credit!*
+* The course codebook has examples of writing math in Quarto and R Markdown documents. If your rendered math does not display correctly, or is hard to read, you will not receive full credit
+* If a question requires code, and code is not provided, you will not receive full credit
+* You will be graded on the quality of your code. In addition to being correct, your code should also be easy to read
+
+
+# Planning a fishing trip
+
+You have **5 days** off from work, and you are planning to go on a fishing trip at a nearby state park. Once you pack all your gear, your car and **camper van** have space for **four people total** (you and three others). Now you just need to figure out who to bring!
+
+You have two options:
+
+* You have three college friends who also enjoy fishing, and have been *angling* for an invitation to join your trip
+* You have three young nieces and nephews who will be on spring break during your trip, and who have also asked to join
+
+You can't take everyone, so you'll have to choose between these two options. You would prefer to take your nieces and nephews if possible, but you are worried they will prevent you from doing enough fishing. You decide that you will take your nieces and nephews, *if* you are confident that the probability that your group catches at least one fish over the five days is at least 80%.
+
+## Data
+
+Because you are a statistician, you decide to use data to help make your decision. You have data on 250 groups of park guests who visited the state park. For each group, you have:
+
+* `count`: the number of fish caught by the group
+* `camper`: whether the group brought a camper van (0 = no, 1 = yes)
+* `child`: the number of children in the group
+* `persons`: the total number of people in the group
+* `LOS`: length of stay (in days)
+
+The data can be downloaded into R with the following code:
+
+```{r, message=F, warning=F}
+library(tidyverse)
+fish <- read_csv("https://sta214-f25.github.io/homework/fish2.csv")
+```
+
+# Questions
+
+## Poisson regression?
+
+You initially consider the following Poisson regression model:
+
+$$\text{Fish}_i \sim Poisson(\lambda_i)$$
+
+$$\log(\lambda_i) = \beta_0 + \beta_1 \text{Camper}_i + \beta_2 \text{Children}_i + \beta_3 \text{Persons}_i + \log(\text{LOS}_i)$$
+
+:::{.question}
+#### Question 1
+
+Explain why the offset term is included here, and how it changes the interpretation of the coefficients.
+
+:::
+
+:::{.question}
+#### Question 2
+
+Fit the Poisson regression model, then use the tools we have learned in class to assess whether the Poisson model is a good fit to the data. Be thorough, and use multiple tools to assess the model fit. Make sure to discuss your results and conclusions.
+
+:::
+
+## Zero-inflated Poisson model
+
+To get a better fit to the data, you instead consider a zero-inflated Poisson model:
+
+$$P(\text{Fish}_i = y) = \begin{cases} e^{-\lambda_i}(1 - \alpha_i) + \alpha_i & y = 0 \\ \dfrac{e^{-\lambda_i} \lambda_i^y}{y!}(1 - \alpha_i) & y > 0 \end{cases}$$
+
+$$\log \left( \dfrac{\alpha_i}{1 - \alpha_i} \right) = \gamma_0 + \gamma_1 \text{Camper}_i + \gamma_2 \text{Children}_i + \gamma_3 \text{Persons}_i$$
+
+$$\log(\lambda_i) = \beta_0 + \beta_1 \text{Camper}_i + \beta_2 \text{Children}_i + \beta_3 \text{Persons}_i + \log(\text{LOS}_i)$$
+
+:::{.question}
+#### Question 3
+
+Why might there be excess zeroes in the data? Explain what the two different groups of park visitors would be for this example. (In the college drinking dataset, e.g., the groups were the drinkers and the non-drinkers).
+
+:::
+
+We can fit the ZIP model in R with the following:
+
+```{r, message=F, warning=F}
+library(pscl)
+
+m_zip <- zeroinfl(count ~ camper + child + persons,
+               offset = log(LOS),
+               data = fish)
+```
+
+:::{.question}
+#### Question 4
+
+Fit the ZIP model, then use rootograms to verify that the ZIP model is a better fit to the data. (If you are having trouble installing the `topmodels` package needed to make the rootograms, please see me. In the meantime, the remaining questions do not require a rootogram.)
+
+:::
+
+
+### Interpretation and prediction
+
+:::{.question}
+#### Question 5
+
+For a fixed number of total persons in the group (and fixing camper van and length of stay), does the model predict that groups with more children are *more* or *less* likely to go fishing?
+
+:::
+
+:::{.question}
+#### Question 6
+
+For a fixed number of total persons in the group (and fixing camper van and length of stay), does the model predict that groups with more children, *who go fishing*, will catch more or fewer fish?
+
+:::
+
+:::{.question}
+#### Question 7
+
+Calculate the predicted number of fish your group will catch for each of the two options described above (either bringing your college friends, or bringing your nieces and nephews). Don't forget to include length of stay when making your predictions!
+
+:::
+
+:::{.question}
+#### Question 8
+
+If $Y \sim Poisson(\lambda)$, then $P(Y = 0) = e^{-\lambda}$.
+
+Using this information, calculate the predicted probability that your group catches 0 fish, if you bring your nieces and nephews. (You *will* go fishing, but you might not catch anything)
+
+:::
+
+### Inference
+
+In question 8 you calculated a predicted probability, but this is just a point estimate. Remember that you want to be confident that the probability of catching at least 1 fish is at least 80%.
+
+So, let's calculate a confidence interval!
+
+As you have hopefully spotted, calculating the confidence interval will require dealing with a linear combination, which means we need to work with the variance-covariance matrix again. In class, we talked about the variance of a linear combination of two random variables. Here we actually have *four* random variables involved in our prediction: $\widehat{\beta}_0$, $\widehat{\beta}_1$, $\widehat{\beta}_2$, and $\widehat{\beta}_3$. This makes finding the variance of the linear combination a bit more difficult.
+
+The variance we want is 
+
+$$Var(\widehat{\beta}_0 + \widehat{\beta}_1 + 3 \widehat{\beta}_2 + 4 \widehat{\beta}_3)$$
+
+In R, we can estimate this variance by:
+
+```{r}
+combo <- c(1, 1, 3, 4)
+vcov_pois <- vcov(m_zip)[1:4, 1:4]
+
+c(t(combo) %*% vcov_pois %*% combo)
+```
+
+(You can use this code to get the variance of the linear combination directly. You do not need to work with the variance-covariance matrix by hand on this assignment!)
+
+:::{.question}
+#### Question 9
+
+Using the information above, construct a confidence interval for
+
+$$\beta_0 + \beta_1 + 3 \beta_2 + 4 \beta_3$$
+
+:::
+
+:::{.question}
+#### Question 10
+
+By transforming the confidence interval from question 9, create a confidence interval for the probability of catching *at least one fish*, for a group with the following characteristics:
+
+* going fishing
+* camper van
+* staying 5 days
+* 3 children
+* 4 people total
+
+:::
+
+:::{.question}
+#### Question 11
+
+Based on your confidence interval from question 10, who do you bring on your fishing trip?
+
+:::
+
+
+
+
+```{r, include=F}
+l_est <- sum(coef(m_zip)[1:4] * combo)
+ci_lower <- l_est - 1.96*sqrt(c(t(combo) %*% vcov_pois %*% combo))
+ci_upper <- l_est + 1.96*sqrt(c(t(combo) %*% vcov_pois %*% combo))
+
+exp(-exp(l_est)*5)
+exp(-exp(ci_lower)*5)
+```
+
+
+
+
+
