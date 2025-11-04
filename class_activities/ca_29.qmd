@@ -1,0 +1,67 @@
+---
+title: "Class activity"
+format: html
+---
+
+**Instructions:** There is nothing you need to submit for this class activity. Play around with the simulation, and see how each parameter influences the resulting data!
+
+# Simulating data from a mixed effects model
+
+The code below simulates data from a mixed effects model, and creates boxplots showing the distribution:
+
+```{r, eval=F}
+library(tidyverse)
+
+# simulate flipped classroom data
+# 15 classrooms (professors), 5 from each teaching style,
+# with 25 students per class
+flipped_data <- data.frame(professor = rep(1:15, each=25),
+                           style = factor(rep(c("no flip", 
+                                                "some flip",
+                                                "full flip"), 
+                                              each=125), 
+                                          levels = c("no flip", 
+                                                     "some flip", 
+                                                     "full flip")))
+
+# true parameters for the underlying mixed effects model                          
+beta0 <- 80
+beta1 <- 5
+beta2 <- 3
+sigma2 <- 2
+sigma2_u <- 1
+
+# simulate the random effect terms
+# there is one random effect per group (class)
+random_effects <- rnorm(15, sd = sqrt(sigma2_u))
+
+# create simulated test scores
+flipped_data$test_scores <- beta0 + 
+  beta1*(flipped_data$style == "some flip") +
+  beta2*(flipped_data$style == "full flip") + 
+  rnorm(nrow(flipped_data), sd = sqrt(sigma2)) +
+  random_effects[flipped_data$professor]
+
+# plot scores for each class (professor), colored by teaching style
+flipped_data |>
+  ggplot(aes(x = as.factor(professor), y = test_scores,
+             color = style)) +
+  geom_boxplot(lwd=1) +
+  labs(x = "Professor", y = "Score") +
+  theme_classic()
+```
+
+1. Run the code, and experiment with changing the parameters. What happens when you increase/decrease $\sigma_u^2$ (`sigma2_u` in the code)? What about when you change $\sigma_\varepsilon^2$ (`sigma2` in the code)? What about $\beta_1$ and $\beta_2$?
+
+2. Now run the code below to fit the mixed effects model. Which pieces of the output correspond to the simulation parameters?
+  * `test_scores ~ style + (1|professor)` means that `test_scores` is the response, `style` is a fixed effect, and `professor` is a random effect. In particular, we have a random *intercept* for each professor
+
+```{r, eval=F}
+library(lme4)
+
+mixed_mod <- lmer(test_scores ~ style + (1|professor), data = flipped_data)
+summary(mixed_mod)
+```
+
+
+

@@ -11,6 +11,7 @@ November 3
 
 November 5
 : Intro to mixed effects
+  : [slides](https://sta214-f25.github.io/slides/lecture_29.pdf), [activity](https://sta214-f25.github.io/class_activities/ca_29.html)
     
 November 7
 : Intro to mixed effects
