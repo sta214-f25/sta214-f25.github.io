@@ -16,3 +16,6 @@ November 5
 November 7
 : Intro to mixed effects
   : [slides](https://sta214-f25.github.io/slides/lecture_30.pdf), [activity 1](https://sta214-f25.github.io/class_activities/ca_30_handout.pdf), [activity 2](https://sta214-f25.github.io/class_activities/ca_30_handout_2.pdf)
+  
+: **HW 8 released**{: .label .label-yellow }
+  : [HW 8](https://sta214-f25.github.io/homework/hw_08.html)

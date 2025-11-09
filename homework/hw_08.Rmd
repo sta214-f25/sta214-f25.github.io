@@ -1,0 +1,99 @@
+---
+title: "Homework 8"
+output: 
+  rmdformats::robobook:
+    css: "homework.css"
+    highlight: pygments
+link-citations: yes
+editor_options: 
+  chunk_output_type: console
+---
+
+**Due:** Monday, November 17, 11:59pm on Canvas
+
+**Instructions:** 
+
+Begin by downloading the HW 8 template from the course website:
+
+[https://sta214-f25.github.io/homework/hw_08_template.qmd](https://sta214-f25.github.io/homework/hw_08_template.qmd)
+
+Save this template file to your computer, then open it in RStudio. As you complete the assignment, you will write down your answers to all questions in the file, and include all R code in code chunks.
+
+When you have completed the assignment, render your homework to HTML and submit on Canvas. 
+
+**Guidelines:**
+
+* *You must submit the rendered HTML on Canvas to receive full credit!*
+* The course codebook has examples of writing math in Quarto and R Markdown documents. If your rendered math does not display correctly, or is hard to read, you will not receive full credit
+* If a question requires code, and code is not provided, you will not receive full credit
+* You will be graded on the quality of your code. In addition to being correct, your code should also be easy to read
+
+
+# Simulation study
+
+We introduced ZIP models as a method to handle zero-inflation in count data. But what happens if we just ignore the zero-inflation, and fit a simpler count model (e.g., a Poisson model) instead? The goal of this section is to use simulations to explore what happens when we ignore possible zero-inflation.
+
+The code below generates data $(X_1, Y_1),...,(X_n, Y_n)$ from the model
+$$X_i \sim N(0, 1)$$
+$$P(Y_i = y) = \begin{cases} e^{-\lambda_i}(1 - \alpha_i) + \alpha_i & y = 0 \\ \dfrac{e^{-\lambda_i} \lambda_i^y}{y!}(1 - \alpha_i) & y > 0 \end{cases}$$
+$$\log \left( \dfrac{\alpha_i}{1 - \alpha_i} \right) = \gamma_0$$
+$$\log(\lambda_i) = \beta_0 + \beta_1 X_i$$
+and then fits two models: a Poisson model, and a ZIP model.
+
+```{r, eval=F}
+library(pscl)
+
+# simulate data
+n <- 1000
+x <- rnorm(n)
+gamma0 <- 0
+beta0 <- 1
+beta1 <- 1
+alpha <- exp(gamma0)/(1 + exp(gamma0))
+lambda <- exp(beta0 + beta1*x)
+z <- rbinom(n, 1, prob=alpha)
+y <- 0*z + rpois(n, lambda)*(1 - z)
+
+# fit Poisson and ZIP models
+m_pois <- glm(y ~ x, family = poisson)
+m_zip <- zeroinfl(y ~ x | x)
+```
+
+
+
+:::{.question}
+#### Question 1
+
+(a)  Run the provided code, and report the estimated coefficients for the Poisson and ZIP models. Which estimates of $\widehat{\beta}_0$ and $\widehat{\beta}_1$ are closer to the truth -- the Poisson estimates or the ZIP estimates?
+
+(b) Calculate a 95\% confidence interval for $\beta_1$ using the Poisson model. Does your interval contain $\beta_1$?
+
+(c) Calculate a 95\% confidence interval for $\beta_1$ using the ZIP model. Does your interval contain $\beta_1$?
+:::
+
+:::{.question}
+#### Question 2
+
+Repeat question 1 many times. What fraction of your confidence intervals contain $\beta_1$ for the Poisson model? For the ZIP model?
+
+:::
+
+In the simple ZIP model above, $\gamma_0$ controls the amount of zero-inflation. When $\gamma_0 = 0$, 50\% of the data will be excess 0s. Smaller (more negative) values of $\gamma_0$ result in less zero-inflation, while larger values of $\gamma_0$ result in more zero-inflation.
+
+:::{.question}
+#### Question 3
+
+(a) Repeat question 2 for different values of $\gamma_0$, and make a plot showing the coverage of Poisson and ZIP confidence intervals for different values of $\gamma_0$.
+
+(b) At what value of $\gamma_0$ do we see a noticeable difference in coverage for the Poisson and ZIP model intervals?
+
+:::
+
+
+
+
+
+
+
+
+
