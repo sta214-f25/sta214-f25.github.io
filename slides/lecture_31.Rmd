@@ -1,0 +1,967 @@
+---
+title: Linear mixed effects models
+output:
+  xaringan::moon_reader:
+    css: "lab-slides.css"
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+editor_options: 
+  chunk_output_type: console
+---
+
+### Data: flipped classrooms?
+
+.large[
+Data set has 375 rows (one per student), and the following variables:
+
+* `professor`: which professor taught the class (1 -- 15)
+* `style`: which teaching style the professor used (no flip, some flip, fully flipped)
+* `score`: the student's score on the final exam
+]
+
+---
+
+### Interpretation
+
+.large[
+\begin{align}
+Score_{ij} &= \beta_0 + \beta_1 \text{SomeFlipped}_i + \beta_2 \text{FullyFlipped}_i + u_i + \varepsilon_{ij}
+\end{align}
+
+$\varepsilon_{ij} \overset{iid}{\sim} N(0, \sigma_\varepsilon^2) \hspace{1cm} u_i \overset{iid}{\sim} N(0, \sigma_u^2)$
+]
+
+.large[
+* $\widehat{\beta}_0 = 77.66$, $\hspace{1cm} \widehat{\beta}_1 = 11.07$, $\hspace{1cm} \widehat{\beta}_2 = 2.81$
+* $\widehat{\sigma}_\varepsilon^2 = 4.25$, $\hspace{1cm} \widehat{\sigma}_u^2 = 21.37$
+
+.question[
+How do I interpret $\widehat{\beta}_1 = 11.07$ and $\widehat{\beta}_2 = 2.81$?
+]
+]
+
+.large[
+We expect that, on average, scores in some-flipped classes are 11.07 points higher than for no-flipped classes.
+
+We expect that, on average, scores in fully-flipped classes are 2.81 points higher than for no-flipped classes.
+]
+
+---
+
+### Interpretation
+
+.large[
+\begin{align}
+Score_{ij} &= \beta_0 + \beta_1 \text{SomeFlipped}_i + \beta_2 \text{FullyFlipped}_i + u_i + \varepsilon_{ij}
+\end{align}
+
+$\varepsilon_{ij} \overset{iid}{\sim} N(0, \sigma_\varepsilon^2) \hspace{1cm} u_i \overset{iid}{\sim} N(0, \sigma_u^2)$
+]
+
+.large[
+* $\widehat{\beta}_0 = 77.66$, $\hspace{1cm} \widehat{\beta}_1 = 11.07$, $\hspace{1cm} \widehat{\beta}_2 = 2.81$
+* $\widehat{\sigma}_\varepsilon^2 = 4.25$, $\hspace{1cm} \widehat{\sigma}_u^2 = 21.37$
+
+.question[
+How do I interpret $\hspace{1cm} \widehat{\sigma}_u^2 = 21.37$?
+]
+]
+
+---
+
+### Interpretation
+
+.large[
+\begin{align}
+Score_{ij} &= \beta_0 + \beta_1 \text{SomeFlipped}_i + \beta_2 \text{FullyFlipped}_i + u_i + \varepsilon_{ij}
+\end{align}
+
+$\varepsilon_{ij} \overset{iid}{\sim} N(0, \sigma_\varepsilon^2) \hspace{1cm} u_i \overset{iid}{\sim} N(0, \sigma_u^2)$
+]
+
+.large[
+* $\widehat{\beta}_0 = 77.66$, $\hspace{1cm} \widehat{\beta}_1 = 11.07$, $\hspace{1cm} \widehat{\beta}_2 = 2.81$
+* $\widehat{\sigma}_\varepsilon^2 = 4.25$, $\hspace{1cm} \widehat{\sigma}_u^2 = 21.37$
+
+.question[
+How do I interpret $\hspace{1cm} \widehat{\sigma}_u^2 = 21.37$?
+]
+]
+
+.large[
+The average score varies from professor to professor by about 4.62 ( $= \sqrt{21.37}$ ) points
+]
+
+---
+
+### Interpretation
+
+.large[
+\begin{align}
+Score_{ij} &= \beta_0 + \beta_1 \text{SomeFlipped}_i + \beta_2 \text{FullyFlipped}_i + u_i + \varepsilon_{ij}
+\end{align}
+
+$\varepsilon_{ij} \overset{iid}{\sim} N(0, \sigma_\varepsilon^2) \hspace{1cm} u_i \overset{iid}{\sim} N(0, \sigma_u^2)$
+]
+
+.large[
+* $\widehat{\beta}_0 = 77.66$, $\hspace{1cm} \widehat{\beta}_1 = 11.07$, $\hspace{1cm} \widehat{\beta}_2 = 2.81$
+* $\widehat{\sigma}_\varepsilon^2 = 4.25$, $\hspace{1cm} \widehat{\sigma}_u^2 = 21.37$
+
+.question[
+How do I interpret $\widehat{\sigma}_\varepsilon^2 = 4.25$?
+]
+]
+
+---
+
+### Interpretation
+
+.large[
+\begin{align}
+Score_{ij} &= \beta_0 + \beta_1 \text{SomeFlipped}_i + \beta_2 \text{FullyFlipped}_i + u_i + \varepsilon_{ij}
+\end{align}
+
+$\varepsilon_{ij} \overset{iid}{\sim} N(0, \sigma_\varepsilon^2) \hspace{1cm} u_i \overset{iid}{\sim} N(0, \sigma_u^2)$
+]
+
+.large[
+* $\widehat{\beta}_0 = 77.66$, $\hspace{1cm} \widehat{\beta}_1 = 11.07$, $\hspace{1cm} \widehat{\beta}_2 = 2.81$
+* $\widehat{\sigma}_\varepsilon^2 = 4.25$, $\hspace{1cm} \widehat{\sigma}_u^2 = 21.37$
+
+.question[
+How do I interpret $\widehat{\sigma}_\varepsilon^2 = 4.25$?
+]
+]
+
+.large[
+Within a class, students' scores vary by about  2.06 ( $= \sqrt{4.25}$ ) points
+]
+
+---
+
+### Intra-class correlation
+
+.pull-left[
+```{r echo=F, message=F, warning=F, fig.width=7, fig.height=4, fig.align='center'}
+
+library(latex2exp)
+library(tidyverse)
+
+ann_text_1 <- data.frame(score = 80, professor = 5.5,
+                         style = factor("no flip",
+                                        levels = c("no flip", "some flip", "full flip")))
+
+ann_text_2 <- data.frame(score = 80, professor = 5.5,
+                         style = factor("some flip",
+                                        levels = c("no flip", "some flip", "full flip")))
+
+ann_text_3 <- data.frame(score = 80, professor = 5.5,
+                         style = factor("full flip",
+                                        levels = c("no flip", "some flip", "full flip")))
+
+set.seed(3)
+
+mean_scores <- c(84, 78, 76, 82, 83,
+                     82, 80, 90, 91, 87,
+                     79, 80, 83, 82, 85)
+
+data.frame(professor = rep(1:15, each=25),
+           style = factor(rep(c("no flip", "some flip", "full flip"),
+                                 each=125),
+                             levels = c("no flip", "some flip", "full flip"))) %>%
+  mutate(score = rnorm(375, mean = mean_scores[professor], sd = 6),
+         professor = rep(rep(1:5, each=25), 3)) %>%
+  ggplot(aes(x = as.factor(professor), y = score)) +
+  geom_boxplot(lwd=1) +
+  facet_wrap(~style) +
+  scale_y_continuous(breaks = c(80, 83, 87),
+                     labels = c(TeX("$\\beta_0"),
+                                TeX("$\\beta_0 + \\beta_2"),
+                                TeX("$\\beta_0 + \\beta_1"))) +
+  labs(x = "Professor", y = "Score") +
+  theme_classic() +
+  theme(text = element_text(size = 30),
+        axis.text.x=element_blank(),
+        axis.text.y = element_text(size=20)) +
+  geom_segment(aes(x = 0.5, y = 80,
+                   xend = 5.5, yend = 80),
+               data = ann_text_1,
+               lwd = 1, lty=3) +
+  geom_segment(aes(x = 0.5, y = 87,
+                   xend = 5.5, yend = 87),
+               data = ann_text_2,
+               lwd = 1, lty=3) +
+  geom_segment(aes(x = 0.5, y = 83,
+                   xend = 5.5, yend = 83),
+               data = ann_text_3,
+               lwd = 1, lty=3)
+```
+
+.large[
+$\sigma_\varepsilon^2$ is large relative to $\sigma_u^2$
+]
+]
+
+.pull-right[
+```{r echo=F, message=F, warning=F, fig.width=7, fig.height=4, fig.align='center'}
+
+ann_text_1 <- data.frame(score = 80, professor = 5.5,
+                         style = factor("no flip",
+                                        levels = c("no flip", "some flip", "full flip")))
+
+ann_text_2 <- data.frame(score = 80, professor = 5.5,
+                         style = factor("some flip",
+                                        levels = c("no flip", "some flip", "full flip")))
+
+ann_text_3 <- data.frame(score = 80, professor = 5.5,
+                         style = factor("full flip",
+                                        levels = c("no flip", "some flip", "full flip")))
+
+set.seed(3)
+
+mean_scores <- c(84, 78, 76, 82, 83,
+                     82, 80, 90, 91, 87,
+                     79, 80, 83, 82, 85)
+
+diffs <- mean_scores - rep(c(80, 87, 83), each=5)
+
+mean_scores <- rep(c(80, 87, 83), each=5) + 3*diffs
+
+data.frame(professor = rep(1:15, each=25),
+           style = factor(rep(c("no flip", "some flip", "full flip"),
+                                 each=125),
+                             levels = c("no flip", "some flip", "full flip"))) %>%
+  mutate(score = rnorm(375, mean = mean_scores[professor], sd = 2),
+         professor = rep(rep(1:5, each=25), 3)) %>%
+  ggplot(aes(x = as.factor(professor), y = score)) +
+  geom_boxplot(lwd=1) +
+  facet_wrap(~style) +
+  scale_y_continuous(breaks = c(80, 83, 87),
+                     labels = c(TeX("$\\beta_0"),
+                                TeX("$\\beta_0 + \\beta_2"),
+                                TeX("$\\beta_0 + \\beta_1"))) +
+  labs(x = "Professor", y = "Score") +
+  theme_classic() +
+  theme(text = element_text(size = 30),
+        axis.text.x=element_blank(),
+        axis.text.y = element_text(size=20)) +
+  geom_segment(aes(x = 0.5, y = 80,
+                   xend = 5.5, yend = 80),
+               data = ann_text_1,
+               lwd = 1, lty=3) +
+  geom_segment(aes(x = 0.5, y = 87,
+                   xend = 5.5, yend = 87),
+               data = ann_text_2,
+               lwd = 1, lty=3) +
+  geom_segment(aes(x = 0.5, y = 83,
+                   xend = 5.5, yend = 83),
+               data = ann_text_3,
+               lwd = 1, lty=3)
+```
+
+.large[
+$\sigma_\varepsilon^2$ is small relative to $\sigma_u^2$
+]
+]
+
+.large[
+* Observations within a group are *more correlated* when $\sigma_\varepsilon^2$ is small relative to $\sigma_u^2$
+* **Intra-class correlation:** $\rho_{group} = \dfrac{\sigma_u^2}{\sigma_u^2 + \sigma_\varepsilon^2} = \dfrac{\text{between group variance}}{\text{total variance}}$
+]
+
+---
+
+### Intra-class correlation
+
+.large[
+\begin{align}
+Score_{ij} &= \beta_0 + \beta_1 \text{SomeFlipped}_i + \beta_2 \text{FullyFlipped}_i + u_i + \varepsilon_{ij}
+\end{align}
+
+$\varepsilon_{ij} \overset{iid}{\sim} N(0, \sigma_\varepsilon^2) \hspace{1cm} u_i \overset{iid}{\sim} N(0, \sigma_u^2)$
+]
+
+.large[
+* $\widehat{\beta}_0 = 77.66$, $\hspace{1cm} \widehat{\beta}_1 = 11.07$, $\hspace{1cm} \widehat{\beta}_2 = 2.81$
+* $\widehat{\sigma}_\varepsilon^2 = 4.25$, $\hspace{1cm} \widehat{\sigma}_u^2 = 21.37$
+
+$$\widehat{\rho}_{group} = \dfrac{21.37}{21.37 + 4.25} = 0.83$$
+]
+
+.large[
+So 83% of the variation in student's scores can be explained by differences in average scores from class to class (after accounting for teaching style). That's huge!
+]
+
+---
+
+### Class activity
+
+.large[
+Work on the class activity (handout).
+]
+
+---
+
+### Class activity
+
+.large[
+.question[
+Interpret the estimate fixed effect coefficients $\widehat{\beta}_0$ and $\widehat{\beta}_1$.
+]
+]
+
+---
+
+### Class activity
+
+.large[
+.question[
+Interpret the estimate fixed effect coefficients $\widehat{\beta}_0$ and $\widehat{\beta}_1$.
+]
+]
+
+.large[
+On average (across neighborhoods), we expect that the price of rental with 0 overall satisfaction is $27.28.
+
+For a fixed neighborhood, an increase of 1 point in overall satisfaction is associated with an increase of $14.81 in rental price.
+]
+
+---
+
+### Class activity
+
+.large[
+.question[
+Calculate and interpret the estimated intra-class correlation.
+]
+]
+
+---
+
+### Class activity
+
+.large[
+.question[
+Calculate and interpret the estimated intra-class correlation.
+]
+]
+
+.large[
+$\widehat{\rho}_{group} = \dfrac{1048}{1048 + 6762} = 0.134$
+
+About 13% of the variability in price can be explained by differences in the average price between neighborhoods (after accounting for overall satisfaction).
+]
+
+---
+
+### Assumptions
+
+.large[
+$$Price_{ij} = \beta_0 + \beta_1 Satisfaction_{ij} + u_i + \varepsilon_{ij}$$
+$u_i \overset{iid}{\sim} N(0, \sigma_u^2) \hspace{1cm} \varepsilon_{ij} \overset{iid}{\sim} N(0, \sigma_\varepsilon^2)$
+
+where $Price_{ij}$ is the price of rental $j$ in neighborhood $i$
+]
+
+.large[
+.question[
+What assumptions are we making in this mixed effects model?
+]
+]
+
+---
+
+### Assumptions
+
+.large[
+$$Price_{ij} = \beta_0 + \beta_1 Satisfaction_{ij} + u_i + \varepsilon_{ij}$$
+$u_i \overset{iid}{\sim} N(0, \sigma_u^2) \hspace{1cm} \varepsilon_{ij} \overset{iid}{\sim} N(0, \sigma_\varepsilon^2)$
+]
+
+.large[
+* **Shape:** 
+  * the overall relationship between satisfaction and price is linear
+  * The slope is the *same* for each neighborhood
+]
+
+---
+
+### Assumptions
+
+.large[
+$$Price_{ij} = \beta_0 + \beta_1 Satisfaction_{ij} + u_i + \varepsilon_{ij}$$
+$u_i \overset{iid}{\sim} N(0, \sigma_u^2) \hspace{1cm} \varepsilon_{ij} \overset{iid}{\sim} N(0, \sigma_\varepsilon^2)$
+]
+
+.large[
+* **Independence:** 
+  * random effects are independent
+  * observations within neighborhoods are independent after accounting for the random effect (i.e., the random effect captures the correlation within neighborhoods)
+  * observations from different neighborhoods are independent
+]
+
+---
+
+### Assumptions
+
+.large[
+$$Price_{ij} = \beta_0 + \beta_1 Satisfaction_{ij} + u_i + \varepsilon_{ij}$$
+$u_i \overset{iid}{\sim} N(0, \sigma_u^2) \hspace{1cm} \varepsilon_{ij} \overset{iid}{\sim} N(0, \sigma_\varepsilon^2)$
+]
+
+.large[
+* **Normality:** Both $u_i \sim N(0, \sigma_u^2)$ and $\varepsilon_{ij} \sim N(0, \sigma_\varepsilon^2)$
+* **Constant variance:** 
+  * $\varepsilon_{ij}$ has the same variance $\sigma_\varepsilon^2$ regardless of satisfaction or neighborhood
+]
+
+---
+
+### Checking assumptions
+
+.large[
+$$Price_{ij} = \beta_0 + \beta_1 Satisfaction_{ij} + u_i + \varepsilon_{ij}$$
+$u_i \overset{iid}{\sim} N(0, \sigma_u^2) \hspace{1cm} \varepsilon_{ij} \overset{iid}{\sim} N(0, \sigma_\varepsilon^2)$
+]
+
+.large[
+* **Shape assumption:** 
+  * the overall relationship between satisfaction and price is linear
+  * The slope is the *same* for each neighborhood
+* **Constant variance assumption:** 
+  * $\varepsilon_{ij}$ has the same variance $\sigma_\varepsilon^2$ regardless of satisfaction or neighborhood
+  
+.question[
+How do you think we could check the shape and constant variance assumptions?
+]
+]
+
+---
+
+### Residual plots
+
+.large[
+Residuals: $Price_{ij} - \widehat{Price}_{ij}$, where
+
+$$\widehat{Price}_{ij} = \widehat{\beta}_0 + \widehat{\beta}_1 Satisfaction_{ij} + \widehat{u}_i$$
+
+```{r message=F, warning=F, echo=F, fig.align='center', fig.height=5, fig.width=7}
+library(lme4)
+library(tidyverse)
+library(knitr)
+
+bnb <- read.csv("https://raw.githubusercontent.com/proback/BYSH/master/data/airbnb.csv")
+m1 <- lmer(price ~ overall_satisfaction + (1 | neighborhood), data = bnb)
+
+bnb %>%
+  mutate(resids = residuals(m1),
+         preds = predict(m1)) %>%
+  ggplot(aes(x = preds, y = resids)) +
+  geom_point(size=2) +
+  geom_abline(slope = 0, intercept = 0, color="blue", lwd=1.2) +
+  labs(x = "Predicted price", 
+       y = "Residual") +
+  theme_bw() +
+  theme(text = element_text(size = 25))
+```
+]
+
+---
+
+### Residual plots
+
+```{r message=F, warning=F, echo=F, fig.align='center', fig.height=5, fig.width=7}
+
+bnb %>%
+  mutate(resids = residuals(m1),
+         preds = predict(m1)) %>%
+  ggplot(aes(x = preds, y = resids)) +
+  geom_point(size=2) +
+  geom_abline(slope = 0, intercept = 0, color="blue", lwd=1.2) +
+  labs(x = "Predicted price", 
+       y = "Residual") +
+  theme_bw() +
+  theme(text = element_text(size = 25))
+```
+
+.large[
+.question[
+Do the shape and constant variance assumptions look reasonable?
+]
+]
+
+---
+
+
+### Residual plots
+
+```{r message=F, warning=F, echo=F, fig.align='center', fig.height=4, fig.width=6}
+
+bnb %>%
+  mutate(resids = residuals(m1),
+         preds = predict(m1)) %>%
+  ggplot(aes(x = preds, y = resids)) +
+  geom_point(size=2) +
+  geom_abline(slope = 0, intercept = 0, color="blue", lwd=1.2) +
+  labs(x = "Predicted price", 
+       y = "Residual") +
+  theme_bw() +
+  theme(text = element_text(size = 25))
+```
+.large[
+* Linearity seems reasonable
+* We can't assess (yet) whether the slope is actually the same for all neighborhoods
+* Constant variance may be slightly violated (but probably not enough to matter)
+]
+
+---
+
+### Calculating predicted values
+
+.large[
+Residuals: $Price_{ij} - \widehat{Price}_{ij}$, where
+
+$$\widehat{Price}_{ij} = \widehat{\beta}_0 + \widehat{\beta}_1 Satisfaction_{ij} + \widehat{u}_i$$
+
+.question[
+Where do the $\widehat{u}_i$ come from?
+]
+]
+
+---
+
+### Estimated random effects
+
+.large[
+R calculates an estimated random effect for each group (i.e., neighborhood):
+
+```{r}
+m1 <- lmer(price ~ overall_satisfaction + 
+             (1 | neighborhood), 
+           data = bnb)
+coef(m1)
+```
+]
+
+---
+
+### Estimated random effects
+
+.large[
+
+```{r, eval=F}
+coef(m1)
+```
+
+```
+                   (Intercept) overall_satisfaction
+Albany Park          16.367331             14.80912
+Archer Heights        9.863461             14.80912
+Avondale             40.533851             14.80912
+Beverly              21.046464             14.80912
+Bridgeport           13.304517             14.80912
+```
+
+.question[
+What is the same for every neighborhood?
+]
+]
+
+---
+
+### Estimated random effects
+
+.large[
+
+```{r, eval=F}
+coef(m1)
+```
+
+```
+                   (Intercept) overall_satisfaction
+Albany Park          16.367331             14.80912
+Archer Heights        9.863461             14.80912
+Avondale             40.533851             14.80912
+Beverly              21.046464             14.80912
+Bridgeport           13.304517             14.80912
+```
+
+.question[
+What is the same for every neighborhood?
+]
+]
+
+.large[
+The slope ( $\widehat{\beta}_1$ )
+]
+
+---
+
+### Estimated random effects
+
+.large[
+
+```{r, eval=F}
+coef(m1)
+```
+
+```
+                   (Intercept) overall_satisfaction
+Albany Park          16.367331             14.80912
+Archer Heights        9.863461             14.80912
+Avondale             40.533851             14.80912
+Beverly              21.046464             14.80912
+Bridgeport           13.304517             14.80912
+```
+
+.question[
+What is *different* for each neighborhood?
+]
+]
+
+
+
+---
+
+### Estimated random effects
+
+.large[
+
+```{r, eval=F}
+coef(m1)
+```
+
+```
+                   (Intercept) overall_satisfaction
+Albany Park          16.367331             14.80912
+Archer Heights        9.863461             14.80912
+Avondale             40.533851             14.80912
+Beverly              21.046464             14.80912
+Bridgeport           13.304517             14.80912
+```
+
+.question[
+What is *different* for each neighborhood?
+]
+]
+
+.large[
+The intercept ( $\widehat{\beta}_0 + \widehat{u}_i$ )
+]
+
+---
+
+### Estimated random effects
+
+.large[
+
+```
+                   (Intercept) overall_satisfaction
+Albany Park          16.367331             14.80912
+Archer Heights        9.863461             14.80912
+Avondale             40.533851             14.80912
+Beverly              21.046464             14.80912
+Bridgeport           13.304517             14.80912
+```
+
+.question[
+How do I get the random effect estimates $\widehat{u}_i$ ?
+]
+]
+
+---
+
+### Estimated random effects
+
+.large[
+
+```
+                   (Intercept) overall_satisfaction
+Albany Park          16.367331             14.80912
+Archer Heights        9.863461             14.80912
+Avondale             40.533851             14.80912
+Beverly              21.046464             14.80912
+Bridgeport           13.304517             14.80912
+```
+
+.question[
+How do I get the random effect estimates $\widehat{u}_i$ ?
+]
+]
+
+.large[
+The intercept for each neighborhood is $\widehat{\beta}_0 + \widehat{u}_i$
+
+So subtract the estimate $\widehat{\beta}_0$ from the intercept for each neighborhood
+]
+
+---
+
+### Checking assumptions
+
+.large[
+$$Price_{ij} = \beta_0 + \beta_1 Satisfaction_{ij} + u_i + \varepsilon_{ij}$$
+$u_i \overset{iid}{\sim} N(0, \sigma_u^2) \hspace{1cm} \varepsilon_{ij} \overset{iid}{\sim} N(0, \sigma_\varepsilon^2)$
+]
+
+.large[
+* **Normality assumption:** Both $u_i \sim N(0, \sigma_u^2)$ and $\varepsilon_{ij} \sim N(0, \sigma_\varepsilon^2)$
+  
+.question[
+How do you think we could check the normality assumption?
+]
+]
+
+---
+
+### QQ plots
+
+.large[
+**Assumption:** $u_i \sim N(0, \sigma_u^2)$
+
+* Check whether the random effect estimates $\widehat{u}_i$ appear normal with a QQ plot
+
+**Assumption:** $\varepsilon_{ij} \sim N(0, \sigma_\varepsilon^2)$
+
+* Check whether the residuals appear normal with a QQ plot
+]
+
+---
+
+### QQ plot for the residuals
+
+```{r message=F, warning=F, echo=F, fig.align='center', fig.height=5, fig.width=7}
+
+bnb %>%
+  mutate(resids = residuals(m1)) %>%
+  ggplot(aes(sample = resids)) +
+  geom_qq(size=2) +
+  geom_qq_line(color="blue", lwd=1.2) +
+  labs(x = "Theoretical normal quantiles", 
+       y = "Observed residual quantiles") +
+  theme_bw() +
+  theme(text = element_text(size = 25))
+```
+
+.large[
+.question[
+Do the residuals appear normal?
+]
+]
+
+---
+
+### QQ plot for the residuals
+
+```{r message=F, warning=F, echo=F, fig.align='center', fig.height=5, fig.width=7}
+
+bnb %>%
+  mutate(resids = residuals(m1)) %>%
+  ggplot(aes(sample = resids)) +
+  geom_qq(size=2) +
+  geom_qq_line(color="blue", lwd=1.2) +
+  labs(x = "Theoretical normal quantiles", 
+       y = "Observed residual quantiles") +
+  theme_bw() +
+  theme(text = element_text(size = 25))
+```
+
+.large[
+.question[
+Do the residuals appear normal?
+]
+]
+
+.large[
+No -- though the sample size is large, so it might not matter
+]
+
+---
+
+### QQ plot for the random effects
+
+```{r message=F, warning=F, echo=F, fig.align='center', fig.height=5, fig.width=7}
+
+data.frame(re = coef(m1)$neighborhood[,1] - summary(m1)$coefficients[2,1]) %>%
+  ggplot(aes(sample = re)) +
+  geom_qq(size=2) +
+  geom_qq_line(color="blue", lwd=1.2) +
+  labs(x = "Theoretical normal quantiles", 
+       y = "Observed random effect quantiles") +
+  theme_bw() +
+  theme(text = element_text(size = 20))
+```
+
+.large[
+.question[
+Do the random effects appear normal?
+]
+]
+
+---
+
+### QQ plot for the random effects
+
+```{r message=F, warning=F, echo=F, fig.align='center', fig.height=5, fig.width=7}
+
+data.frame(re = coef(m1)$neighborhood[,1] - summary(m1)$coefficients[2,1]) %>%
+  ggplot(aes(sample = re)) +
+  geom_qq(size=2) +
+  geom_qq_line(color="blue", lwd=1.2) +
+  labs(x = "Theoretical normal quantiles", 
+       y = "Observed random effect quantiles") +
+  theme_bw() +
+  theme(text = element_text(size = 20))
+```
+
+.large[
+.question[
+Do the random effects appear normal?
+]
+]
+
+.large[
+No -- and this could be more problematic
+]
+
+---
+
+### Addressing assumption violations
+
+
+.pull-left[
+```{r message=F, warning=F, echo=F, fig.align='center', fig.height=4, fig.width=6}
+
+bnb %>%
+  mutate(resids = residuals(m1)) %>%
+  ggplot(aes(sample = resids)) +
+  geom_qq(size=2) +
+  geom_qq_line(color="blue", lwd=1.2) +
+  labs(x = "Theoretical normal quantiles", 
+       y = "Observed residual quantiles") +
+  theme_bw() +
+  theme(text = element_text(size = 20))
+```
+]
+
+.pull-right[
+```{r message=F, warning=F, echo=F, fig.align='center', fig.height=4, fig.width=6}
+
+data.frame(re = coef(m1)$neighborhood[,1] - summary(m1)$coefficients[2,1]) %>%
+  ggplot(aes(sample = re)) +
+  geom_qq(size=2) +
+  geom_qq_line(color="blue", lwd=1.2) +
+  labs(x = "Theoretical normal quantiles", 
+       y = "Observed random effect quantiles") +
+  theme_bw() +
+  theme(text = element_text(size = 20))
+```
+]
+
+.large[
+.question[
+How could we address violations of the normality assumptions?
+]
+]
+
+---
+
+### Addressing assumption violations
+
+
+.pull-left[
+```{r message=F, warning=F, echo=F, fig.align='center', fig.height=4, fig.width=6}
+
+bnb %>%
+  mutate(resids = residuals(m1)) %>%
+  ggplot(aes(sample = resids)) +
+  geom_qq(size=2) +
+  geom_qq_line(color="blue", lwd=1.2) +
+  labs(x = "Theoretical normal quantiles", 
+       y = "Observed residual quantiles") +
+  theme_bw() +
+  theme(text = element_text(size = 20))
+```
+]
+
+.pull-right[
+```{r message=F, warning=F, echo=F, fig.align='center', fig.height=4, fig.width=6}
+
+data.frame(re = coef(m1)$neighborhood[,1] - summary(m1)$coefficients[2,1]) %>%
+  ggplot(aes(sample = re)) +
+  geom_qq(size=2) +
+  geom_qq_line(color="blue", lwd=1.2) +
+  labs(x = "Theoretical normal quantiles", 
+       y = "Observed random effect quantiles") +
+  theme_bw() +
+  theme(text = element_text(size = 20))
+```
+]
+
+.large[
+.question[
+How could we address violations of the normality assumptions?
+]
+]
+
+.large[
+Transformations!
+]
+
+---
+
+### Transformations
+
+.large[
+$$\log(Price_{ij}) = \beta_0 + \beta_1 Satisfaction_{ij} + u_i + \varepsilon_{ij}$$
+$u_i \overset{iid}{\sim} N(0, \sigma_u^2) \hspace{1cm} \varepsilon_{ij} \overset{iid}{\sim} N(0, \sigma_\varepsilon^2)$
+]
+
+```{r include =F}
+m1 <- lmer(log(price) ~ overall_satisfaction + (1 | neighborhood), data = bnb)
+```
+
+.pull-left[
+```{r message=F, warning=F, echo=F, fig.align='center', fig.height=4, fig.width=6}
+
+bnb %>%
+  mutate(resids = residuals(m1)) %>%
+  ggplot(aes(sample = resids)) +
+  geom_qq(size=2) +
+  geom_qq_line(color="blue", lwd=1.2) +
+  labs(x = "Theoretical normal quantiles", 
+       y = "Observed residual quantiles") +
+  theme_bw() +
+  theme(text = element_text(size = 20))
+```
+]
+
+.pull-right[
+```{r message=F, warning=F, echo=F, fig.align='center', fig.height=4, fig.width=6}
+
+data.frame(re = coef(m1)$neighborhood[,1] - summary(m1)$coefficients[2,1]) %>%
+  ggplot(aes(sample = re)) +
+  geom_qq(size=2) +
+  geom_qq_line(color="blue", lwd=1.2) +
+  labs(x = "Theoretical normal quantiles", 
+       y = "Observed random effect quantiles") +
+  theme_bw() +
+  theme(text = element_text(size = 20))
+```
+]
+
+.large[
+* Transformations can help with both the residuals and random effects
+]
+
+
+
+
+
+
+
+
