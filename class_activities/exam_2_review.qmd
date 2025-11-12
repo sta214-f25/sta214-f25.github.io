@@ -1,0 +1,159 @@
+---
+title: "Exam 2 review questions"
+format: html
+---
+
+Below are questions to help you study for Exam 2. These are some examples of the kinds of questions I might ask.
+
+* This is not a practice exam.
+* The questions cover most, but not all, possible material for the exam.
+* The distribution of questions here is not necessarily reflective of the distribution of questions on the actual exam.
+
+## Data
+
+In this activity, you will work with data from the 1977-1978 Australian Health Survey. The `DoctorVisits` data contains information on 5190 respondents, and the researchers analyzing the data are interested in the number of times each respondent visited the doctor in the past 2 weeks. The variables include:
+
+* `visits`: Number of doctor visits in past 2 weeks.
+* `gender`: Factor indicating gender.
+* `age`: Age in years divided by 100.
+* `income`: Annual income in tens of thousands of dollars.
+* `insurance`: type of health insurance. Possible types are None, Private, Free (poor), and Free (repat). Free (poor) indicates free health insurance due to low income, while Free (repat) indicates free health insurance due to old age, disability, or veteran status.
+
+## Questions
+
+### Initial Poisson model
+
+The researchers are interested in modeling the number of doctor visits in the past 2 weeks. Since the number of doctor visits is a count variable, they propose using a Poisson regression model. Below is the output of their fitted model:
+
+```{r, echo=F, message=F, warning=F}
+library(tidyverse)
+library(pscl)
+library(AER)
+library(MASS)
+library(gridExtra)
+library(statmod)
+
+data("DoctorVisits")
+
+DoctorVisits <- DoctorVisits %>%
+  mutate(insurance = ifelse(private == "yes", "private", 
+                                          ifelse(freepoor == "yes", "freepoor",
+                                                 ifelse(freerepat == "yes", "freerepat", "none")))) %>%
+  mutate(insurance = factor(insurance, levels = c("none", "private", "freepoor", "freerepat")))
+
+m1 <- glm(visits ~ gender + age + income + insurance, 
+          family = poisson,
+          data = DoctorVisits)
+summary(m1)
+```
+
+1. Write down the population Poisson model corresponding to the fitted model shown in the R output above.
+
+2. Interpret the estimated slope $\widehat{\beta}_2$ in terms of the number of doctor visits in the past 2 weeks.
+
+3. An offset was not used in this model. Describe a situation in which we might want to use an offset when modeling the number of doctor visits.
+
+4. After accounting for the other variables in the model, is there a relationship between income and the number of doctor visits in the past 2 weeks? Use a hypothesis test to answer this question; you should be able to calculate your test statistic from the output above.
+
+5. What is the estimated number of doctor visits in the past 2 weeks for a male participant, aged 20, with no health insurance, who makes $5000 annually?
+
+### Model diagnostics
+
+The Poisson model assumes that the Poisson distribution is a good choice for the response. What if it isn't? To choose between a Poisson, quasi-Poisson, and negative binomial model, the researchers produce the following output in R:
+
+```{r, echo=F, message=F, warning=F}
+m2 <- glm(visits ~ gender + age + income + insurance, 
+          family = quasipoisson,
+          data = DoctorVisits)
+summary(m2)
+
+m3 <- glm.nb(visits ~ gender + age + income + insurance, 
+          data = DoctorVisits)
+summary(m3)
+```
+
+```{r, echo=F, message=F, warning=F, fig.align='center', fig.width=10, fig.height=4}
+p1 <- DoctorVisits %>%
+  mutate(resids = qresid(m1)) %>%
+  ggplot(aes(x = income, y = resids)) +
+  geom_point() +
+  geom_smooth() +
+  labs(x = "Income", y = "Quantile residuals",
+       title = "Poisson model") +
+  theme_bw()
+
+p2 <- DoctorVisits %>%
+  mutate(resids = qresid(m3)) %>%
+  ggplot(aes(x = income, y = resids)) +
+  geom_point() +
+  geom_smooth() +
+  labs(x = "Income", y = "Quantile residuals",
+       title = "Negative binomial model") +
+  theme_bw()
+
+grid.arrange(p1, p2, ncol=2)
+```
+
+6. Using the R output above, explain which model you would use: the Poisson, quasi-Poisson, or negative binomial. It is possible that more than one model may be suitable for the data.
+
+7. Sketch a quantile residual plot for a Poisson regression fit, which suggests that a negative binomial model is needed.
+
+8. Compare and contrast the quasi-Poisson model with the Poisson model. Which parts of the fitted model are the same? Which parts are different?
+
+9. Using your chosen model from question 6, create a confidence interval for $\beta_2$ (the coefficient on income).
+
+### ZIP models
+
+Concerned about the possibility of zero-inflation, the researchers decide to fit a ZIP model instead:
+
+```{r, echo=F, message=F, warning=F}
+m4 <- zeroinfl(visits ~ gender + age + income + insurance, 
+          data = DoctorVisits)
+summary(m4)
+```
+
+10. What is a potential latent variable which could cause excess 0s in this data?
+
+11. Write down the population ZIP model corresponding to the fitted ZIP model above. Make sure to include the random component!
+
+12. What is the estimated number of doctor visits in the past 2 weeks for a male participant, aged 20, with no health insurance, who makes $5000 annually?
+
+13. What is the estimated probability that a male participant, aged 20, with no health insurance, who makes $5000 annually, did not go to the doctor in the past 2 weeks?
+
+14. What does the logistic component of the ZIP model estimate? (i.e., the component that R calls the `zero-inflation model`, in contrast to the `count model`).
+
+# More questions
+
+(These are unrelated to the data scenario described above)
+
+Suppose we have data $(X_i, Y_i)$ which was generated from the model
+
+$$Y_i \sim NB(\theta, p_i)$$
+
+$$\log(\mu_i) = \beta_0 + \beta_1 X_i$$
+
+15. Write down $Var(Y_i)$ as a function of $\mu_i$ and $\theta$.
+
+16. For a Poisson, the mean and variance are the same. As $\theta$ increases, does the negative binomial look *more* like a Poisson distribution, or *less* like a Poisson distribution? Explain your reasoning.
+
+17. Suppose that we don't know that the correct distribution of $Y_i$ is Negative Binomial. Instead, we fit a Poisson regression model.
+    * Will the estimate $\widehat{\beta}_1$ be a *biased* estimator of the true parameter $\beta_1$? Or will, on average, $\widehat{\beta}_1$ be close to $\beta_1$? Explain, with reference to a simulation study from homework.
+    * Let $SE(\widehat{\beta}_1)_{Poisson}$ be the estimated standard error for $\widehat{\beta}_1$ from the Poisson model (i.e., the value that appears in the "standard error" column of the model output). Will this standard error be too big, too small, or just right?
+    
+18. Using our fitted Poisson regression model, we construct a 95% confidence interval for $\beta_1$. Recall that a "95% confidence interval" means that, if we were to repeat the study many times with many different datasets, 95% of the intervals would contain the true parameter $\beta_1$. The fraction of intervals which capture the true parameter is called the *coverage*. If I construct 95% confidence intervals from a Poisson model, for data that is really negative binomial, what should I expect for the coverage of my intervals? Explain.
+    (a) 95%
+    (b) Less than 95%
+    (c) Greater than 95%
+
+19. Instead of fitting a Poisson model, we consider a quasi-Poisson model. Let $SE(\widehat{\beta}_1)_{QP}$ be the estimated standard error from the quasi-Poisson model.
+    * Provide the equation relating $SE(\widehat{\beta}_1)_{QP}$ to $SE(\widehat{\beta}_1)_{Poisson}$
+    * In the scenario described above (in which the true data come from a negative binomial distribution), do you expect $SE(\widehat{\beta}_1)_{QP}$ to be larger, smaller, or the same as $SE(\widehat{\beta}_1)_{Poisson}$?
+  
+20. How is the dispersion parameter $\phi$ estimated for a Poisson / quasi-Poisson fit? Provide the full formula.
+
+21. If the data truly come from a Poisson distribution, what should be the approximate value of $\widehat{\phi}$?
+
+
+
+
+
