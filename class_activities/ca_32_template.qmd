@@ -1,0 +1,24 @@
+---
+---
+---
+title: "Class activity"
+format: 
+  html:
+    embed-resources: true
+editor: source
+author: "Group members: "
+---
+
+```{r setup, message=F, warning=F}
+library(tidyverse)
+library(lme4)
+music <- read_csv("https://sta214-f25.github.io/class_activities/music.csv")
+```
+
+
+1. 
+
+```{r}
+
+```
+

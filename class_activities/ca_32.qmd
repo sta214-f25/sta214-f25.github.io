@@ -1,0 +1,65 @@
+---
+title: "Class activity"
+format: html
+---
+
+**Instructions:** 
+
+* Work individually or with a neighbor to answer the following questions 
+* To get started, download the [class activity template](https://sta214-f25.github.io/class_activities/ca_32_template.qmd) file
+* When you are finished, render the file as an HTML and submit the HTML to Canvas (let me know if you encounter any problems)
+
+# Data
+
+Anxiety can affect musicians before performances, and can negatively affect their ability to play and their emotional state. In a [2010 study](https://journals.sagepub.com/doi/10.1177/1948550610370492), researchers examined anxiety in 37 undergraduate music majors. For each musician, data was collected on anxiety levels before different performances (between 2 and 15 performances were measured for each musician). Each row in the data represents one performance; in this activity, we will work with the following variables:
+
+* `id`: a unique identifier for the musician
+* `na`: negative affect score (a measure of anxiety)
+* `large`: whether the musician was performing as part of a large ensemble (large = 1), or as part of a small ensemble or solo (large = 0)
+
+The researchers hypothesize that students will be less anxious when performing in large ensembles. Furthermore, the researchers suspect that overall anxiety varies between individuals, but that the effects of ensemble size (large vs. small) are the *same* for each individual. They therefore write down the following mixed effects model:
+
+$$Anxiety_{ij} = \beta_0 + \beta_1 Large_{ij} + u_i + \varepsilon_{ij}$$
+
+$u_i \overset{iid}{\sim} N(0, \sigma_u^2)$, $\varepsilon_{ij} \overset{iid}{\sim} N(0, \sigma_\varepsilon^2)$
+
+
+### Downloading the data
+
+The following code imports the data and saves it as a data frame called `music`:
+
+```r
+music <- read_csv("https://sta214-f25.github.io/class_activities/music.csv")
+```
+
+# Questions
+
+1. Fit the mixed effects model described above.
+
+2. Does the fitted model support the researchers' hypothesis that students will be less anxious when performing in large ensembles? Explain your answer.
+
+3. Does the fitted model support the researchers' hypothesis that there is variability in anxiety between students? Calculate and interpret a statistic that supports your answer, and explain your reasoning.
+
+## Model diagnostics
+
+Now let's check assumptions for our fitted model. 
+
+One assumption our model is making is that the variance of the residual term $\varepsilon_{ij}$ is the same for each student. 
+
+4. Create a scatterplot showing the residuals for your fitted model, plotted against student ID (normally I would suggest boxplots here, but there aren't enough observations for each student). Does it seem plausible that the variance of the residuals is the same for each student?
+    * Just like with a linear regression model, the `residuals` function can be used to extract residuals from the fitted mixed effects model.
+
+Another assumption is that the residual term $\varepsilon_{ij}$ follows a normal distribution.
+
+5. Create a QQ plot for the residuals. Does it seem reasonable to assume normality here?
+    * If you like `ggplot`, then `geom_qq` and `geom_qq_line` may be helpful
+
+Finally, let's look at the distribution of the random effects $u_i$, which we also assume is normal.
+
+6. Create a QQ plot for the estimated random effects $\widehat{u}_i$. Does normality seem plausible?
+    * If your model is called `m1`, then `coef(m1)$id[,1]` will return $\widehat{\beta}_0 + \widehat{u}_i$
+
+
+
+
+
