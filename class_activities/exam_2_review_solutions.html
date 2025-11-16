@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.42">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Exam 2 review questions</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="exam_2_review_solutions_files/libs/clipboard/clipboard.min.js"></script>
+<script src="exam_2_review_solutions_files/libs/quarto-html/quarto.js"></script>
+<script src="exam_2_review_solutions_files/libs/quarto-html/popper.min.js"></script>
+<script src="exam_2_review_solutions_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="exam_2_review_solutions_files/libs/quarto-html/anchor.min.js"></script>
+<link href="exam_2_review_solutions_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="exam_2_review_solutions_files/libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="exam_2_review_solutions_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="exam_2_review_solutions_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="exam_2_review_solutions_files/libs/bootstrap/bootstrap-c0367b04c37547644fece4185067e4a7.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Exam 2 review questions</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Below are questions to help you study for Exam 2. These are some examples of the kinds of questions I might ask.</p>
+<ul>
+<li>This is not a practice exam.</li>
+<li>The questions cover most, but not all, possible material for the exam.</li>
+<li>The distribution of questions here is not necessarily reflective of the distribution of questions on the actual exam.</li>
+</ul>
+<section id="data" class="level2">
+<h2 class="anchored" data-anchor-id="data">Data</h2>
+<p>In this activity, you will work with data from the 1977-1978 Australian Health Survey. The <code>DoctorVisits</code> data contains information on 5190 respondents, and the researchers analyzing the data are interested in the number of times each respondent visited the doctor in the past 2 weeks. The variables include:</p>
+<ul>
+<li><code>visits</code>: Number of doctor visits in past 2 weeks.</li>
+<li><code>gender</code>: Factor indicating gender.</li>
+<li><code>age</code>: Age in years divided by 100.</li>
+<li><code>income</code>: Annual income in tens of thousands of dollars.</li>
+<li><code>insurance</code>: type of health insurance. Possible types are None, Private, Free (poor), and Free (repat). Free (poor) indicates free health insurance due to low income, while Free (repat) indicates free health insurance due to old age, disability, or veteran status.</li>
+</ul>
+</section>
+<section id="questions" class="level2">
+<h2 class="anchored" data-anchor-id="questions">Questions</h2>
+<section id="initial-poisson-model" class="level3">
+<h3 class="anchored" data-anchor-id="initial-poisson-model">Initial Poisson model</h3>
+<p>The researchers are interested in modeling the number of doctor visits in the past 2 weeks. Since the number of doctor visits is a count variable, they propose using a Poisson regression model. Below is the output of their fitted model:</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+glm(formula = visits ~ gender + age + income + insurance, family = poisson, 
+    data = DoctorVisits)
+
+Coefficients:
+                   Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept)        -1.66099    0.09724 -17.081  &lt; 2e-16 ***
+genderfemale        0.18533    0.05664   3.272 0.001068 ** 
+age                 0.90922    0.16166   5.624 1.86e-08 ***
+income             -0.29751    0.08606  -3.457 0.000546 ***
+insuranceprivate    0.14918    0.07088   2.105 0.035319 *  
+insurancefreepoor  -0.40545    0.17989  -2.254 0.024205 *  
+insurancefreerepat  0.25013    0.09264   2.700 0.006931 ** 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for poisson family taken to be 1)
+
+    Null deviance: 5634.8  on 5189  degrees of freedom
+Residual deviance: 5417.7  on 5183  degrees of freedom
+AIC: 7763.3
+
+Number of Fisher Scoring iterations: 6</code></pre>
+</div>
+</div>
+<ol type="1">
+<li>Write down the population Poisson model corresponding to the fitted model shown in the R output above.</li>
+</ol>
+<p><strong>Solution:</strong></p>
+<p><span class="math display">\[Visits_i \sim Poisson(\lambda_i)\]</span></p>
+<p><span class="math display">\[\log(\lambda_i) = \beta_0 + \beta_1 Gender_i + \beta_2 Age_i + \beta_3 Income_i + \beta_4 Private_i + \beta_5FreePoor_i + \beta_6 FreeRepat_i\]</span> where <span class="math inline">\(Gender_i = 0\)</span> if male and <span class="math inline">\(Gender_i = 1\)</span> if female.</p>
+<ol start="2" type="1">
+<li>Interpret the estimated slope <span class="math inline">\(\widehat{\beta}_2\)</span> in terms of the number of doctor visits in the past 2 weeks.</li>
+</ol>
+<p><strong>Solution:</strong> A one-unit increase in respondent age is associated with an increase by a factor of <span class="math inline">\(\exp\{0.90922\} = 2.48\)</span> (i.e., a 148% increase) in the average number of doctor visits in the last two weeks, holding gender, income, and insurance constant.</p>
+<p>Now, a one-unit increase here is pretty meaningless, because a one-unit increase in age would be 100 years. So, let’s instead think about a one-year increase, which would be a change of 0.01 in age. A one-year increase in respondent age is associated with an increase by a factor of <span class="math inline">\(exp\{0.01(0.90922) \} = 1.0091\)</span> (i.e., a 0.9% increase) in the average number of doctor visits in the last two weeks, holding gender, income, and insurance constant.</p>
+<ol start="3" type="1">
+<li>An offset was not used in this model. Describe a situation in which we might want to use an offset when modeling the number of doctor visits.</li>
+</ol>
+<p><strong>Solution:</strong> Offsets are used when observations have different levels of exposure. If we were to record the number of doctor visits over different lengths of time (e.g., over one week for some respondents, 1 year for others), then we would want to include an offset that accounted for this length of time.</p>
+<ol start="4" type="1">
+<li>After accounting for the other variables in the model, is there a relationship between income and the number of doctor visits in the past 2 weeks? Use a hypothesis test to answer this question; you should be able to calculate your test statistic from the output above.</li>
+</ol>
+<p><strong>Solution:</strong> Our hypotheses are</p>
+<p><span class="math display">\[H_0: \beta_3 = 0 \hspace{1cm} H_A: \beta_3 \neq 0\]</span> We can use a <span class="math inline">\(z\)</span>-test to test these hypotheses. The observed test statistic is -3.457 and the p-value is 0.000546; so, we have evidence against the null hypothesis that there is no relationship between income and the number of doctor visits.</p>
+<ol start="5" type="1">
+<li>What is the estimated number of doctor visits in the past 2 weeks for a male participant, aged 20, with no health insurance, who makes $5000 annually?</li>
+</ol>
+<p><strong>Solution:</strong></p>
+<p><span class="math display">\[\widehat{\lambda}_i = \exp\{-1.661 + 0.9092(20/100) - 0.298(5000/10000)\} = 0.196\]</span></p>
+</section>
+<section id="model-diagnostics" class="level3">
+<h3 class="anchored" data-anchor-id="model-diagnostics">Model diagnostics</h3>
+<p>The Poisson model assumes that the Poisson distribution is a good choice for the response. What if it isn’t? To choose between a Poisson, quasi-Poisson, and negative binomial model, the researchers produce the following output in R:</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+glm(formula = visits ~ gender + age + income + insurance, family = quasipoisson, 
+    data = DoctorVisits)
+
+Coefficients:
+                   Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)        -1.66099    0.13948 -11.908  &lt; 2e-16 ***
+genderfemale        0.18533    0.08124   2.281   0.0226 *  
+age                 0.90922    0.23188   3.921 8.93e-05 ***
+income             -0.29751    0.12344  -2.410   0.0160 *  
+insuranceprivate    0.14918    0.10167   1.467   0.1423    
+insurancefreepoor  -0.40545    0.25803  -1.571   0.1162    
+insurancefreerepat  0.25013    0.13287   1.882   0.0598 .  
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for quasipoisson family taken to be 2.057397)
+
+    Null deviance: 5634.8  on 5189  degrees of freedom
+Residual deviance: 5417.7  on 5183  degrees of freedom
+AIC: NA
+
+Number of Fisher Scoring iterations: 6</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+glm.nb(formula = visits ~ gender + age + income + insurance, 
+    data = DoctorVisits, init.theta = 0.4319080953, link = log)
+
+Coefficients:
+                   Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept)        -1.68994    0.12316 -13.721  &lt; 2e-16 ***
+genderfemale        0.21565    0.07370   2.926  0.00343 ** 
+age                 0.92155    0.21373   4.312 1.62e-05 ***
+income             -0.28058    0.10965  -2.559  0.01050 *  
+insuranceprivate    0.13873    0.08902   1.558  0.11914    
+insurancefreepoor  -0.40597    0.21293  -1.907  0.05658 .  
+insurancefreerepat  0.25590    0.12315   2.078  0.03771 *  
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for Negative Binomial(0.4319) family taken to be 1)
+
+    Null deviance: 3119.9  on 5189  degrees of freedom
+Residual deviance: 2990.4  on 5183  degrees of freedom
+AIC: 7062
+
+Number of Fisher Scoring iterations: 1
+
+              Theta:  0.4319 
+          Std. Err.:  0.0316 
+
+ 2 x log-likelihood:  -7046.0330 </code></pre>
+</div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="exam_2_review_solutions_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+<ol start="6" type="1">
+<li>Using the R output above, explain which model you would use: the Poisson, quasi-Poisson, or negative binomial. It is possible that more than one model may be suitable for the data.</li>
+</ol>
+<p><strong>Solution:</strong> The quantile residual plot shows that the shape assumption is satisfied. For the Poisson model, however, the distribution assumption does not appear to be satisfied – examining the quantile residual plot, we see more variability than expected, and the estimated dispersion parameter is about 2. Because the residuals have approximately constant variance, either a quasi-Poisson or negative binomial model could be suitable here.</p>
+<ol start="7" type="1">
+<li><p>Sketch a quantile residual plot for a Poisson regression fit, which suggests that a negative binomial model is needed.</p></li>
+<li><p>Compare and contrast the quasi-Poisson model with the Poisson model. Which parts of the fitted model are the same? Which parts are different?</p></li>
+</ol>
+<p><strong>Solution:</strong> The estimated coefficients are the same, but the standard errors are different. Because the quasi-Poisson estimates the dispersion parameter, we use <span class="math inline">\(t\)</span> and <span class="math inline">\(F\)</span> tests for the quasi-Poisson (as opposed to <span class="math inline">\(z\)</span> and <span class="math inline">\(\chi^2\)</span> tests for the Poisson).</p>
+<ol start="9" type="1">
+<li>Using your chosen model from question 6, create a confidence interval for <span class="math inline">\(\beta_2\)</span> (the coefficient on income).</li>
+</ol>
+<p><strong>Solution:</strong></p>
+<p>Using the quasi-Poisson:</p>
+<p><span class="math display">\[-0.29751 \pm t^* (0.12344)\]</span></p>
+<p>The critical value for a 95% confidence interval, with a <span class="math inline">\(t_{5183}\)</span> distribution, is 1.96 (just like for a Normal(0, 1), because the df is large enough). This gives</p>
+<p><span class="math display">\[-0.29751 \pm 1.96 (0.12344) = (-0.539, -0.056)\]</span></p>
+<p>Using the negative binomial:</p>
+<p><span class="math display">\[-0.28058 \pm 1.96(0.10965) = (-0.495, -0.066)\]</span></p>
+</section>
+<section id="zip-models" class="level3">
+<h3 class="anchored" data-anchor-id="zip-models">ZIP models</h3>
+<p>Concerned about the possibility of zero-inflation, the researchers decide to fit a ZIP model instead:</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+zeroinfl(formula = visits ~ gender + age + income + insurance, data = DoctorVisits)
+
+Pearson residuals:
+    Min      1Q  Median      3Q     Max 
+-0.6321 -0.4544 -0.3766 -0.3197 12.4987 
+
+Count model coefficients (poisson with log link):
+                   Estimate Std. Error z value Pr(&gt;|z|)   
+(Intercept)         0.11676    0.16135   0.724  0.46929   
+genderfemale       -0.13686    0.08887  -1.540  0.12356   
+age                 0.36657    0.25216   1.454  0.14602   
+income             -0.40862    0.14448  -2.828  0.00468 **
+insuranceprivate   -0.12401    0.11844  -1.047  0.29507   
+insurancefreepoor   0.18349    0.26248   0.699  0.48451   
+insurancefreerepat -0.32347    0.14177  -2.282  0.02251 * 
+
+Zero-inflation model coefficients (binomial with logit link):
+                   Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept)          1.7045     0.2165   7.875 3.41e-15 ***
+genderfemale        -0.5208     0.1304  -3.994 6.49e-05 ***
+age                 -0.7968     0.3704  -2.151   0.0315 *  
+income              -0.1971     0.2010  -0.981   0.3267    
+insuranceprivate    -0.3882     0.1556  -2.494   0.0126 *  
+insurancefreepoor    0.7017     0.3103   2.261   0.0238 *  
+insurancefreerepat  -1.0136     0.2232  -4.541 5.59e-06 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+
+Number of iterations in BFGS optimization: 22 
+Log-likelihood: -3614 on 14 Df</code></pre>
+</div>
+</div>
+<ol start="10" type="1">
+<li>What is a potential latent variable which could cause excess 0s in this data?</li>
+</ol>
+<p><strong>Solution:</strong> Whether the study participant ever goes to the doctor</p>
+<ol start="11" type="1">
+<li>Write down the population ZIP model corresponding to the fitted ZIP model above. Make sure to include the random component!</li>
+</ol>
+<p><strong>Solution:</strong></p>
+<p><span class="math display">\[P(Y_i = y) = \begin{cases} e^{-\lambda_i}(1 - \alpha_i) + \alpha_i &amp; y = 0 \\ \dfrac{e^{-\lambda_i} \lambda_i^y}{y!}(1 - \alpha_i) &amp; y &gt; 0 \end{cases}\]</span></p>
+<p><span class="math display">\[\log \left( \dfrac{\alpha_i}{1 - \alpha_i} \right) = \gamma_0 + \gamma_1 Gender_i + \gamma_2 Age_i + \gamma_3 Income_i + \gamma_4 Private_i + \gamma_5FreePoor_i + \gamma_6 FreeRepat_i\]</span></p>
+<p><span class="math display">\[\log(\lambda_i) = \beta_0 + \beta_1 Gender_i + \beta_2 Age_i + \beta_3 Income_i + \beta_4 Private_i + \beta_5FreePoor_i + \beta_6 FreeRepat_i\]</span></p>
+<ol start="12" type="1">
+<li>What is the estimated number of doctor visits in the past 2 weeks for a male participant, aged 20, with no health insurance, who makes $5000 annually?</li>
+</ol>
+<p><strong>Solution:</strong></p>
+<p><span class="math display">\[\log \left( \dfrac{\widehat{\alpha}_i}{1 - \widehat{\alpha}_i} \right) = 1.70 - 0.80(0.2) - 0.20(0.5) = 1.44\]</span></p>
+<p><span class="math display">\[\log(\widehat{\lambda}_i) = 0.12 + 0.37(0.2) - 0.41(0.5) = -0.011\]</span> This gives <span class="math inline">\(\widehat{\alpha}_i = 0.808\)</span> and <span class="math inline">\(\widehat{\lambda}_i = 0.99\)</span>. So, the expected number of visits is <span class="math inline">\((1 - 0.808)0.99 = 0.19\)</span>.</p>
+<ol start="13" type="1">
+<li>What is the estimated probability that a male participant, aged 20, with no health insurance, who makes $5000 annually, did not go to the doctor in the past 2 weeks?</li>
+</ol>
+<p><strong>Solution:</strong></p>
+<p><span class="math inline">\(\widehat{P}(Y_i = 0) = e^{-\widehat{\lambda}_i}(1 - \widehat{\alpha}_i) + \widehat{\alpha}_i = e^{-0.99}(1 - 0.808) + 0.808 = 0.880\)</span></p>
+<ol start="14" type="1">
+<li>What does the logistic component of the ZIP model estimate? (i.e., the component that R calls the <code>zero-inflation model</code>, in contrast to the <code>count model</code>).</li>
+</ol>
+<p><strong>Solution:</strong> It estimates <span class="math inline">\(\widehat{\alpha}_i\)</span>, the probability that <span class="math inline">\(Z_i = 1\)</span> (i.e., the probability that the observation belongs to the group for which <span class="math inline">\(Y_i\)</span> is <em>always</em> 0, as opposed to the Poisson group).</p>
+</section>
+</section>
+<section id="more-questions" class="level1">
+<h1>More questions</h1>
+<p>(These are unrelated to the data scenario described above)</p>
+<p>Suppose we have data <span class="math inline">\((X_i, Y_i)\)</span> which was generated from the model</p>
+<p><span class="math display">\[Y_i \sim NB(\theta, p_i)\]</span></p>
+<p><span class="math display">\[\log(\mu_i) = \beta_0 + \beta_1 X_i\]</span></p>
+<ol start="15" type="1">
+<li>Write down <span class="math inline">\(Var(Y_i)\)</span> as a function of <span class="math inline">\(\mu_i\)</span> and <span class="math inline">\(\theta\)</span>.</li>
+</ol>
+<p><strong>Solution:</strong> <span class="math inline">\(Var(Y_i) = \mu_i + \dfrac{\mu_i^2}{\theta}\)</span></p>
+<ol start="16" type="1">
+<li>For a Poisson, the mean and variance are the same. As <span class="math inline">\(\theta\)</span> increases, does the negative binomial look <em>more</em> like a Poisson distribution, or <em>less</em> like a Poisson distribution? Explain your reasoning.</li>
+</ol>
+<p><strong>Solution:</strong> If <span class="math inline">\(\mu_i\)</span> stays constant while <span class="math inline">\(\theta \to \infty\)</span>, then <span class="math inline">\(Var(Y_i) \to \mu_i\)</span>, so the negative binomial looks more like a Poisson.</p>
+<ol start="17" type="1">
+<li>Suppose that we don’t know that the correct distribution of <span class="math inline">\(Y_i\)</span> is Negative Binomial. Instead, we fit a Poisson regression model.
+<ul>
+<li>Will the estimate <span class="math inline">\(\widehat{\beta}_1\)</span> be a <em>biased</em> estimator of the true parameter <span class="math inline">\(\beta_1\)</span>? Or will, on average, <span class="math inline">\(\widehat{\beta}_1\)</span> be close to <span class="math inline">\(\beta_1\)</span>? Explain, with reference to a simulation study from homework.</li>
+<li>Let <span class="math inline">\(SE(\widehat{\beta}_1)_{Poisson}\)</span> be the estimated standard error for <span class="math inline">\(\widehat{\beta}_1\)</span> from the Poisson model (i.e., the value that appears in the “standard error” column of the model output). Will this standard error be too big, too small, or just right?</li>
+</ul></li>
+</ol>
+<p><strong>Solution:</strong> The shape assumption for the Poisson model matches the shape assumption for the negative binomial. As we saw in simulations on HW 7, the bias will be pretty small. That is, on average <span class="math inline">\(\widehat{\beta}_1\)</span> be close to <span class="math inline">\(\beta_1\)</span>.</p>
+<p>However, the estimated standard error from the Poisson model will be too small, because there is more variability in the data than accounted for by the Poisson model.</p>
+<ol start="18" type="1">
+<li>Using our fitted Poisson regression model, we construct a 95% confidence interval for <span class="math inline">\(\beta_1\)</span>. Recall that a “95% confidence interval” means that, if we were to repeat the study many times with many different datasets, 95% of the intervals would contain the true parameter <span class="math inline">\(\beta_1\)</span>. The fraction of intervals which capture the true parameter is called the <em>coverage</em>. If I construct 95% confidence intervals from a Poisson model, for data that is really negative binomial, what should I expect for the coverage of my intervals? Explain.
+<ol type="a">
+<li>95%</li>
+<li>Less than 95%</li>
+<li>Greater than 95%</li>
+</ol></li>
+</ol>
+<p><strong>Solution:</strong> (b) less than 95%. The Poisson model doesn’t capture the full amount of variability in the response. As a result, the standard errors estimated by the Poisson model are too small, and the confidence intervals are too narrow. This results in reduced coverage.</p>
+<ol start="19" type="1">
+<li>Instead of fitting a Poisson model, we consider a quasi-Poisson model. Let <span class="math inline">\(SE(\widehat{\beta}_1)_{QP}\)</span> be the estimated standard error from the quasi-Poisson model.
+<ul>
+<li>Provide the equation relating <span class="math inline">\(SE(\widehat{\beta}_1)_{QP}\)</span> to <span class="math inline">\(SE(\widehat{\beta}_1)_{Poisson}\)</span></li>
+<li>In the scenario described above (in which the true data come from a negative binomial distribution), do you expect <span class="math inline">\(SE(\widehat{\beta}_1)_{QP}\)</span> to be larger, smaller, or the same as <span class="math inline">\(SE(\widehat{\beta}_1)_{Poisson}\)</span>?</li>
+</ul></li>
+</ol>
+<p><strong>Solution:</strong></p>
+<p><span class="math display">\[SE(\widehat{\beta}_1)_{QP} = \left(\sqrt{\widehat{\phi}}\right)SE(\widehat{\beta}_1)_{Poisson}\]</span> If the true data come from a negative binomial, we would expect <span class="math inline">\(SE(\widehat{\beta}_1)_{QP}\)</span> to be larger than <span class="math inline">\(SE(\widehat{\beta}_1)_{Poisson}\)</span>, because there is greater variability in the response which will be captured (to some extent) by the estimated dispersion parameter <span class="math inline">\(\widehat{\phi}\)</span>.</p>
+<ol start="20" type="1">
+<li>How is the dispersion parameter <span class="math inline">\(\phi\)</span> estimated for a Poisson / quasi-Poisson fit? Provide the full formula.</li>
+</ol>
+<p><strong>Solution:</strong></p>
+<p>The <span class="math inline">\(i\)</span>th Pearson residual for a Poisson fit is</p>
+<p><span class="math display">\[e_{(P)i} = \dfrac{Y_i - \widehat{\lambda}_i}{\sqrt{\widehat{\lambda}_i}}\]</span> Then,</p>
+<p><span class="math display">\[\widehat{\phi} = \frac{1}{n-p} \sum \limits_{i=1}^n e_{(P)i}^2\]</span></p>
+<ol start="21" type="1">
+<li>If the data truly come from a Poisson distribution, what should be the approximate value of <span class="math inline">\(\widehat{\phi}\)</span>?</li>
+</ol>
+<p><strong>Solution:</strong> <span class="math inline">\(\widehat{\phi} \approx 1\)</span></p>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

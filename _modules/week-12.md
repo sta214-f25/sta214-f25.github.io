@@ -10,7 +10,7 @@ November 12
   : [slides](https://sta214-f25.github.io/slides/lecture_31.pdf), [activity 1](https://sta214-f25.github.io/class_activities/ca_30_handout_2.pdf)
   
 : Exam 2 review questions
-  : [review](https://sta214-f25.github.io/class_activities/exam_2_review.html)
+  : [review](https://sta214-f25.github.io/class_activities/exam_2_review.html), [review solutions](https://sta214-f25.github.io/class_activities/exam_2_review_solutions.html)
     
 November 14
 : Mixed effects models
