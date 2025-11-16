@@ -1,0 +1,100 @@
+---
+title: "Class activity"
+format: html
+---
+
+**Instructions:** 
+
+* Work individually or with a neighbor to answer the following questions 
+* To get started, download the [class activity template](https://sta214-f25.github.io/class_activities/ca_33_template.qmd) file
+* When you are finished, render the file as an HTML and submit the HTML to Canvas (let me know if you encounter any problems)
+
+# Data
+
+Researchers have observed many species for which larger offspring have a biological fitness advantage over smaller offspring, but there have been competing hypotheses for why this is the case, and there are exceptions. In the paper "Why does offspring size affect performance? Integrating metabolic scaling with life-history theory" (Pattersen et al. 2015, *Proc. R. Soc. B.*), the authors propose that larger offspring are more efficient in energy consumption and thus have greater fitness.
+
+To investigate, the authors collected data on two species of marine bryozoan, *Bugula neritina* and *Watersipora subtorquata*. After initial growth, the developmental process of these two species consists of three phases before they are considered mature - a larval stage (before the individual settles and begins metamorphosis), an early post-settlement stage, and a late post-settlement stage (as the individual nears the end of metamorphosis).
+
+Here we have data from 568 individuals from these two species, measured at the three different developmental stages. For each individual, the researchers recorded the mass (in micrograms) and the rate of oxygen consumption. The rate of oxygen consumption was then converted into the metabolic rate (rate of energy consumption), based on the amount of energy in oxygen.
+
+Note that the same individuals were measured at the early and late stages, so while there are 568 individuals in the data, the dataset has 823 rows.
+
+The different columns are:
+
+* *Species:* 	Species of the organism measured, either bugula (Bugula neritina) or watersipora (Watersipora subtorquata)
+* *Stage:* Developmental stage of the organism (larvae = larval stage, early = early post-settlement stage, late = late post-settlement stage)
+* *Run:* Which run of the study the individual was recorded in. Several runs were done for each species
+* *Mass:* Mass of the individual (in micrograms)
+* *Metabolic:* Recorded metabolic rate (rate of energy consumption) of the individual (in mJ per hour)
+
+
+### Downloading the data
+
+The following code imports the data and saves it as a data frame called `bryozoan`, then subsets the data to focus only on the early-stage *bugula*:
+
+```r
+bryozoan <- read_csv("https://sta214-f25.github.io/slides/bryozoan_data.csv")
+bugula_early <- bryozoan |>
+  filter(Stage == "early", Species == "bugula")
+```
+
+# Questions
+
+Different individuals were measured in different runs of the study. We wonder if this could lead to a natural grouping effect, in which observations in the same run are correlated. To attempt to answer this question, we fit the mixed effects model
+
+$$Metabolic_{ij} = \beta_0 + u_i + \varepsilon_{ij} \hspace{1cm} u_i \overset{iid}{\sim} N(0, \sigma_u^2), \hspace{0.2cm} \varepsilon_{ij} \overset{iid}{\sim} N(0, \sigma_\varepsilon^2)$$
+
+and we calculate the intra-class correlation coefficient, which in this case is about 3%. The question is whether this is an unusual intra-class correlation, if in fact there are no systematic differences between runs (i.e., $\sigma_u^2 = 0$).
+
+## Step 1: Fit a reduced model
+
+Under the null hupothesis ($\sigma_u^2 = 0$), the reduced model is
+
+$$Metabolic_{ij} = \beta_0 + \varepsilon_{ij} \hspace{1cm} \varepsilon_{ij} \overset{iid}{\sim} N(0, \sigma_\varepsilon^2)$$
+
+1. Fit this reduced model in R, and report $\widehat{\beta}_0$ and $\widehat{\sigma}_\varepsilon^2$.
+
+## Step 2: Pretend the reduced model is correct, and simulate from the reduced model
+
+Now let's pretend that the reduced model is correct. To see what data could look like under the reduced model, we will simulate using the estimated parameters from the fitted reduced model.
+
+Our simulated metabolic rates will be 
+
+$$Metabolic_{ij}^* = \widehat{\beta}_0 + \varepsilon_{ij}^*$$
+
+where $\varepsilon_{ij}^* \overset{iid}{\sim} N(0, \widehat{\sigma}_\varepsilon^2)$.
+
+2. Let $n$ be the number of rows in the `bugula_early` dataset. Using the `rnorm` function, simulate $n$ new errors $\varepsilon^*$.
+
+3. Create $n$ new observed metabolic rates, $Metabolic_{ij}^*$, by adding $\widehat{\beta}_0$ to your $n$ errors from question 2.
+
+## Step 3: Fit the full model on the simulated data
+
+Now we want to fit the *full* model (which includes the random effect term $u_i$) to the simulated data, and calculate the ICC. Since the data were simulated *under the null hypothesis*, this will give us a sense of what the ICC could be *when the null hypothesis is true*.
+
+4. Using your simulated data from question 3, fit the mixed effects model
+
+$$Metabolic_{ij} = \beta_0 + u_i + \varepsilon_{ij} \hspace{1cm} u_i \overset{iid}{\sim} N(0, \sigma_u^2), \hspace{0.2cm} \varepsilon_{ij} \overset{iid}{\sim} N(0, \sigma_\varepsilon^2)$$
+
+5. Calculate the intra-class correlation coefficient from the model in question 4.
+
+## Step 4: Repeat!
+
+The ICC calculated in question 5 is only one value. We really want to see what the *distribution* of $\widehat{\rho}_{group}$ looks like under the null hypothesis, which means we need to repeat the process many times.
+
+6. Repeat steps 2 and 3 many times using a `for` loop. Store the result of each repetition of the simulation (i.e, the calculated ICC). You should get a vector of ICCs, one for each repetition of the simulation.
+
+*Hint:* The extract the ICC automatically from the model output, the following code will work (if you called your fitted model `m_sim`):
+
+```{r, eval=F}
+variance_ests <- as.data.frame(summary(m_sim)$varcor)
+variance_ests[1,4]/(variance_ests[1,4] + variance_ests[2,4])
+```
+
+7. Make a histogram of the ICC values. Does a value of 3% seem unusual, if in fact $\sigma_u^2 = 0$?
+
+
+
+
+
+

@@ -1,0 +1,140 @@
+---
+title: Inference with mixed effects
+output:
+  xaringan::moon_reader:
+    css: "lab-slides.css"
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+editor_options: 
+  chunk_output_type: console
+---
+
+### Agenda
+
+.large[
+* Project part 3 due last day of class
+  * No additional analysis needed; just combining work from first two parts and adding introduction, conclusion, etc.
+  * There will be time during the last week of class to work on the project
+* Exam 2 Friday
+  * Review day on Wednesday in class
+]
+
+---
+
+### Data and Goal
+
+.large[
+```{r include=F}
+library(lme4)
+library(tidyverse)
+library(knitr)
+
+bryozoan <- read_csv("bryozoan_data.csv")
+
+bugula_early <- bryozoan %>%
+  filter(Stage == "early", Species == "bugula")
+```
+
+We have date on 197 early-stage *Bugula neritina*, with information on
+
+* `Run`: which repetition of the experiment the individual was recorded in
+* `Mass`: Mass of the individual (in micrograms)
+* `Metabolic`: Recorded metabolic rate (rate of energy consumption) of the individual (in mJ per hour)
+
+.question[
+**Goal for this class:** Is there systematic variation between different runs (i.e., is there any correlation due to Run)?
+]
+]
+
+---
+
+### Visualizing runs
+
+.large[
+
+```{r echo=F, message=F, warning=F, fig.align='center', fig.width=7, fig.height=4.5}
+bugula_early %>%
+  ggplot(aes(x = as.factor(Run), y = Metabolic)) +
+  geom_boxplot() +
+  theme_bw() +
+  labs(x = "Run") +
+  theme(text = element_text(size = 15))
+```
+
+.question[
+Does it look like there is variation from run to run (i.e., do we need $u_i$ )?
+]
+]
+
+---
+
+### Visualizing runs
+
+.large[
+
+```{r echo=F, message=F, warning=F, fig.align='center', fig.width=7, fig.height=4.5}
+bugula_early %>%
+  ggplot(aes(x = as.factor(Run), y = Metabolic)) +
+  geom_boxplot() +
+  theme_bw() +
+  labs(x = "Run") +
+  theme(text = element_text(size = 15))
+```
+
+It is hard to tell if there are actually differences between runs, or if observed differences are just due to chance.
+
+.question[
+How can I estimate variability between runs?
+]
+]
+
+---
+
+### Initial random intercepts model
+
+.large[
+$$Metabolic_{ij} = \beta_0 + u_i + \varepsilon_{ij} \hspace{1cm} u_i \overset{iid}{\sim} N(0, \sigma_u^2), \hspace{0.2cm} \varepsilon_{ij} \overset{iid}{\sim} N(0, \sigma_\varepsilon^2)$$
+
+```{r eval=F}
+m1 <- lmer(Metabolic ~ (1|Run), data = bugula_early)
+summary(m1)
+```
+
+```
+Random effects:
+ Groups   Name        Variance Std.Dev.
+ Run      (Intercept) 0.000131 0.01145 
+ Residual             0.004181 0.06466
+```
+]
+
+
+---
+
+### Initial random intercepts model
+
+.large[
+$$Metabolic_{ij} = \beta_0 + u_i + \varepsilon_{ij} \hspace{1cm} u_i \overset{iid}{\sim} N(0, \sigma_u^2), \hspace{0.2cm} \varepsilon_{ij} \overset{iid}{\sim} N(0, \sigma_\varepsilon^2)$$
+
+$\widehat{\beta}_0 = 0.175$, $\hspace{0.5cm} \widehat{\sigma}_u^2 = 0.00013$, $\hspace{0.5cm} \widehat{\sigma}_\varepsilon^2 = 0.0042$
+
+.question[
+How would we test whether there is systematic variation between runs?
+]
+
+]
+
+---
+
+### Plan
+
+---
+
+### Class activity
+
+.large[
+Work on the class activity. Submit your HTML on canvas at the end of class.
+]

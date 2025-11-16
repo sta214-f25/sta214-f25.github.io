@@ -1,0 +1,26 @@
+---
+---
+---
+title: "Class activity"
+format: 
+  html:
+    embed-resources: true
+editor: source
+author: "Group members: "
+---
+
+```{r setup, message=F, warning=F}
+library(tidyverse)
+library(lme4)
+bryozoan <- read_csv("https://sta214-f25.github.io/slides/bryozoan_data.csv")
+bugula_early <- bryozoan |>
+  filter(Stage == "early", Species == "bugula")
+```
+
+
+1. 
+
+```{r}
+
+```
+
