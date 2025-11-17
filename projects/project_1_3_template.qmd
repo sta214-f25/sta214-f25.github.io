@@ -1,0 +1,18 @@
+---
+---
+---
+title: "Project Part 3"
+author: "Your Name"
+format: 
+  html:
+    embed-resources: true
+editor: source
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+```
+
+
+
+
