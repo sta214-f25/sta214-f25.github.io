@@ -11,6 +11,7 @@ November 17
 
 November 19
 : Exam 2 review day
+  : [review slides](https://sta214-f25.github.io/slides/exam_2_review.pdf)
     
 November 21
 : Exam 2
