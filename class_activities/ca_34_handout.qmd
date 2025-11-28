@@ -1,0 +1,23 @@
+---
+title: "Activity"
+format: pdf
+editor: source
+---
+
+\vspace{-2.5cm}
+
+**Group members:**
+
+\vspace{-0.5cm}
+
+# Mixed effects models
+
+Anxiety can affect musicians before performances, and can negatively affect their ability to play and their emotional state. In a 2010 study, researchers examined anxiety in 37 undergraduate music majors. For each musician, data was collected on anxiety levels before different performances (between 2 and 15 performances were measured for each musician). Each row in the data represents one performance, and variables include
+
+* `id`: a unique identifier for the musician
+* `na`: negative affect score (a measure of anxiety)
+* `large`: whether the musician was performing as part of a large ensemble (large = 1), or as part of a small ensemble or solo (large = 0)
+
+Researchers hypothesize that anxiety will be lower before large ensemble performance (because the student is one of many performers). Researchers also expect that anxiety levels will vary from student to student, and the difference in performance anxiety between large and small performances will also vary from person to person.
+
+1. What mixed effects model should the researchers use to investigate their hypothesis?
