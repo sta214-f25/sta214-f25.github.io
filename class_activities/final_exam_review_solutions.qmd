@@ -1,0 +1,180 @@
+---
+title: "Final exam review questions"
+format: html
+---
+
+**The final exam in this class will be cumulative**, covering everything we have learned from logistic regression through mixed effects models. 
+
+To review the material from logistic regression and count regression (Poisson, quasi-Poisson, ZIP, etc.), look back at the review questions for the first two exams.
+
+Below are questions on mixed effects models to help you study this portion of the course. These are some examples of the kinds of questions I might ask.
+
+## Data
+
+Here we will work with data on the mobility scores for 8510 patients seen by doctors in a large healthcare system. Each row in the data represents one patient, and we have the following variables recorded for each patient:
+
+* `mobility`: their mobility score. This is a continuous variable, and higher values represent greater mobility
+* `sex`: the patient's sex, recorded as male (sex = 0) or female (sex = 1)
+* `age`: the patient's age in years
+* `married`: the patient's marital status (1 if married, 0 if not married)
+* `doctorID`: and ID for the doctor that the patient visited (values from 1 to 230). Each doctor sees multiple patients in the dataset
+
+Researchers believe that mobility scores will vary from patient to patient, and also from doctor to doctor. Furthermore, they believe that mobility scores depend on the patient's sex, age, and marital status.
+
+## Questions
+
+1. Mixed effects models are useful when there are group effects in our data. What are the groups in this data, and what are the observations within each group?
+
+**Solution:** The groups in this data are the different doctors, and the observations within each group are the patients. Every row corresponds to a different patient, but each doctor sees multiple patients, so there are multiple rows in the data related to each doctor.
+
+2. Write down a population mixed effects model that matches the researchers' beliefs. Make sure to include all pieces of the population model, and explain what your subscripts represent!
+
+**Solution:** 
+
+$$\text{Mobility}_{ij} = \beta_0 + u_i + \beta_1 \text{Sex}_{ij} + \beta_2 \text{Age}_{ij} + \beta_3 \text{Married}_{ij} + \varepsilon_{ij}$$
+
+where $\text{Mobility}_{ij}$ represents the mobility score of patient $j$ for doctor $i$, and
+
+$$u_i  \overset{iid}{\sim} N(0, \sigma_u^2) \hspace{1cm} \varepsilon_{ij}  \overset{iid}{\sim} N(0, \sigma_{\varepsilon}^2)$$
+
+Important notes: when writing down a mixed effects model,
+
+* Make sure to include distributions for random effects and noise
+* Be careful about subscripts -- since the subscripts tell us at which level our variables are observed, we need to get them right. It helps to explain what the subscripts represent when you write down the model
+
+### Fitted model
+
+We now fit the mixed effects model in R, producing the following output:
+
+```
+Random effects:
+ Groups   Name        Variance Std.Dev.
+ doctorID (Intercept) 0.165    0.4062  
+ Residual             1.038    1.0189  
+Number of obs: 8510, groups:  doctorID, 230
+
+Fixed effects:
+             Estimate Std. Error 
+(Intercept) -0.154277   0.148705  
+sex          0.522167   0.022378 
+age          0.051686   0.002234 
+married      0.251665   0.022367 
+```
+
+
+```{r, include=F, eval=F}
+set.seed(3)
+m <- 230
+n <- 37
+sex <- rbinom(m*n, 1, 0.5)
+age <- rnorm(m*n, 65, 5)
+married <- rbinom(m*n, 1, 0.5)
+doctorID <- rep(1:m, each=n)
+u <- rnorm(m, sd=0.4)
+noise <- rnorm(m*n)
+mobility <- 0.5*sex + 0.05*age + 0.3*married + u[doctorID] + noise
+
+m1 <- lmer(mobility ~ sex + age + married + (1|doctorID))
+summary(m1)
+```
+
+3. Interpret each of the estimated fixed effects coefficients in the model.
+
+**Solution:**
+
+* $\widehat{\beta}_0 = -0.154$. On average (across all doctors), an unmarried male patient, aged 0, has a mobility score of -0.154. (Of course, an age of 0 is impossible)
+* $\widehat{\beta}_1 = 0.522$. For a given doctor, and holding age and marital status fixed, female patients have an average mobility score that is 0.522 units higher than male patients.
+* $\widehat{\beta}_2 = 0.052$. For a given doctor, and holding sex and marital status fixed, a one-year increase in age is associated with an average increase of 0.052 in the mobility score.
+* $\widehat{\beta}_3 = 0.252$. For a given doctor, and holding sex and age fixed, on average married patients have a mobility score that is 0.252 units higher than unmarried patients.
+
+4. Interpret the values 0.165 and 1.038 in the model output.
+
+**Solution:** 
+
+* $\widehat{\sigma}_u^2 = 0.165$, which means that patient mobility scores tend to vary by around $\sqrt{0.165} = 0.406$ points between doctors.
+* $\widehat{\sigma}_\varepsilon^2 = 1.038$, which means that for patients seen by the same doctor, mobility scores tend to vary by around $\sqrt{1.038} = 1.02$ points from patient to patient
+
+5. Using the model output, does there appear to be systematic variation in mobility scores between doctors? Calculate an appropriate statistic.
+
+**Solution:** 
+
+$$\widehat{\rho}_{group} = \dfrac{\widehat{\sigma}_u^2}{\widehat{\sigma}_u^2 + \widehat{\sigma}_\varepsilon^2} = \dfrac{0.165}{0.165 + 1.038} = 0.137$$
+
+That is, after accounting for the effects of sex, age, and marital status, about 14% of the variability in patient mobility scores can be explained by differences between doctors.
+
+This is a small to moderate amount of intra-class correlation; there may be some systematic variation in mobility scores between doctors.
+
+6. Below is output for the 214th doctor in the dataset. For doctor 214, what is the predicted mobility score for a female patient, unmarried, of age 65?
+
+```
+doctorID    (Intercept)       sex        age   married
+214          -0.2902217 0.5221674 0.05168561 0.2516646
+```
+
+**Solution:**
+
+$$-0.29 + 0.522 + 0.052(65) = 3.62$$
+
+### Inference
+
+7. Suppose you want to test whether there is systematic variation in mobility scores between doctors, after accounting for patient sex, age, and marital status. Write down the null and alternative hypotheses, and describe what your reduced model would be (you may treat the model whose output is shown above as your full model).
+
+**Solution:**
+
+$$H_0: \sigma_u^2 = 0 \hspace{1cm} H_A: \sigma_u^2 > 0$$
+
+The reduced model removes the random effect term $u_i$:
+
+$$\text{Mobility}_{ij} = \beta_0 + \beta_1 \text{Sex}_{ij} + \beta_2 \text{Age}_{ij} + \beta_3 \text{Married}_{ij} + \varepsilon_{ij}$$
+
+8. Now suppose instead that you want to test whether there is a relationship between patients' marital status and mobility scores, after accounting for sex, age, and systematic variation between doctors. Write down the null and alternative hypotheses, and describe what your reduced model would be (you may treat the model whose output is shown above as your full model).
+
+**Solution:**
+
+$$H_0: \beta_3 = 0 \hspace{1cm} H_A: \beta_3 \neq 0$$
+
+The reduced model removes marital status, but does include the random effect (because we still want to account for possible systematic variation between doctors):
+
+$$\text{Mobility}_{ij} = \beta_0 + u_i + \beta_1 \text{Sex}_{ij} + \beta_2 \text{Age}_{ij} + \varepsilon_{ij}$$
+
+
+Now you fit your reduced model from question 8, producing the following output:
+
+```
+Random effects:
+ Groups   Name        Variance Std.Dev.
+ doctorID (Intercept) 0.1746   0.4179  
+ Residual             1.0538   1.0266  
+Number of obs: 8510, groups:  doctorID, 230
+
+Fixed effects:
+             Estimate Std. Error 
+(Intercept) -0.043115   0.149453 
+sex          0.540829   0.022546 
+age          0.053930   0.002251
+```
+
+9. Describe how you would use parametric bootstrapping to carry out the hypothesis test from the question. Provide as much detail as you can, so that someone could turn your description into R code if they wanted to (you do not need to write code, though you may choose to if it helps you explain your procedure). Your description should include details like values for the parameters of the model you will simulate from, how many simulations you will use, and how you will calculate a test statistic for each simulation.
+
+```{r, include=F, eval=F}
+m2 <- lmer(mobility ~ sex + age + (1|doctorID))
+summary(m2)
+```
+
+**Solution:**
+
+* Step 0: Calculate the log-likelihood for the reduced and full models, fit on the *observed* data (i.e., the models whose output is shown above). Our test statistic is the LRT statistic: $G = 2 \log L_{full} - 2 \log L_{reduced}$
+* Step 1: Using the fitted reduced model, simulate a new response $\text{Mobility}_{ij}^*$ for each row of the data
+    * Generate 230 new random effects $u_i^* \overset{iid}{\sim} N(0, 0.1746)$
+    * Generate 8510 new noise terms $\varepsilon_{ij}^* \overset{iid}{\sim} N(0, 1.0538)$
+    * Then $\text{Mobility}_{ij}^* = -0.0431 + u_i^* + 0.5408 \text{Sex}_{ij} + 0.0539 \text{Age}_{ij} + \varepsilon_{ij}^*$
+* Step 2: Using the new simulated data, fit the full and reduced models, and calculate the LRT test statistic. Let $G^*$ be the test statistic calculated on the simulated data
+* Step 3: Repeat Steps 1 - 2 many times (e.g., $B = 1000$ times). This produces $B$ bootstrap test statistics, one for each simulated dataset: $G_1^*,...,G_B^*$
+* Step 4: The p-value for our hypothesis test is the fraction of times we have a bootstrap test statistic $G^*$ which is as or more extreme than the observed test statistic $G$ (from step 0):
+
+$$p = \dfrac{\#\{G_k^* \geq G\}}{B}$$
+
+
+
+
+
