@@ -1,0 +1,103 @@
+---
+title: "Class activity solutions"
+format: html
+---
+
+
+# Data
+
+Anxiety can affect musicians before performances, and can negatively affect their ability to play and their emotional state. In a [2010 study](https://journals.sagepub.com/doi/10.1177/1948550610370492), researchers examined anxiety in 37 undergraduate music majors. For each musician, data was collected on anxiety levels before different performances (between 2 and 15 performances were measured for each musician). Each row in the data represents one performance; in this activity, we will work with the following variables:
+
+* `id`: a unique identifier for the musician
+* `na`: negative affect score (a measure of anxiety)
+* `large`: whether the musician was performing as part of a large ensemble (large = 1), or as part of a small ensemble or solo (large = 0)
+* `audience`: who attended (Instructor, Public, Students, or Juried)
+
+The researchers hypothesize that audience type might impact performer anxiety, and that after accounting for audience type, students will be less anxious when performing in large ensembles. Furthermore, the researchers suspect that overall anxiety varies between individuals, *and* that the effect of ensemble size (large vs. small) is different for different individuals.
+
+
+
+### Downloading the data
+
+The following code imports the data and saves it as a data frame called `music`:
+
+```r
+music <- read_csv("https://sta214-f25.github.io/class_activities/music.csv")
+```
+
+# Questions
+
+1. Write down a mixed effects model that matches the researchers' hypothesis.
+
+**Solution:**
+
+$$\text{Anxiety}_{ij} = \beta_0 + u_i + \beta_1 \text{Juried}_{ij} + \beta_2 \text{Public}_{ij} + \beta_3 \text{Student}_{ij} + (\beta_4 + v_i)\text{Large}_{ij} + \varepsilon_{ij}$$
+
+$\varepsilon_{ij} \overset{iid}{\sim} N(0, \sigma_\varepsilon^2) \hspace{1cm} \begin{bmatrix} u_i \\ v_i \end{bmatrix} \overset{iid}{\sim} N \left( \begin{bmatrix} 0 \\ 0 \end{bmatrix}, \begin{bmatrix} \sigma_u^2 & \rho_{uv}\sigma_u \sigma_v \\ \rho_{uv}\sigma_u \sigma_v & \sigma_v^2 \end{bmatrix} \right)$
+
+2. Fit the mixed effects model in R, and report and interpret the estimated parameters.
+
+**Solution:**
+
+```{r, message=F, warning=F}
+library(tidyverse)
+library(lme4)
+
+music <- read_csv("https://sta214-f25.github.io/class_activities/music.csv")
+
+m1 <- lmer(na ~ audience + large + (large|id), data = music)
+summary(m1)
+```
+
+* $\widehat{\beta}_0 = 14.96$. On average (across all students), students had an anxiety score of 14.96 before small performances in front of only the instructor.
+* $\widehat{\beta}_1 = 3.87$. For a given student and ensemble size, anxiety was 3.87 points higher, on average, before juried recitals than before instructor-only performances.
+* $\widehat{\beta}_2 = 2.28$. For a given student and ensemble size, anxiety was 2.28 points higher, on average, before public performances than before instructor-only performances.
+* $\widehat{\beta}_3 = 3.28$. For a given student and ensemble size, anxiety was 3.28 points higher, on average, before student performances than before instructor-only performances.
+* $\widehat{\beta}_4 = -2.18$. The average effect of large ensembles (vs small ensembles), across all students and holding audience type fixed, is a decrease of 2.18 points in anxiety.
+
+3. Create a QQ plot for the residuals. Does it seem reasonable to assume normality here?
+
+**Solution:**
+
+```{r, message=F}
+data.frame(residuals = residuals(m1)) |>
+  ggplot(aes(sample = residuals)) +
+  geom_qq() +
+  geom_qq_line() +
+  theme_bw() +
+  labs(x = "Theoretical normal quantiles",
+       y = "Observed residual quantiles")
+```
+
+There are some departures from normality in the tails here -- we can see that the right tail is too heavy, and the left tail is too light, which suggests a right-skewed distribution for the residuals. However, I don't think the departure from normality is so extreme as to warrant a transformation of the response.
+
+4. Create a QQ plot for the random intercepts $\widehat{u}_i$. Does it seem reasonable to assume normality here?
+
+**Solution:** Normality does seem reasonable:
+
+```{r, message=F}
+data.frame(ranefs = ranef(m1)$id[,1]) |>
+  ggplot(aes(sample = ranefs)) +
+  geom_qq() +
+  geom_qq_line() +
+  theme_bw() +
+  labs(x = "Theoretical normal quantiles",
+       y = "Observed random effect quantiles")
+```
+
+5. Create a QQ plot for the random slopes $\widehat{v}_i$. Does it seem reasonable to assume normality here?
+
+
+**Solution:** Normality does seem reasonable:
+
+```{r, message=F}
+data.frame(ranefs = ranef(m1)$id[,2]) |>
+  ggplot(aes(sample = ranefs)) +
+  geom_qq() +
+  geom_qq_line() +
+  theme_bw() +
+  labs(x = "Theoretical normal quantiles",
+       y = "Observed random effect quantiles")
+```
+
+
