@@ -14,4 +14,4 @@ November 12
     
 November 14
 : Mixed effects models
-  : [slides](https://sta214-f25.github.io/slides/lecture_32.pdf), [activity 1](https://sta214-f25.github.io/class_activities/ca_31_handout.pdf), [activity 2](https://sta214-f25.github.io/class_activities/ca_32.html)
+  : [slides](https://sta214-f25.github.io/slides/lecture_32.pdf), [activity 1](https://sta214-f25.github.io/class_activities/ca_31_handout.pdf), [activity 2](https://sta214-f25.github.io/class_activities/ca_32.html), [activity 2 solutions](https://sta214-f25.github.io/class_activities/ca_32_solutions.html)
