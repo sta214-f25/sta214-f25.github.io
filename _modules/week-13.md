@@ -4,7 +4,7 @@ title: Mixed effects models, Exam 2
 
 November 17
 : Mixed effects models
-  : [slides](https://sta214-f25.github.io/slides/lecture_33.pdf), [activity](https://sta214-f25.github.io/class_activities/ca_33.html)
+  : [slides](https://sta214-f25.github.io/slides/lecture_33.pdf), [activity](https://sta214-f25.github.io/class_activities/ca_33.html), [activity solutions](https://sta214-f25.github.io/class_activities/ca_33_solutions.html)
   
 : **Project part 3 released**{: .label .label-green }
   : [Part 3](https://sta214-f25.github.io/projects/project_1_3.html)
