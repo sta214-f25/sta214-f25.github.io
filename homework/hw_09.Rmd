@@ -37,7 +37,7 @@ The following code imports the data and saves it as a data frame called `music`:
 
 ```r
 library(tidyverse)
-music <- read_csv("https://sta214-f25.github.io/slides/musicdata.csv")
+music <- read_csv("https://sta214-f25.github.io/class_activities/music.csv")
 ```
 
 # Parametric bootstrapping
